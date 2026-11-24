@@ -1,0 +1,40 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-24: 24px;
+  --radius-32: 32px;
+  --radius-full: 999px;
+  --size-margin: 16px;
+  --size-control: 44px;
+  --size-button-large: 50px;
+  --size-header: 44px;
+  --size-tabbar: 62px;
+  --size-tabbar-inset: 20px;
+  --safe-top: 62px;
+  --safe-bottom: 34px;
+  --effect-shadow-brand-card: 0 12px 30px -10px rgba(184, 18, 18, 0.35);
+  --effect-shadow-pin: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
+  --effect-shadow-sheet: 0 -4px 24px 0 rgba(0, 0, 0, 0.12);
+  --effect-shadow-bottom-bar: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+  --effect-glass-bar: 0 6px 24px 0 rgba(0, 0, 0, 0.1);
+  --effect-glass-control: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
+  --effect-glass-input: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
+  --motion-spring-smooth: 0.5s 0;
+  --motion-spring-snappy: 0.35s 0.15;
+  --motion-spring-bouncy: 0.5s 0.3;
+  --motion-spring-sheet-release: 0.4s 0.15;
+  --motion-ease-fade: 0.2s;
+  --motion-ease-press: 0.1s;
+}

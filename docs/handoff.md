@@ -1,0 +1,274 @@
+# Movitae Redesign — HANDOFF COMPLETO (aggiornato 24 nov 2026, fase 6 in corso: progetto, token e cornice fatti)
+
+Questo file basta per riprendere il progetto in una nuova conversazione. Leggerlo per primo, poi claude/movitae-flussi.md (tutti i flussi passo per passo). Dove flussi.md o claude/movitae-correzioni-dopo-round9.md dicono cose diverse vale questo file.
+
+## Contesto
+- Nicolò, studente magistrale LM-91 UX Design (LUMSA), cerca tirocinio UX/UI/Product (candidature da subito; scadenza gennaio).
+- Movitae: progetto universitario di gruppo (team di 7, ott 2025 – mag 2026). Nicolò ha curato concept, architettura dell'informazione, wireframe, direzione visiva, design system e circa il 90% dei prototipi finali. NON citare la Maker Faire nel portfolio.
+- Obiettivo: redesign da solo + prototipo web in codice fedele alle schermate, video dei flussi con motion design, caso studio professionale in inglese (stile rachelchen.tech/projects/openai: Overview → Approach → Problem → Opportunity → Solution).
+
+## Link e file
+- Documento base con tabella "Decisioni prese": https://claude.ai/artifact/56QqmAHUkjG4rkX1K6t2cv (è un Claude Doc: si modifica con gli strumenti Docs)
+- Guida skill + installazione Mac: https://claude.ai/artifact/7ZCkJBy1sz12eJCUL5z1dD
+- Figma (file Movitae-Design-System, fileKey 6UqomibKpRWEhGOp1Y9oj0):
+  - Vecchio prototipo v2: https://www.figma.com/design/6UqomibKpRWEhGOp1Y9oj0/Movitae-Design-System?node-id=1046-1375
+  - Bozze attuali, pagina "Fase 4 — bozza Home": https://www.figma.com/design/6UqomibKpRWEhGOp1Y9oj0/Movitae-Design-System?node-id=1119-1375 (non si tocca: è il riferimento)
+  - Pagine del design system: DS · Fondamenta (1437:2440), DS · Componenti, DS · Asset (1457:1734), DS · Schermate.
+  - Pagina "immagini" (node 1166-5763): oggetti morbidi, Movi, trofei, foto. Le immagini usate hanno nomi (`img/movi-base`, `img/movi-pensa`, `img/movi-saluto`, `img/orme`, `img/bandierina`, `img/moneta`, `img/monete`, `img/pin`, `img/biglietto`, `img/fiamma-ghiacciata`, `img/tennis`, `img/boxe`, `img/corsa`, `img/arti-marziali`, `foto/padel`, `foto/nuoto`, `foto/palestra`, `foto/calcetto`, `foto/pilates`). Frame `riferimento/sport-per-chatgpt` = i 7 sport in fila da allegare a ChatGPT.
+  - Icone SF e loghi (Apple, Google, Apple Salute, Movitae): pagina Icone (82:858), componenti con varianti size=sm/md/lg. `Icon/UI/Alert` (1400:1387) = `exclamationmark.circle.fill`, sostituisce `Icon/UI/Error` (x) negli errori. `Icon/Activity/Boxing` (1375:1399) = simbolo SF `figure.boxing` convertito in tracciato.
+  - Riferimento Apple: libreria community "iOS and iPadOS 26" (componenti importabili per misurare: Toolbar - Top - iPhone, Toolbar - Top - Sheet, Status bar - iPhone).
+- Project: claude/movitae-flussi.md (flussi F1–F9), claude/movitae-prompt-immagini.md (immagini 1–28), claude/movitae-prompt-immagini-2.md (29–45 e foto), claude/movitae-prompt-immagini-3.md (46–54, foto di riserva), claude/movitae-ricerca-app-simili.md, claude/movitae-dati-verificati.md, claude/movitae-redesign-indice.md, claude/movitae-correzioni-dopo-round9.md (storico), claude/movitae-comportamenti.md (scorrimento, layout adattivo, Figma ↔ codice, movimento §15, mappa vera §16), claude/movitae-schermate.md (97 schermate con componenti, tocchi e scorrimento; catalogo dei ~65 componenti; cosa serve al codice), claude/movitae-dati-prototipo.md (NUOVO: dati finti del prototipo, Q26).
+
+### Mappa delle bozze (pagina "Fase 4 — bozza Home", riordinata il 23 nov: onboarding → Home → Scopri → Movi → Premi → Profilo)
+Ogni flusso sta nella sezione da cui parte; stati, conferme ed errori stanno nella riga della schermata a cui appartengono. Frame a x 100 + 522 per posizione; titolo di riga 70 sopra; didascalia 16 sotto ogni frame. Il frame "home/01-home" a x −363 è la vecchia Home v2: non toccare.
+- y 200 · Onboarding dal primo avvio alla Home: splash, intro 1–3, crea account, codice email sbagliato, sport preferiti, Salute, posizione, avviso posizione, obiettivo passi, benvenuto.
+- y 1320 · Onboarding se rifiuti Salute: "Quanto cammini?", benvenuto senza Salute.
+- y 2420 · Home: chiaro, primo giorno, Salute non collegata, missione completata, scuro (provvisorio).
+- y 3514 · Missione del giorno: sheet "La tua serie", celebrazione, celebrazione 7 giorni.
+- y 4634 · Flusso E, collegare Salute: card, spiegazione, avviso di sistema, missione attiva.
+- y 5746 · Flusso B, sport da Home: Home, Scopri padel, scheda a mezza altezza, scheda grande.
+- y 6858 · Le mie prenotazioni: in arrivo, vuote, passate, dettaglio con QR, check-in fatto, avviso disdetta, dettaglio dopo il limite, avviso senza rimborso.
+- y 7978 · Scopri: chiaro, sheet piccolo, medio, grande, scuro (provvisorio).
+- y 9072 · Ricerca e stati: ricerca, ricerca senza risultati, caricamento, offline, posizione negata.
+- y 10172 · Flusso A, filtri: Scopri, pannello Sport, Prezzo, Distanza, filtro attivo, nessun risultato.
+- y 11284 · Prenotare dove serve un documento: riepilogo con modulo, sheet del modulo, modulo firmato, riepilogo con certificato mancante, menu "Caricalo ora", "Controlla i dati", certificato scaduto, certificato caricato.
+- y 12404 · Movi: apertura, sta pensando, risposta, fuori tema, senza connessione, risposta scura (provvisoria).
+- y 13504 · Flusso D, prenotare dalla chat: orario scelto, riepilogo, orario esaurito, conferma, ritorno in chat.
+- y 14624 · Flusso D, mappa e scheda: mappa in Movi, scheda da Movi, riepilogo nella scheda.
+- y 15754 · Premi: chiaro (frame alto 1285, pagina intera), "Come arrivarci", tutti i traguardi (frame alto 1539), dettaglio traguardo, scuro (provvisorio).
+- y 17539 · Flusso C, uso un buono: Premi, sheet del buono, Scopri con buono attivo, riepilogo, pagamento non riuscito, conferma.
+- y 18639 · Profilo e impostazioni: profilo, sport preferiti, impostazioni, Salute collegata, notifiche, notifiche spente, obiettivo passi, avviso elimina account.
+- y 19779 · Documenti: pagina Documenti, avviso elimina certificato.
+- y 20900 · Fase 4d, pilota Home: in cima, scorrendo (titolo piccolo, bordo sfocato in alto), 375 × 667, 440 × 956.
+- y 22200 · Fase 4d, pilota Scopri e Riepilogo: Scopri 402 / 375 / 440, Riepilogo 402 / 375 / 440.
+- Prossima riga libera: y 23400. Se si aggiungono schermate a una sezione, metterle nella sua riga (in fondo) o in una riga nuova sotto la sezione, spostando in giù le successive.
+
+## Skill
+- App: apple-look, apple-motion, ui-ux-pro-max, grilling, humanizer
+- Claude Code: apple-look, apple-motion, impeccable (globale), karpathy-guidelines, grilling, humanizer
+- Metodo: decisioni con grilling (domande numerate con raccomandazione, "sì" accetta); apple-look per citare le HIG; humanizer per tutti i testi destinati a persone; ricerche su app reali prima delle scelte; misure esatte dal kit Figma iOS 26 (le HIG non danno numeri).
+
+## Stato delle fasi
+0–3. Analisi v2, concept, funzioni, flussi e architettura — FATTE
+4. Identità visiva e bozze — FATTA
+4b. Intestazioni standard — FATTA (22 nov)
+4c. Schermate mancanti — FATTA (23 nov): profilo e impostazioni, documenti (nuova funzione), splash, posizione, percorso senza Salute, le tre correzioni aperte + separatori.
+4d. Comportamenti di scorrimento e layout adattivo — FATTA (24 nov): regole in claude/movitae-comportamenti.md, 3 schermate pilota provate a 375 / 402 / 440.
+5. Design system — FATTA (24 nov, approvata da Nicolò con correzioni). Pagine DS · Fondamenta, DS · Componenti, DS · Asset, DS · Schermate (pagine v2 dopo il separatore "Archivio v2"). Collezioni: Primitivi (51), Colori (ex v3, semantici che puntano ai primitivi, codice web var(--nome); in più fill/segment, applepay/bg, applepay/label, mode/show-light e mode/show-dark booleane per le immagini che non cambiano colore), Misure (22: spazi, raggi, dimensioni, aree sicure). Stili di testo v3/ con i nomi dei ruoli iOS (più v3/number-large 28/36 Extra Bold e v3/number-small 15/20 Bold) e 7 stili di effetto v3/ (vetro e ombre).
+Componenti (pagina DS · Componenti, ognuno con descrizione-specifica per Dev Mode e verifica Chiaro/Scuro): Button (1439:182, 45 varianti), Chip, SelectCard, Toggle, SegmentedControl, ProgressSteps, PageDots, ProgressBar, PointsBadge, Grabber, Separator, Avatar, InlineError, FeatureRow, ListRow, RadioRow, SectionHeader, ListGroup, IconButton, LargeTitle, Header (A/B/C/D/sheet, scrolled), TabBar (1442:350, solo intera × 4 tab), ScrollEdge (top/bottom × page/sheet), Scrim, SearchField, FilterSummary, ApplePayButton, BottomBar, Sheet, ActivityBlock, VoucherCard, PriceCard, DocumentCard, BookingTicket, SavingsCard, ActionsCard, EmptyState, GlassBanner, Skeleton/ActivityRow, SignInButton, TextField, MissionCard, StreakDay, StatTile, BalanceCard, RewardRow, AchievementTile, SportShelfItem, VenueCard, ActivityRow, MapPin, UserLocation, MapBackground, MoviMessage, MoviActivityCard, SuggestionChip, MoviInput, MapCarouselCard, FilterPanel, StatusBar, HomeIndicator, Keyboard, SystemAlert (1476:437, action=confirm | destructive), PermissionAlert, ContextMenu. Icone nuove: Icon/Nav/Movi, Icon/UI/Search-Field. Limite noto: il logo Apple è un'immagine; nel codice si usa il pulsante ufficiale Apple Pay.
+Asset (DS · Asset): immagini con nome ed esportazione PNG @2x/@3x (WebP in codice), comprese le foto nuove foto/yoga, foto/yoga-tramonto, foto/padel-coperto, foto/padel-aperto, foto/yoga-largo.
+Schermate (DS · Schermate): copia delle bozze con quasi tutto sostituito da istanze; versioni scure = copie in modalità Scuro; controllo testi 86/103 identiche, le differenze vere corrette. Restano disegnati a mano (si fanno in codice con i componenti): cornici degli sheet, righe con riquadro icona 44 (Documenti), righe a tre testi, card "Disdici", intro, celebrazioni, testata del profilo, avviso di Salute.
+Correzioni finali di Nicolò applicate: bordi sfocati più morbidi e mai più alti dell'elemento; tab bar ridotta eliminata; anello di salute/4 con numero centrato; pulsante "Indicazioni" (Hug, margini 24, icona 20); avvisi con "Annulla" + azione piena (Q21).
+6. Prototipo in codice — IN CORSO (dal 24 nov, decisioni Q22–Q26 nel PROSSIMO PASSO). Per ogni flusso: schermate Figma → codice → confronto → video (storyboard dei 5 video prima del primo video).
+7. Rifinitura, accessibilità, caso studio
+
+## Tempi
+12 h/settimana. Design system entro metà dicembre (fatto in anticipo); primo flusso in codice + video entro fine dicembre; altri flussi a gennaio.
+
+## DECISIONI
+
+### Fondamenta
+- Protagonista: Marco, 31, sedentario (ha abbandonato app fitness). Persona secondaria: Giulia, 26, sportiva (prenotazioni sparse su app diverse).
+- Ciclo centrale: muoviti o prenota → punti → sconto → prenoti.
+- Prototipo web React, aspetto e convenzioni iOS 26, dati finti, pubblicato online. App in italiano, caso studio in inglese.
+- Fuori dal prototipo: anti-frode, algoritmo obiettivi, pagamenti e notifiche reali, divisione del pagamento del campo, strumenti per strutture, commissioni/Gym Shield (citabili come visione).
+
+### Navigazione
+- Tab bar a 4: Home · Scopri · Movi · Premi, capsula di vetro flottante. Profilo dall'avatar, SOLO nella Home. Impostazioni dentro il profilo.
+- Tab bar visibile con gli sheet non modali e nelle pagine aperte da una sezione (Traguardi, Prenotazioni, Profilo, Impostazioni, Notifiche, Documenti); coperta dagli sheet modali e dalle schermate a tutto schermo (celebrazione, riepilogo, conferma). Le pagine di modifica con pulsante principale in fondo (Obiettivo passi) nascondono la tab bar. In Scopri sparisce con lo sheet della lista a media o grande altezza (anche nello stato offline).
+
+### Home
+1. "Ciao, Marco" (34) + avatar. Niente data.
+2. Card ROSSA della missione: "Missione di oggi", "6.000 passi · +7 pt", "Ne mancano 1.880", riga "5 giorni di fila" con fiamma in un cerchio bianco, anello bianco sottile a destra. Tutta la card apre lo sheet "La tua serie".
+3. "Cosa ti va oggi?" + "Altro": riga di sport preferiti (oggetti morbidi). Tocco = stato premuto, poi Scopri col filtro attivo.
+4. "Prossima prenotazione" (riga con freccia) + "Vedi tutte" → Le mie prenotazioni.
+5. Riquadri "I tuoi punti" e "Hai risparmiato €X" (verde).
+6. Carosello "Vicino a te" con prezzo e punti. Senza posizione diventa "A Roma", senza distanze.
+- Stati della card: primo giorno; Salute non collegata ("Conta i tuoi passi", pulsante bianco "Collega Salute"); missione completata.
+
+### Onboarding (bozze y 12800 e y 20200)
+Ordine: splash → 3 intro → crea account → sport preferiti → Apple Salute → posizione → obiettivo passi (o "Quanto cammini?" se rifiuti Salute) → benvenuto → Home. 8 schermate dopo lo splash (nel caso studio: "da 33 a 8"). Barra di avanzamento a 5 tratti (136 pt, tratti 24 con 4 di spazio) nella riga d'intestazione da "Crea account" a obiettivo, con freccia indietro: account 1, sport 2, Salute 3, posizione 4, obiettivo o "Quanto cammini?" 5.
+- Splash: fondo `brand/default` pieno, logo Movitae bianco centrato (180 pt), barra di stato bianca, meno di 1 s, dissolvenza sull'intro 1. Deviazione voluta dalle HIG (che vorrebbero la schermata d'avvio senza logo), motivata dai video.
+- Intro (nessuna intestazione tranne "Accedi" rosso a destra nella riga; pallini delle pagine a y 754; "Avanti", all'ultima "Inizia"). Immagine 360×360 a y 116 (intro 2 e 3 a 336, centrate), titolo 28/36 centrato a y 508, testo 17 centrato sotto.
+  1. "Muoviti ogni giorno" · "Ogni giorno hai una missione di passi pensata per te. Per completarla basta camminare." Immagine: piccolo pianeta con Roma, Movi che cammina verso la bandierina a scacchi.
+  2. "Prenota vicino a te" · "Padel, yoga, nuoto e molto altro: trovi l'attività sulla mappa e prenoti in pochi tocchi." Immagine: piastrella-mappa con punto blu e sette sport, niente Movi.
+  3. "Più prenoti, più risparmi" · "Ogni prenotazione ti dà punti in base a quanto paghi. Con i punti sblocchi buoni da €5 a €100." Immagine: Movi esce da una palestra con il trofeo d'Oro e monete.
+- Crea account: "Crea il tuo account" · "Bastano pochi secondi: punti, buoni e prenotazioni saranno sempre con te." Apple (nero), Google (bianco con bordo), email (grigio); sotto i Termini. Con email: +2 schermate (codice, nome) con etichetta sopra il campo.
+- Sport preferiti: "Che sport ti piacciono?" · griglia 3×3 di card (padel, yoga, palestra, nuoto, calcio, tennis, basket, boxe, corsa). Scelto = bordo rosso 2 + spunta rossa (unico posto con la spunta, insieme allo sheet Sport preferiti del profilo). "Continua".
+- Apple Salute: orme 140, "Conta i passi con Salute" · tre righe con spunta · un solo "Continua" → avviso di sistema.
+- Posizione: pin 140 (`img/pin`), "Trova attività vicino a te" · "Ti mostriamo campi, corsi e piscine in base a dove sei." · righe "La usiamo solo mentre usi l'app." / "Non la mostriamo alle strutture." / "Puoi cambiarla da Impostazioni di iPhone." · un solo "Continua" → avviso di sistema (Consenti una volta / Consenti mentre usi l'app / Non consentire; testo d'uso "Ti mostriamo le attività vicino a te."). Se rifiuti: Scopri parte da Roma centro senza punto blu, con banner di vetro "Attiva la posizione per vedere cosa c'è vicino a te." + "Impostazioni" (rosso); tutto resta prenotabile. Movi e Scopri usano la stessa autorizzazione.
+- Obiettivo passi: bandierina 96, "Quanti passi al giorno?" · 6 scaglioni (4.000 +4 · 6.000 +7 "Consigliato" · 8.000 +10 · 10.000 +14 · 12.000 +18 · 15.000 +25), scelto = cerchio rosso con spunta. "Mi impegno".
+- "Quanto cammini?" (solo se rifiuti Salute; prende il posto dell'obiettivo): orme 72 a colori (nere), "Quanto cammini in una giornata normale?" · "Scegli la frase che ti somiglia di più. Partiamo da lì con l'obiettivo, e puoi cambiarlo quando vuoi." · tre card di scelta (standard di scelta + cerchio con spunta), ognuna con l'obiettivo che ne segue (13 Semi Bold): "Poco · Lavoro seduto e mi sposto quasi sempre in auto o con i mezzi. · Obiettivo: 4.000 passi" / "Abbastanza · Cammino un po' ogni giorno, per andare al lavoro o fare la spesa. · Obiettivo: 6.000 passi" / "Tanto · Passo molte ore in piedi o cammino a lungo quasi ogni giorno. · Obiettivo: 8.000 passi". "Continua" spento finché non scegli. L'obiettivo vale da quando colleghi Salute; si cambia da Impostazioni.
+- Benvenuto: Movi saluto 240, "Benvenuto, Marco!" · "La prima missione è già pronta: 6.000 passi oggi. Alla prima prenotazione ricevi anche 500 punti di benvenuto." · "Inizia". Senza Salute: "Collega Salute quando vuoi dalla Home per iniziare la missione. Alla prima prenotazione ricevi 500 punti di benvenuto." → Home nello stato "Salute non collegata".
+- Notifiche chieste dopo la prima missione completata. Certificato medico NON chiesto nell'onboarding.
+
+### Collegare Salute (flusso E)
+Card → sheet di spiegazione con orme: "Guadagna punti camminando" · "Collega Salute per contare in automatico i passi di ogni giorno. Quando completi la missione ricevi punti da usare come sconto sulle prenotazioni." · righe "Leggiamo solo passi e distanza." / "Non modifichiamo i tuoi dati in Salute." / "Puoi scollegarla da Impostazioni." · UN solo pulsante "Continua" → avviso di sistema → missione attiva. Se si rifiuta: la card resta, "Collega Salute" anche in Impostazioni.
+
+### Missione del giorno e serie (bozze y 14000)
+- Solo passi. Obiettivo a scaglioni di 2.000 fino a 15.000, cambiabile solo da Impostazioni (vale da domani).
+- Pause (max 2, non acquistabili): si guadagnano superando l'obiettivo del 50% o con un check-in; si usano da sole; il giorno coperto non interrompe la serie e non aggiunge un giorno; fiamma ghiacciata. Testi: "Ieri hai usato una pausa: la tua serie di 12 giorni è salva." / "Si riparte. Oggi bastano 6.000 passi."
+- Sheet "La tua serie" (medio, con x): fiamma 72, "5 giorni di fila" (28), "Oggi ti mancano 1.880 passi."; settimana L–D in una card (fatto = cerchio rosso con spunta, pausa = cerchio azzurro con fiamma ghiacciata, oggi = anello, futuri = vuoto); card "Pause · 1 di 2 disponibili" e "Serie più lunga · 12 giorni"; regola: "Guadagni una pausa quando cammini il 50% in più o vai a una lezione. Se salti un giorno, la pausa salva la tua serie."
+- Celebrazione: schermo intero alla prima apertura dopo il traguardo, x in alto e "Fatto" in fondo. Anello rosso chiuso 220 con "6.000 passi", "Missione completata", pillola verde "+7 pt", fiamma + "6 giorni di fila", poi "Ti va di continuare?" con UNA card attività. Niente Movi. Con bonus serie (3, 7, 30 giorni): titolo dedicato, seconda pillola "+25 pt bonus serie", fiamma più grande.
+- Dopo: la card in Home resta "Missione completata" fino a mezzanotte.
+
+### Prezzi di esempio (Roma)
+Yoga e pilates €18 (+180 pt) · boxe €15 (+150) · padel campo 90 min €52, €13 a persona in 4 (+520) · nuoto libero €12 (+120) · palestra ingresso €12 (+120) · calcetto campo 60 min €70, €7 a persona in 10 (+700). Si paga il campo intero. Boxe, palestra e calcetto sono stime da verificare. Elenco completo di strutture e attività in claude/movitae-dati-prototipo.md.
+
+### Punti e premi (bozze y 15100)
+- Missione: 4.000 = 4 · 6.000 = 7 · 8.000 = 10 · 10.000 = 14 · 12.000 = 18 · 15.000 = 25 pt.
+- Prenotazione 10 pt per €1 PAGATO, "in arrivo" fino al check-in; check-in +50; serie +10 / +25 / +100; benvenuto +500 alla prima prenotazione. Disdetta entro 2 ore prima: rimborso, punti in arrivo annullati, buono restituito.
+- Buoni ripetibili: Bronzo 2.500 = €5 · Argento 8.000 = €20 · Oro 18.000 = €50 · Platino 30.000 = €100. Niente livelli. Contatori che salgono soltanto. Nessuna scadenza mostrata. Linguaggio "usa", mai "spendi"/"perdi". Marco: 2.700 pt, Bronzo pronto.
+- Premi: card rossa del saldo solo informativa → I tuoi buoni (Bronzo con "Usa"; altre righe "Mancano N pt" + freccia → "Come arrivarci") → risparmiato / punti totali → traguardi → storico.
+- Sheet "Come arrivarci": trofeo, "Buono da €20", "Ti mancano 5.300 pt", barra 2.700/8.000, "Come guadagnare punti" (prenota · check-in · missione · serie); pulsante rosso "Trova un'attività". Nessuna stima "ti bastano N lezioni".
+- Traguardi (13, non danno punti): in Premi solo gli sbloccati, con "Vedi tutti" (rosso Semi Bold 15) a destra del titolo "Traguardi", come "Vedi tutte" in Home. Pagina "Traguardi": gruppi Serie, Punti, Lezioni, Risparmio; griglia a 3 colonne; sbloccato a colori con stelle e data; bloccato grigio con barra. Tocco → sheet di dettaglio senza pulsanti.
+- Testi del buono: notifica "Hai un buono da €5. Vale sulla prossima prenotazione." · sheet "Buono da €5 / Vale su qualsiasi prenotazione. I 2.500 pt si scalano quando paghi. / Trova un'attività / Non ora" · riepilogo "Buono da €5 · Userai 2.500 pt"; da Scopri o Movi "Hai un buono da €5 · Attivalo e paghi €13" con interruttore spento · conferma "Hai risparmiato €5 / Ti restano 200 pt. Altri 130 arrivano al check-in."
+
+### Scopri
+- Mappa a schermo pieno + "Cerca sport o struttura" (vetro) + UN pulsante filtri. Sheet della lista a tre altezze. Ricerca con "Annulla" nero, Recenti, Sport su 3 colonne. Pannello filtri Sport · Prezzo · Quando · Distanza con istogrammi alla Airbnb. Nel codice la mappa è vera (MapLibre GL, stile nostro con i colori map/*).
+- Pannello Sport: ogni sport in una piccola card (raggio 16) con lo standard di scelta. "Azzera" (nero Semi Bold) si accende appena c'è almeno un filtro scelto; grigio spento solo senza filtri. Sotto gli sport, "Dove" (etichetta 13 Semi Bold grigia) con controllo segmentato a scelta singola "Tutti | Al chiuso | All'aperto", "Tutti" di partenza (non conta come filtro).
+- Pin: cerchio bianco con icona dello sport rossa (boxe = `figure.boxing` in `Icon/Activity/Boxing`, arti marziali = figura che calcia); selezionato = capsula rossa con nome e prezzo; punto blu di sistema.
+- Offline: lo sheet sale a media altezza (tab bar nascosta): wifi barrato, "Sei offline", "Controlla la connessione: mappa e attività tornano appena sei di nuovo online.", "Riprova" pulsante principale rosso in fondo.
+- Foto vere nelle righe: padel, nuoto, palestra (FitLab Testaccio), pilates, calcetto.
+- Nessun risultato: niente pin; nello sheet "Nessuna attività" + "Con questi filtri non c'è niente qui vicino. Prova così:" e righe con il conteggio ("Allarga a 5 km · 6 attività", "Togli il prezzo · 4 attività", "Chiedi a Movi"). Ricerca senza risultati: "Nessun risultato per “arrampicata”", spiegazione, riga "Chiedi a Movi “arrampicata”", poi gli sport.
+- Movi senza connessione: risposta "Non riesco a cercare senza connessione. Controlla il Wi-Fi o i dati e riprova." + capsula grigia "Riprova".
+- Account con email: schermata "Controlla la tua email" con campo "Codice" (etichetta sopra); errore = bordo rosso + "Il codice non è giusto. Controlla l'ultima email o fattene mandare un altro." + link "Invia di nuovo il codice"; il codice si inserisce da Mail/Messaggi.
+- Notifiche spente in iOS: card in cima a Notifiche "Le notifiche sono spente su iPhone" + "Apri Impostazioni"; interruttori grigi.
+
+### Scheda della struttura
+- Nome (22 Bold) e dettagli, cuore e x; foto; prezzo e punti; giorni e orari; Informazioni. Barra fissa "Indicazioni" + "Prenota alle …" (spento finché non scegli). Toccare un orario lo sceglie. Da Movi è modale sopra la chat; il riepilogo si apre nello stesso sheet.
+- In Informazioni, se la struttura chiede documenti: riga con icona documento "Serve il certificato medico" o "Modulo da firmare al primo ingresso". Esempi: Piscina Aventino (nuoto) = certificato; FitLab Testaccio (palestra, ingresso singolo) = modulo; padel, calcetto, yoga = niente.
+
+### Riepilogo, conferma e prenotazioni (bozze y 16900)
+- BLOCCO ATTIVITÀ (riepilogo, conferma, dettaglio, check-in e varianti): foto 64 centrata in verticale rispetto alle tre righe di testo; tre righe: nome dell'attività 17 Semi Bold nero ("Yoga Flow", "Palestra, ingresso singolo") · giorno per esteso + orario con fine 15 nero ("Venerdì 13 novembre · 18:30–19:30"; ingresso libero: "dalle 18:00") · struttura + via 15 grigio ("Zen Studio · Via Marmorata 12"), città solo se diversa da quella dell'utente ("Zen Studio · Via Roma 4, Milano"). Il nome della struttura resta: è sull'insegna, si cerca in Mappe e si dice all'ingresso (come Booking.com, Eventbrite, OpenTable). Orario esaurito = solo l'orario barrato. Indirizzi: vedi claude/movitae-dati-prototipo.md.
+- DISTANZE: solo dove si sceglie (Scopri, scheda struttura, card di Movi, "Vicino a te", proposta nella celebrazione). Mai dopo aver prenotato: riepilogo, conferma, dettaglio, "Prossima prenotazione" in Home, riga "Indicazioni" (solo testo + freccia). Nelle liste delle prenotazioni: "Oggi, 18:30 · Zen Studio".
+- Riepilogo: "Annulla" + "Riepilogo"; card attività; eventuale card documenti; card buono; card prezzo; disdetta; Apple Pay ufficiale.
+- Conferma a biglietto: "Prenotato" (34), card con blocco attività e QR sotto linea tratteggiata, risparmio, card azioni, "Fatto" che torna all'origine.
+- Card azioni (conferma e dettaglio, uguale ovunque): righe in card con icona SF a sinistra e freccia ›: "Aggiungi al calendario" e "Indicazioni" (separatore che parte dal testo, a 52). Niente più capsule grigie affiancate.
+- Le mie prenotazioni (da "Vedi tutte" in Home o dal profilo): freccia + titolo grande "Prenotazioni", controllo segmentato "In arrivo / Passate", lista in card (foto 56, nome, "Oggi, 18:30 · Zen Studio", freccia). Separatori che partono dal testo, non dalla foto. Passate con stato: "Check-in fatto · +200 pt" (verde) o "Disdetta" (grigio).
+- Dettaglio (freccia + titolo piccolo "Prenotazione"): biglietto con QR, card azioni, poi card a parte "Disdici prenotazione" (testo rosso centrato, come "Esci") e sotto la nota 13 grigia "Puoi disdire gratis fino alle 16:30."
+- Check-in fatto: al posto del QR `checkmark.circle.fill` 64 in verde con la spunta bianca a metà del diametro (32), "Check-in fatto", "+230 pt"; resta la card azioni, spariscono la card "Disdici" e la nota.
+- Disdetta: avviso "Vuoi disdire Yoga Flow?" · "Ti rimborsiamo €13 e il buono da €5 torna disponibile." · "Annulla" / "Disdici" (azione piena, vedi Avvisi); poi in Passate come "Disdetta". Oltre le 2 ore: la card "Disdici" resta, la nota diventa "La disdetta gratuita è scaduta alle 16:30." e l'avviso "Vuoi disdire senza rimborso?" · "Non ti rimborsiamo i €13, i punti in arrivo si annullano e il buono non torna." Senza check-in: nessun rimborso, punti in arrivo decadono, il buono non torna.
+- Le mie prenotazioni vuote: icona calendario 48, "Nessuna prenotazione in arrivo", "Quando prenoti un'attività la trovi qui, con il QR per l'ingresso.", pulsante rosso "Trova un'attività" (larghezza del testo).
+- Orario esaurito nel riepilogo: dentro la card dell'attività, orario barrato, riga rossa "Le 18:30 non sono più disponibili. Scegli un altro orario:" e le capsule degli orari vicini; Apple Pay sostituito da "Scegli un orario" spento finché non scegli.
+- Pagamento non riuscito (uno stato): nella barra in fondo, al posto della riga del totale e subito sopra Apple Pay: "Pagamento non riuscito" (rosso) · "Non ti abbiamo addebitato nulla. Riprova o scegli un'altra carta nel Wallet."; il totale resta nella card del prezzo.
+
+### Documenti (bozze y 19100)
+- Perché: in Italia il certificato per l'attività ludico-motoria (palestra, piscina senza tesseramento) non è obbligatorio dal 2013 (art. 42-bis DL 69/2013), ma molte strutture lo chiedono per assicurazione; il non agonistico vale 12 mesi. Quindi decide ogni struttura. Le app gestionali italiane (Sport-In, MooPlan) fanno caricare il certificato in una sola palestra; nessuna lo collega alla prenotazione in strutture diverse (problema di Giulia).
+- Due documenti: **certificato medico** (personale, uno, 12 mesi, vale per tutte le strutture che lo chiedono) e **modulo della struttura** (regolamento + dichiarazione, uno per struttura, si firma una volta). Non chiamarlo "liberatoria".
+- Riepilogo con modulo da firmare (FitLab): card "Modulo di FitLab Testaccio · Da firmare prima di pagare" + freccia, sopra il prezzo. Apple Pay resta attivo: se non hai firmato, il tocco apre prima il modulo.
+- Sheet del modulo (grande, "Annulla" + "Modulo della struttura"): nome della struttura, "Si firma una volta e vale per tutti i prossimi ingressi.", 4 punti in parole semplici (regolamento, stai bene, attrezzi come indica lo staff, avvisi se ti fai male), "Leggi il regolamento completo" (rosso), riga "Ho letto e accetto" con interruttore che parte SPENTO, pulsante "Firma" spento finché l'interruttore è spento. Niente firma col dito. Dopo: card "Modulo di FitLab Testaccio · ✓ Firmato oggi" senza freccia.
+- Dopo "Salva" del certificato: card "Certificato medico · ✓ Valido fino al 12 set 2027", senza avviso né link. Certificato scaduto in "Controlla i dati": data in rosso + "Questo certificato è scaduto il 3 ott: per prenotare qui serve quello nuovo."; "Salva" resta attivo.
+- Elimina certificato: avviso "Vuoi eliminare il certificato?" · "Le strutture che lo chiedono non potranno più vederlo." · Annulla / Elimina.
+- Riepilogo con certificato mancante (piscina): card "Certificato medico · Non l'hai ancora caricato" + "Senza certificato la piscina può non farti entrare." + "Caricalo ora" (rosso). Il pagamento NON si blocca.
+- "Caricalo ora" → menu: Scansiona documento (scanner di iOS, per primo) · Scegli dalle foto · Scegli da File.
+- "Controlla i dati" (sheet grande, "Annulla" + "Certificato medico"): miniatura, Tipo (segmentato Non agonistico / Agonistico), date "Rilasciato il" e "Scade il" (proposta: +1 anno), nota "Di solito vale un anno dal rilascio. Controlla la data scritta sul certificato.", "Salva". Nessuna lettura automatica del testo nel prototipo.
+- Pagina Documenti (dal profilo, freccia + titolo grande): sezione Certificato medico (icona documento, "Non agonistico", stato con icona + testo: "Valido fino al 12 set 2027" verde / "Scade tra 20 giorni" / "Da caricare"; righe Sostituisci ›, Elimina rosso); nota "Il certificato lo vede solo la struttura dove hai prenotato, e solo se lo chiede."; sezione Moduli firmati (struttura + "Firmato il …", solo lettura).
+- Notifica 30 giorni prima della scadenza ("Il tuo certificato medico scade il 12 settembre"), categoria "Scadenza certificato" in Notifiche.
+- Flusso facoltativo: non entra nei 5 video principali; nel caso studio è la risposta al problema di Giulia.
+
+### Movi
+- Apertura: Movi che saluta, "Ciao Marco, cosa ti va di fare oggi?", sottotitolo, 4 suggerimenti, avviso "Movi può sbagliare: controlla orari e prezzi prima di pagare." (solo qui), campo "Chiedi a Movi". Nessun pulsante nuova chat.
+- Risposta: avatar + una riga + fino a 3 card + "Vedi sulla mappa". Orario = scorciatoia al riepilogo; card o freccia = scheda; mappa dentro Movi con le 3 attività. Dopo la prenotazione "Prenotato alle 18:30" e "Vedi prenotazione". Dettagli in F4 di flussi.md.
+
+### Profilo e impostazioni (bozze y 18000)
+- Profilo: pagina con freccia + titolo grande "Profilo", tab bar visibile. Testata: avatar 64 con l'iniziale, "Marco Rossi" (22 Bold), "Su Movitae da settembre 2026". Due riquadri: "Hai risparmiato €25" (verde) e "Serie più lunga · 12 giorni". Card-lista: Prenotazioni › · Documenti › · Preferiti › (pagina non disegnata: in codice copia la lista delle prenotazioni) · Sport preferiti (sotto "Padel, Yoga, Nuoto") ›. Card Traguardi ("2 di 13 sbloccati" + oggetti sbloccati) → pagina Traguardi. Card Impostazioni ›. Nome e foto non modificabili nel prototipo. Punti non ripetuti (sono in Home e Premi).
+- Sport preferiti: sheet grande con la griglia dell'onboarding, "Annulla" a sinistra, "Fine" a destra (Semi Bold, nero).
+- Impostazioni: pagina con freccia + titolo grande; gruppi con etichetta 13 Semi Bold: Missione (Obiettivo passi · 6.000 passi ›, Apple Salute · Collegata ›) · Notifiche (Notifiche ›) · Account (Email da leggere, Esporta i miei dati ›, Elimina account rosso) · "Esci" rosso centrato in una card a parte. Nessun metodo di pagamento: si paga con Apple Pay nel riepilogo, gestito dal Wallet.
+- Apple Salute collegata → sheet piccolo con orme: "Salute è collegata" · "Contiamo i tuoi passi in automatico. Per scollegarla vai in Impostazioni di iPhone › Salute › Accesso ai dati › Movitae." · "Apri Impostazioni". Non collegata: la riga diventa "Collega Salute" (rosso) e apre lo sheet del flusso E.
+- Notifiche: interruttori Missione del mattino · Missione completata · Pausa usata · Buono pronto · Promemoria lezioni · Orario liberato · Scadenza certificato; nota "Ti scriviamo solo per queste cose. Puoi spegnere tutto anche da Impostazioni di iPhone."; riga "Ora della missione · 8:00" ›. Interruttore acceso = verde `earn/default`.
+- Obiettivo passi: freccia + titolo grande, "Il nuovo obiettivo vale da domani. La tua serie resta com'è.", lista dei 6 scaglioni, "Salva" spento finché non cambi; senza tab bar.
+- Elimina account: avviso "Vuoi eliminare l'account?" · "Punti, buoni e prenotazioni vengono cancellati. Non si può annullare." · Annulla / Elimina (rosso). Esci: stesso avviso con "Vuoi uscire?" · Annulla / Esci (non disegnato).
+
+### Identità visiva
+- Carattere calmo e atletico. Colore nelle card rosse, nell'azione principale, nelle scelte e negli oggetti morbidi; il resto neutro.
+- Rosso: `brand/default` #B91213 / scuro #D91F24 per superfici piene; `brand/accent` #B91213 / scuro #FF5A55 per icone, testi, bordi e barre. Errore #D70015 / #FF453A con icona + messaggio. Verde #16794A / #34C77B solo guadagno/risparmio (e interruttori accesi).
+- Neutri: fondo #F5F5F8 / #000, card #FFF / #1C1C1E, sheet #FFF / #2C2C2E; testo #16171A / #5C5E66 / #696B73 (scuro #F5F5F7 / #A3A4AB / #8B8C93); disattivato #A8AAB1 / #5A5B61. Card dentro uno sheet bianco = fondo `bg/default` grigio.
+- Vetro (Liquid Glass) solo sui controlli flottanti (tab bar, ricerca, filtri, campo di Movi, banner della posizione). Riduci trasparenza = superfici piene.
+- Icone SF Symbols (anche la boxe, `figure.boxing`). Immagini: oggetti morbidi lucidi per Movi, sport, trofei, fiamma, orme, bandierina, pin; scene 3D sospese nelle intro; foto vere nelle liste e nelle schede.
+- Motion: molle iOS (.smooth navigazione/sheet, .snappy controlli, .bouncy celebrazioni), pressione 0,97, movimento ridotto = dissolvenze. Token: spring/smooth 0,5 s rimbalzo 0 · snappy 0,35/0,15 · bouncy 0,5/0,3 · sheet-release 0,4/0,15 · ease/fade 0,2 s · ease/press 0,1 s.
+
+### Standard UI (valgono ovunque)
+- **Testi (Inter, griglia da 4 pt):** 34/40 Bold · 28/36 Bold · 22/28 Bold · 20/24 Semi Bold · 17/24 Semi Bold e Regular · 15/20 · 13/16 Semi Bold · 12/16 Semi Bold (tab bar). Numeri: 28/36 Extra Bold e 15/20 Bold.
+- **Spazi:** 2 · 4 · 8 · 12 · 16 · 24 · 32. Margini laterali 16.
+- **Raggi:** capsule 999; card 24; foto 16–20; miniature e riquadri icona 12; card sport nei filtri 16; sheet 32 in alto; smussatura 60%.
+- **Intestazioni (dal kit Apple iOS 26; frame 402×874):**
+  - Riga d'intestazione alta 44 a y 62–106, asse a y 84. Primo contenuto a y 116.
+  - Sezioni principali: titolo grande 34/40 a sinistra nella riga, pulsante da 44 a destra sulla stessa riga (Home, Premi, Movi apertura, Conferma).
+  - Titolo piccolo 17 centrato nella riga (chat di Movi, Riepilogo, Traguardi, Dettaglio prenotazione).
+  - Pagine aperte da un'altra pagina con titolo grande: freccia indietro nella riga, titolo 34/40 sotto a y 116, contenuto da y 168 (Prenotazioni, Profilo, Impostazioni, Notifiche, Obiettivo passi, Documenti).
+  - Liste a gruppi: etichetta 13 Semi Bold grigia a x 32, 8 sopra la card; nota 13 Regular grigia 8 sotto; 24 tra i gruppi.
+  - Onboarding: freccia + barra di avanzamento nella riga; contenuto a y 116.
+  - Controlli flottanti centrati sull'asse y 84 (Scopri, Ricerca, mappa in Movi).
+  - Sheet: grabber a +5; riga d'intestazione a +16 ("Annulla" a sinistra, titolo 17 Semi Bold centrato, "Fine" a destra); contenuto 12 sotto il titolo. Sheet senza titolo che iniziano con un oggetto: primo elemento a +32; x da 36 a destra a +16. Sheet ancorati al fondo (bordo inferiore a y 881); negli sheet grandi il pulsante principale a +724.
+  - Nel codice il titolo grande scorre col contenuto e lascia il titolo piccolo nella riga.
+  - Tab bar: 362×62 a 20 dai lati e 21 dal fondo (y 791).
+- **Pulsanti per funzione:** misure: grande 50, margini 24, icona 20, spazio 8; medio 44 (margini 20, icona 18); piccolo 36 (16, icona 16); larghezza che segue il contenuto (Hug), Fill solo nelle barre in basso. Nella barra della scheda "Indicazioni" segue il contenuto (165) e "Prenota alle …" prende il resto. Principale rosso pieno (50/17 in fondo a y 786; una per schermata; spento = grigio `fill/tertiary` con testo disattivato) · Apple Pay di sistema (mai spento) · principale su card rossa bianco · secondaria grigio `fill/tertiary` · scelta grigio → rosso (card: bordo rosso 2 + spunta) · link avanti testo rosso · link che chiude testo nero · freccia › grigia solo sulle righe · distruttiva testo rosso con conferma. Card senza pulsanti: si tocca tutta la card.
+- **Liste:** card bianca con raggio 24, righe da 52 (64 con sottotitolo), separatori rientrati che partono dal testo (dopo foto o icona) e arrivano al bordo destro; controllo segmentato a capsula grigia con segmento bianco; interruttore 51×31.
+- **Cosa si tocca (revisione UX del 23 nov):** (1) STANDARD DI SCELTA, vale per tutto ciò che si sceglie fra più opzioni (card degli sport in onboarding, sheet e filtri; card di "Quanto cammini"; capsule di giorni, orari, Al chiuso/All'aperto, Mattina/Pomeriggio/Sera): non scelta = bianca `bg/surface` con bordo 1 `border/control` (#D1D1D6 / #3A3A3C) e testo nero; card scelta = bianca con bordo rosso 2 `brand/accent` e nome Semi Bold; capsula scelta = rossa piena `brand/default` e testo bianco Semi Bold; la spunta rossa resta SOLO nelle griglie grandi degli sport preferiti (onboarding/5 e profilo/2, sheet Sport preferiti), tolta il 24 nov da filtri, giorni e orari (flussi Sport, Filtri, Movi); esaurita = grigia `fill/tertiary` senza bordo, testo disattivato barrato. La scelta non è mai più chiara della non scelta, e lo stato non dipende solo dal colore (riferimenti: Material 3 filter chip, Thumbprint, Airbnb osservato; HIG toggles: "Avoid relying solely on different colors"). Le liste con cerchio di scelta (obiettivo passi) e i controlli segmentati restano come da iOS. (2) Un riquadro che porta altrove ha la freccia › in alto a destra (riquadri punti e risparmio in Home); uno solo da leggere no (riquadri del profilo). (3) Il riassunto dei filtri sotto la ricerca è una capsula di vetro con `chevron.down` (riapre il pannello).
+- **Cosa è successo:** ogni azione che cambia uno stato lo mostra dov'era la richiesta (modulo → "Firmato oggi" con spunta verde, certificato → "Valido fino al …"); i valori cambiati tornano aggiornati nella riga che li ha aperti.
+- **Errori:** colore `feedback/error` (#D70015 / #FF453A), sempre simbolo `Icon/UI/Alert` (= `exclamationmark.circle.fill`; MAI `xmark`, che in iOS significa Chiudi/Annulla) + testo, senza contenitore né x di chiusura: il messaggio sparisce quando il problema è risolto. Sta nell'elemento che ha il problema: sotto il campo (bordo 2 rosso + riga 15), dentro la card dell'attività (orario esaurito: orario barrato, riga d'errore, orari vicini), sopra il pulsante che si ripete (pagamento non riuscito: titolo 15 Semi Bold rosso + spiegazione 13 grigia al posto della riga del totale). Mai avvisi per errori, mai card in cima che sembrano notifiche. Prevenzione prima del messaggio: pulsanti spenti finché manca una condizione (Firma, Salva, Continua), interruttori di consenso che partono spenti.
+- **Avvisi:** solo per azioni rare e non annullabili (disdetta, elimina account, elimina certificato). "Annulla" grigio a sinistra, mai predefinito; a destra l'azione confermata piena (selected/default: nera in Chiaro, bianca in Scuro), mai rossa perché la persona l'ha scelta (`alerts.md › Buttons`). Eccezione: "Elimina account" rosso pieno. Predefinita solo nella disdetta gratuita; non predefinita nella disdetta senza rimborso, in Elimina account e in Elimina certificato. Il rosso sta sul comando che apre l'avviso. Il testo dice cosa si perde in euro, punti e buoni (Q21, 24 nov).
+- **Stati vuoti:** dicono cosa manca e danno il passo successivo con un pulsante (Prenotazioni → "Trova un'attività"; Preferiti → "Tocca il cuore su un'attività per ritrovarla qui."; Documenti → "Da caricare").
+- **Accessibilità:** aree toccabili 44×44; nomi VoiceOver; nessuna informazione solo col colore (giorni della serie, stato del certificato con icona + testo).
+- **Scorrimento:** liste orizzontali da bordo a bordo con 16 ai lati; l'ultimo elemento si ferma 16 sopra tab bar o campo. Regole complete nella sezione "Scorrimento e layout" qui sotto e in claude/movitae-comportamenti.md.
+
+### Scorrimento e layout (fase 4d, dettagli in claude/movitae-comportamenti.md)
+- Sezioni principali: titolo grande che scorre via, titolo piccolo centrato che compare, avatar fisso. Pagine aperte: freccia fissa, titolo grande che si riduce. Riepilogo, prenotazione, chat: intestazione fissa.
+- Bordi sfocati (ScrollEdge) solo sotto elementi di vetro (intestazione, ricerca, tab bar, campo di Movi), mai più alti dell'elemento che proteggono (106 intestazione, 108 ricerca, 83 tab bar, 60 titolo dello sheet), stile morbido (sfocatura 0→10, velo 72%→30%→0); niente bordo sopra le barre opache. Con Riduci trasparenza: banda piena.
+- Tab bar sempre intera (la riduzione a cerchio è stata scartata il 24 nov).
+- Scaffali: snap a sinistra con margine 16, ultimo elemento a 16 dal bordo destro; carosello della mappa di Movi: snap al centro.
+- Margini 16 fissi, card e barre si allargano, miniature e controlli fissi, testi a capo; prova sempre a 375 × 667, 402 × 874, 440 × 956.
+- In Figma: tutto in layout automatico tranne ciò che è davvero sovrapposto; frame con Overflow verticale e livelli fissi in cima; nomi dei livelli = nomi dei componenti nel codice.
+- Da fare a mano in Figma: "Sticky" sull'intestazione dello sheet di Scopri (il plugin non espone la proprietà).
+
+### Stati e video
+- Stati: nessun risultato, orario esaurito, posizione negata (disegnato), pausa usata, caricamento, offline, Movi fuori tema, Movi che pensa, Salute rifiutata nell'onboarding (disegnato).
+- Notifiche finte nei video: missione del mattino, missione completata, pausa usata, buono pronto, promemoria lezione (apre il QR), orario liberato.
+- Flussi del prototipo/video: onboarding, missione del giorno, Scopri e prenota, Movi, Premi (con uso del buono) + facoltativi collegare Salute, check-in QR e disdetta, documenti.
+
+## Aperti / da fare
+- Schermate non disegnate (si fanno in codice o se servono al video): pagina Preferiti, avviso "Esci", schermate email dell'account (codice, nome), scheda di Nuoto/Palestra con la riga documenti, impostazioni con Salute non collegata.
+- Avvisi di sistema (Salute, posizione) sono segnaposti: nel codice usare quelli reali del kit iOS 26.
+- Immagini mancanti: boxe (ora una foto v2 non in asset), corsa, tennis, basket, più le foto di riserva (prompt 50–54 in claude/movitae-prompt-immagini-3.md).
+- Aggiornare il testo "Solution" del caso studio (citare documenti e onboarding "da 33 a 8").
+
+## Bozza testi caso studio (inglese, già passata con humanizer; da rifinire dopo il design)
+Overview: How might we get sedentary people moving, and turn that habit into bookings at local sports venues? Movitae started as a university project in a team of seven. I led the concept, information architecture, wireframes, visual direction and design system, and built about 90% of the final prototypes. Six months later I redesigned it on my own and rebuilt it as a working prototype in code.
+
+Approach: Product strategy: I went back to why the app exists and cut everything that didn't serve one loop: move or book, earn points, get a discount, book again. Simplification: fewer screens, fewer taps. Onboarding went from 33 screens to 8, and booking from the map takes four taps. Prototyping in code: every flow runs in a real web app, so I could test it on a phone instead of guessing from static frames.
+
+Problem: Most people already know they should move more. In Italy, 30.8% of people did no physical activity at all in 2025, and only 19% of adults reach the WHO's weekly minimum, against an EU average of 32.7%. When asked why, they mention lack of time first (35.1%) and lack of interest second (31.2%). Apps haven't solved this. A median of 70% of users abandon lifestyle apps within 100 days. Marco, 31, has deleted several fitness apps after a few days because the goals felt out of reach. Giulia, 26, is already active, but she books gym classes, padel and swimming through different apps and websites. Venues see the other side of the problem: slots that stay empty in the quiet hours.
+
+Opportunity: Small financial incentives change behaviour. In a meta-analysis of 23 trials, about $1.40 a day added roughly 600 steps a day, and part of the effect lasted after the payments stopped. In Italy, the apps that reward walking, like Sweatcoin and WeWard, can't book anything. The booking apps either cover a single sport, like Playtomic, or only work through an employer, like Wellhub. No app connects rewards for moving with booking any sport, and that gap is where Movitae sits.
+
+Solution (da aggiornare): Movitae gives you a daily step mission sized to your habits, a map of bookable sports near you, and points that turn into real discounts. A walk earns a few points and a class earns many more, so the rewards lead people from their first walk to their first booking.
+
+(Fonti dei numeri: claude/movitae-dati-verificati.md. Togliere il "no-show 20%" del gruppo: non verificabile.)
+
+## Regole di lavoro
+- Una conversazione per fase; partire sempre da questo handoff.
+- Nuove decisioni: aggiungerle alla tabella "Decisioni prese" del documento base E a questo file.
+- Una sola fonte di verità: token unici Figma = codice; schermate prima in Figma, poi in codice. Stesso aspetto, stesso flusso, stesse regole di layout automatico.
+- Correzioni chieste su una schermata vanno applicate a tutti gli elementi uguali nelle altre schermate.
+- Ogni schermata nuova passa le tre domande della revisione UX: si capisce cosa si tocca? si capisce cosa è successo? se va storto, si capisce cosa fare?
+- Nuove schermate: nella sezione giusta (vedi Mappa delle bozze), titolo di riga e didascalie come le altre, colori legati alle variabili, controllo con screenshot.
+- In Figma passare link a frame precisi. Risposte sempre in italiano.
+
+## PROSSIMO PASSO: fase 6, prototipo in codice (in corso)
+Decisioni del grilling fase 6 (24 nov, Q22–Q26):
+- Q22: repository GitHub `movitae-prototype` + pubblicazione su Vercel. Serve che Nicolò colleghi GitHub in claude.ai › Impostazioni › Connettori (poi Vercel lo collega lui al repository).
+- Q23: React + TypeScript + Vite; variabili CSS generate da Style Dictionary con gli stessi nomi di Figma (`--bg-default`, `.t-large-title`…); niente Tailwind; animazioni con Motion (molle con i token motion/*); mappa MapLibre GL con tasselli gratuiti e stile nostro; Storybook per i componenti; Playwright per gli screenshot; Inter incluso nel progetto.
+- Q24: primo flusso = Home + Scopri e prenota (F3) dentro la cornice dell'app con tab bar.
+- Q25: ordine: 1) progetto, token, cornice → 2) componenti in Storybook confrontati con Figma → 3) flusso con i dati → 4) confronto automatico degli screenshot con Figma → 5) pubblicazione e prova sull'iPhone come app installata. Anteprima a Nicolò dopo ogni passo.
+- Q26: dati finti in un solo file (`src/data/data.ts`, descritto in claude/movitae-dati-prototipo.md): Marco, strutture con le vie già decise e coordinate approssimate, attività, orari, prezzi, punti, prenotazione in arrivo.
+
+Stato del codice (cartella di lavoro `movitae-prototype`, non ancora su GitHub):
+1. (fatto 24 nov) Progetto Vite React TS; `npm run tokens` converte l'esportazione delle variabili Figma (tokens/figma-export.json) in DTCG e poi in CSS: tokens.base.css (misure, effetti, motion), tokens.light.css (`:root, [data-theme="light"]`), tokens.dark.css (`[data-theme="dark"]`), typography.css (`.t-<stile>` in rem, 17 px = 1 rem). Tema dal sistema (prefers-color-scheme); `?theme=dark` lo forza per i confronti.
+2. (fatto) Icone della libreria Figma in `src/ui/icons.ts` con currentColor + componente `<Icon name size label/>`. Mancano ancora Boxing e il tracciato esatto di Map/Directions (ora semplificato): da riesportare.
+3. (fatto) Cornice: sul telefono schermo intero con le safe area vere; su computer iPhone 17 Pro 402×874 con barra di stato e indicatore Home disegnati (solo lì). TabBar uguale a Figma 1442:350 (362×62, padding 6, tab 87×48, a 21 dal fondo, vetro glass/bar con bordo glass/edge, attiva tab/selected + brand/accent), un solo contenitore che scorre, ScrollEdge in basso alto 83. Rotte Home / Scopri / Movi / Premi con segnaposto. Verificato con screenshot in Chiaro e Scuro.
+4. Problema aperto: le immagini di DS · Asset non si scaricano dal codice (il dominio figma.com è bloccato dalla rete della sessione). Soluzioni: Nicolò aggiunge `www.figma.com` ai domini consentiti (claude.ai › Impostazioni › Funzionalità), oppure allega le immagini, oppure collega il computer con la cartella delle immagini.
+5. Prossimo: passo 2, componenti in Storybook confrontati con Figma (prima quelli di Home e Scopri e prenota).
+
+Messaggio da incollare in una nuova conversazione:
+"Riprendo il redesign di Movitae. Leggi claude/movitae-handoff.md e claude/movitae-flussi.md nel Project. Siamo nella fase 6, prototipo in codice (sezione PROSSIMO PASSO dell'handoff, dati in claude/movitae-dati-prototipo.md). Fammi le domande con grilling prima di decisioni nuove e controlla gli screenshot. File Figma: https://www.figma.com/design/6UqomibKpRWEhGOp1Y9oj0/Movitae-Design-System?node-id=1119-1375"

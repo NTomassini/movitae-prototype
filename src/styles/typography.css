@@ -1,0 +1,13 @@
+.t-large-title { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 700; font-size: 2rem; line-height: 1.1765; }
+.t-title-1 { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 700; font-size: 1.6471rem; line-height: 1.2857; }
+.t-title-2 { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 700; font-size: 1.2941rem; line-height: 1.2727; }
+.t-title-3 { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 1.1765rem; line-height: 1.2; }
+.t-headline { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 1rem; line-height: 1.4118; }
+.t-body { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 400; font-size: 1rem; line-height: 1.4118; }
+.t-subheadline { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 400; font-size: 0.8824rem; line-height: 1.3333; }
+.t-subheadline-emphasized { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 0.8824rem; line-height: 1.3333; }
+.t-footnote { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 400; font-size: 0.7647rem; line-height: 1.2308; }
+.t-footnote-emphasized { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 0.7647rem; line-height: 1.2308; }
+.t-caption { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 0.7059rem; line-height: 1.3333; }
+.t-number-large { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 800; font-size: 1.6471rem; line-height: 1.2857; }
+.t-number-small { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 700; font-size: 0.8824rem; line-height: 1.3333; }

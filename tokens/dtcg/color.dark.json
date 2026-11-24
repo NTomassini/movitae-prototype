@@ -1,0 +1,164 @@
+{
+  "bg": {
+    "default": {
+      "$type": "color",
+      "$value": "{prim.dark.1000}"
+    },
+    "surface": {
+      "$type": "color",
+      "$value": "{prim.dark.900}"
+    },
+    "glass": {
+      "$type": "color",
+      "$value": "{prim.dark.800}"
+    },
+    "elevated": {
+      "$type": "color",
+      "$value": "{prim.dark.800}"
+    }
+  },
+  "fill": {
+    "tertiary": {
+      "$type": "color",
+      "$value": "{prim.dark.800}"
+    },
+    "segment": {
+      "$type": "color",
+      "$value": "{prim.dark.550}"
+    }
+  },
+  "text": {
+    "primary": {
+      "$type": "color",
+      "$value": "{prim.dark.0}"
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "{prim.dark.300}"
+    },
+    "tertiary": {
+      "$type": "color",
+      "$value": "{prim.dark.400}"
+    },
+    "disabled": {
+      "$type": "color",
+      "$value": "{prim.dark.500}"
+    }
+  },
+  "brand": {
+    "default": {
+      "$type": "color",
+      "$value": "{prim.red.500}"
+    },
+    "on": {
+      "$type": "color",
+      "$value": "{prim.grey.0}"
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "{prim.red.400}"
+    }
+  },
+  "earn": {
+    "default": {
+      "$type": "color",
+      "$value": "{prim.green.400}"
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "{prim.green.950}"
+    }
+  },
+  "border": {
+    "separator": {
+      "$type": "color",
+      "$value": "{prim.dark.700}"
+    },
+    "control": {
+      "$type": "color",
+      "$value": "{prim.dark.650}"
+    }
+  },
+  "selected": {
+    "default": {
+      "$type": "color",
+      "$value": "{prim.dark.0}"
+    },
+    "on": {
+      "$type": "color",
+      "$value": "{prim.dark.1000}"
+    }
+  },
+  "system": {
+    "blue": {
+      "$type": "color",
+      "$value": "{prim.apple.blue-dark}"
+    }
+  },
+  "map": {
+    "land": {
+      "$type": "color",
+      "$value": "{prim.map.land-dark}"
+    },
+    "water": {
+      "$type": "color",
+      "$value": "{prim.map.water-dark}"
+    },
+    "park": {
+      "$type": "color",
+      "$value": "{prim.map.park-dark}"
+    },
+    "road": {
+      "$type": "color",
+      "$value": "{prim.dark.750}"
+    },
+    "road-minor": {
+      "$type": "color",
+      "$value": "{prim.map.road-minor-dark}"
+    },
+    "label": {
+      "$type": "color",
+      "$value": "{prim.dark.450}"
+    }
+  },
+  "glass": {
+    "regular": {
+      "$type": "color",
+      "$value": "{prim.alpha.dark-58}"
+    },
+    "thick": {
+      "$type": "color",
+      "$value": "{prim.alpha.dark-84}"
+    },
+    "edge": {
+      "$type": "color",
+      "$value": "{prim.alpha.white-16}"
+    },
+    "bar": {
+      "$type": "color",
+      "$value": "{prim.alpha.dark-88}"
+    }
+  },
+  "tab": {
+    "selected": {
+      "$type": "color",
+      "$value": "{prim.alpha.white-16}"
+    }
+  },
+  "feedback": {
+    "error": {
+      "$type": "color",
+      "$value": "{prim.apple.red-dark}"
+    }
+  },
+  "applepay": {
+    "bg": {
+      "$type": "color",
+      "$value": "{prim.grey.0}"
+    },
+    "label": {
+      "$type": "color",
+      "$value": "{prim.dark.1000}"
+    }
+  }
+}

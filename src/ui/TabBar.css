@@ -1,0 +1,48 @@
+.tabbar {
+  position: absolute;
+  left: var(--size-tabbar-inset);
+  right: var(--size-tabbar-inset);
+  bottom: var(--tabbar-bottom);
+  z-index: 20;
+  height: var(--size-tabbar);
+  padding: 6px;
+  display: flex;
+  border-radius: var(--radius-full);
+  background: var(--glass-bar);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--effect-glass-bar);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.tabbar-tab {
+  flex: 1 1 0;
+  height: 48px;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background-color var(--motion-ease-fade), transform var(--motion-ease-press);
+}
+
+.tabbar-tab:active { transform: scale(0.94); }
+
+.tabbar-tab.active {
+  background: var(--tab-selected);
+  color: var(--brand-accent);
+}
+
+.tabbar-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .tabbar { background: var(--bg-glass); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
