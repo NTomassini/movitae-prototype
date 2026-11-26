@@ -13,11 +13,11 @@ export type Demo = {
   payment: 'ok' | 'fail';
   soldOut: boolean;
 };
-export type AppState = { bookings: Booking[]; favorites: string[]; onboarded: boolean; demo: Demo };
+export type AppState = { bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; demo: Demo };
 
 const KEY = 'movitae-prototipo-v1';
 export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false };
-const initial = (): AppState => ({ bookings: [], favorites: [], onboarded: true, demo: { ...initialDemo } });
+const initial = (): AppState => ({ bookings: [], favorites: [], onboarded: true, voucherActive: false, demo: { ...initialDemo } });
 
 const load = (): AppState => {
   try {
@@ -36,7 +36,7 @@ export const store = {
   get: () => state,
   addBooking(b: Omit<Booking, 'id' | 'status'>) {
     const nb: Booking = { ...b, id: String(Date.now()), status: 'upcoming' };
-    set({ bookings: [nb, ...state.bookings] });
+    set({ bookings: [nb, ...state.bookings], voucherActive: false });
     return nb;
   },
   updateBooking(id: string, patch: Partial<Booking>) { set({ bookings: state.bookings.map((b) => (b.id === id ? { ...b, ...patch } : b)) }); },
@@ -45,6 +45,8 @@ export const store = {
   },
   setDemo(patch: Partial<Demo>) { set({ demo: { ...state.demo, ...patch } }); },
   setOnboarded(v: boolean) { set({ onboarded: v }); },
+  /** flusso C: "Trova un'attività" dallo sheet del buono lo attiva fino al pagamento */
+  setVoucherActive(v: boolean) { set({ voucherActive: v }); },
   reset() { state = initial(); save(); subs.forEach((f) => f()); },
 };
 

@@ -1,0 +1,4 @@
+.modal-scrim { position: absolute; inset: 0; z-index: 26; pointer-events: auto; background: rgba(0, 0, 0, 0.35); }
+.modal-sheet { pointer-events: auto; position: absolute; left: 0; right: 0; top: 0; bottom: -40px; z-index: 27; background: var(--bg-elevated); border-radius: 32px 32px 0 0; box-shadow: var(--effect-shadow-sheet); }
+.modal-sheet__grabber { position: absolute; top: 5px; left: 50%; width: 36px; height: 5px; margin-left: -18px; border-radius: 3px; background: var(--text-tertiary); opacity: 0.6; }
+.modal-sheet__close { position: absolute; top: 16px; right: 16px; z-index: 1; }

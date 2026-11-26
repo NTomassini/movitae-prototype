@@ -16,7 +16,7 @@ OUT.mkdir(exist_ok=True)
 URL = 'http://localhost:4173'
 FLAT = '.device{border-radius:0!important;box-shadow:none!important} .stage{padding:0!important} *{caret-color:transparent}'
 
-def go_home(pg): pg.goto(f'{URL}/?theme=light')
+def go_home(pg): pg.goto(f'{URL}/'); pg.evaluate('localStorage.clear()'); pg.goto(f'{URL}/?theme=light')
 def go_scopri(pg): pg.goto(f'{URL}/scopri?theme=light')
 def go_scheda(pg):
     pg.goto(f'{URL}/scopri/padel-ostiense?sport=padel&theme=light'); pg.wait_for_timeout(900)
@@ -33,6 +33,15 @@ def go_conferma(pg):
     go_riepilogo(pg)
     pg.locator('.apple-pay').click(); pg.wait_for_timeout(1600)
 
+def reset(pg):
+    pg.goto(f'{URL}/'); pg.evaluate("localStorage.clear()")
+def go_premi(pg): reset(pg); pg.goto(f'{URL}/premi?theme=light')
+def go_premi_scuro(pg): reset(pg); pg.goto(f'{URL}/premi?theme=dark')
+def go_arrivarci(pg): go_premi(pg); pg.wait_for_timeout(500); pg.locator('.voucher-row').nth(1).click(); pg.wait_for_timeout(900)
+def go_sheet_buono(pg): go_premi(pg); pg.wait_for_timeout(500); pg.locator('.use-button').click(); pg.wait_for_timeout(900)
+def go_scopri_buono(pg): go_sheet_buono(pg); pg.get_by_role('button', name="Trova un'attività").click(); pg.wait_for_timeout(1500)
+def go_dettaglio(pg): reset(pg); pg.goto(f'{URL}/premi/traguardi?t=serie-30&theme=light'); pg.wait_for_timeout(900)
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -40,6 +49,12 @@ SCREENS = [
     ('scheda', go_scheda, [(0, 108, 402, 392)]),                 # mappa sopra lo sheet
     ('riepilogo', go_riepilogo, [(0, 0, 402, 56)]),              # sotto: chat di Movi in Figma, Scopri nel codice
     ('conferma', go_conferma, []),
+    ('premi', go_premi, []),
+    ('premi-scuro', go_premi_scuro, []),
+    ('come-arrivarci', go_arrivarci, [(0, 0, 402, 246)]),
+    ('sheet-buono', go_sheet_buono, [(0, 0, 402, 470)]),
+    ('scopri-buono', go_scopri_buono, [(0, 160, 402, 650)]),
+    ('dettaglio-traguardo', go_dettaglio, [(0, 0, 402, 523)]),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):

@@ -61,3 +61,6 @@
 /* GlassBanner (posizione negata) — a y 120, padding 12/16, gap 12, raggio 24 */
 .glass-banner { position: absolute; left: 16px; right: 16px; top: calc(var(--device-top) + 66px); z-index: 12; display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 24px; color: var(--text-primary); }
 .glass-banner > div { display: flex; flex-direction: column; gap: 2px; }
+
+/* FilterSummary kind=voucher — capsula verde: il buono è attivo fino al pagamento (flusso-buono/2b) */
+.voucher-pill { position: absolute; left: 16px; top: calc(var(--device-top) + 62px); z-index: 12; height: 40px; padding: 6px 16px 6px 6px; border-radius: 999px; background: var(--earn-subtle); color: var(--earn-default); display: inline-flex; align-items: center; gap: 8px; }

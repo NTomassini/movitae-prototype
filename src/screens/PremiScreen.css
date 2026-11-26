@@ -1,0 +1,43 @@
+/* Premi: titolo grande a y 64, saldo a y 116, sezioni a 24. */
+.premi { display: flex; flex-direction: column; gap: 24px; padding: 10px var(--size-margin) 0; }
+.premi__title { margin-bottom: -12px; }
+.premi__section { display: flex; flex-direction: column; gap: 12px; }
+
+/* BalanceCard — padding 24, gap 16, raggio 24, brand/default, ombra brand-card */
+.balance-card { display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: var(--radius-24); background: var(--brand-default); color: var(--brand-on); box-shadow: var(--effect-shadow-brand-card); }
+.balance-card__muted { color: rgba(255, 255, 255, 0.82); }
+.balance-card__amount { line-height: 56px; height: 56px; }
+.balance-card__number { font-size: 62px; font-weight: 800; letter-spacing: -0.02em; }
+.balance-card__unit { font-size: 26px; font-weight: 600; }
+.balance-card__bar { height: 10px; border-radius: 5px; background: rgba(255, 255, 255, 0.25); overflow: hidden; }
+.balance-card__bar span { display: block; height: 100%; border-radius: 5px; background: #fff; }
+
+/* RewardRow — card con padding 4/16, righe con immagine 48, gap 16, padding 12/0 */
+.voucher-list { padding: 4px 16px; display: flex; flex-direction: column; }
+.voucher-row { display: flex; align-items: center; gap: 16px; padding: 12px 0; width: 100%; text-align: left; color: var(--text-primary); }
+.voucher-row__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.use-button { height: 44px; padding: 0 16px; border-radius: 999px; background: var(--brand-default); color: var(--brand-on); flex: none; }
+
+/* Riquadri piccoli: padding 16, gap 4, numero 28 Extra Bold */
+.small-tile { gap: 4px; }
+.number-28 { font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.02em; }
+
+/* AchievementTile — 64 + stella 18 + etichetta, gap 4 */
+.trophies { display: flex; gap: 12px; }
+.trophy { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px; }
+
+/* Sheet del buono — padding 32/24/42, gap 12, centrato */
+.voucher-sheet { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 24px 42px; text-align: center; }
+.voucher-sheet__later { min-height: 48px; padding: 12px 24px; }
+
+/* Come arrivarci — padding 32/16/42 */
+.path-sheet { display: flex; flex-direction: column; padding: 32px 16px 42px; }
+.path-sheet__bar { height: 8px; border-radius: 4px; background: var(--fill-tertiary); margin-top: 16px; overflow: hidden; }
+.path-sheet__bar span { display: block; height: 100%; border-radius: 4px; background: var(--brand-accent); }
+.path-sheet__ends { display: flex; justify-content: space-between; margin-top: 8px; }
+.ways { margin-top: 8px; border-radius: var(--radius-24); background: var(--bg-default); }
+.way { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; }
+.way + .way { box-shadow: inset 0 1px 0 var(--border-separator); margin-left: 16px; padding-left: 0; }
+.earn { color: var(--earn-default); text-align: right; }
+/* separatori tra le righe: partono dal testo (dopo l'immagine 48 + 16) e arrivano al bordo */
+.voucher-row + .voucher-row { box-shadow: inset 64px 0 0 var(--bg-surface), inset 0 1px 0 var(--border-separator); }

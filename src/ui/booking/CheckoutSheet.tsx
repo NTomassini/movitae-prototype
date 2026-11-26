@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { VOUCHER, activity, days, endTime, euro, euroCents, fmtPoints, user, venueOf } from '../../data/data';
 import { Icon } from '../Icon';
-import { balance, useBookings, useDemo } from '../../state/bookings';
+import { balance, store, useBookings, useDemo } from '../../state/bookings';
 import { Img } from '../Img';
 import { ActivityBlock, AppleLogo, Toggle } from './BookingParts';
 
@@ -21,7 +21,8 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid }: {
   const end = endTime(a, time);
   const bal = balance(useBookings(), user.points, user.saved);
   const canVoucher = bal.points >= VOUCHER.points;
-  const [voucher, setVoucher] = useState(false);
+  // dal flusso C il buono arriva già attivo; altrimenti parte spento
+  const [voucher, setVoucher] = useState(() => store.get().voucherActive && bal.points >= VOUCHER.points);
   const [paying, setPaying] = useState(false);
   const [failed, setFailed] = useState(false);
   const demo = useDemo();

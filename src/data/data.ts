@@ -11,6 +11,7 @@ export const user = {
   location: { lat: 41.8768, lng: 12.4757, label: 'Testaccio' },
   favoriteSports: ['padel', 'yoga', 'nuoto'] as Sport[],
   points: 2700,
+  totalPoints: 6850,
   saved: 25,
   streak: 5,
   bestStreak: 12,
@@ -106,3 +107,30 @@ export const endTime = (a: Activity, time: string) => {
 };
 export const euroCents = (n: number) => `€${n.toFixed(2).replace('.', ',')}`;
 export const VOUCHER = { value: 5, points: 2500 };
+
+// Buoni ripetibili (handoff › Punti e premi)
+export const vouchers = [
+  { id: 'bronzo', name: 'Bronzo', value: 5, points: 2500, image: 'img/buono-bronzo' },
+  { id: 'argento', name: 'Argento', value: 20, points: 8000, image: 'img/buono-argento' },
+  { id: 'oro', name: 'Oro', value: 50, points: 18000, image: 'img/buono-oro' },
+  { id: 'platino', name: 'Platino', value: 100, points: 30000, image: 'img/buono-platino' },
+];
+
+// Traguardi (13, non danno punti) — come la tavola premi/2-traguardi-tutti (1461:5459). stars = livello (1–4).
+export type Achievement = { id: string; group: 'Serie' | 'Punti' | 'Lezioni' | 'Risparmio'; label: string; title: string; image: string; stars: number; target: number; progress: number; unit: string; unlocked?: string; description: string };
+const A = (id: string, group: Achievement['group'], label: string, title: string, image: string, stars: number, target: number, progress: number, unit: string, description: string, unlocked?: string): Achievement => ({ id, group, label, title, image, stars, target, progress, unit, description, unlocked });
+export const achievements: Achievement[] = [
+  A('serie-7', 'Serie', '7 giorni', '7 giorni di fila', 'img/trSerie', 1, 7, 7, 'giorni', 'Hai completato la missione per 7 giorni di fila.', '10 nov'),
+  A('serie-30', 'Serie', '30 giorni', '30 giorni di fila', 'img/trSerie', 2, 30, 5, 'giorni', 'Completa la missione per 30 giorni di fila. Le pause tengono viva la serie.'),
+  A('serie-100', 'Serie', '100 giorni', '100 giorni di fila', 'img/trSerie', 3, 100, 5, 'giorni', 'Completa la missione per 100 giorni di fila. Le pause tengono viva la serie.'),
+  A('serie-365', 'Serie', '365 giorni', 'Un anno di fila', 'img/trSerie', 4, 365, 5, 'giorni', 'Completa la missione ogni giorno per un anno. Le pause tengono viva la serie.'),
+  A('punti-5k', 'Punti', '5.000 pt', '5.000 punti', 'img/trPunti', 1, 5000, 6850, 'pt', 'Hai guadagnato 5.000 punti in totale.', '2 nov'),
+  A('punti-25k', 'Punti', '25.000 pt', '25.000 punti', 'img/trPunti', 2, 25000, 6850, 'pt', 'Guadagna 25.000 punti in totale, tra missioni, prenotazioni e check-in.'),
+  A('punti-50k', 'Punti', '50.000 pt', '50.000 punti', 'img/trPunti', 3, 50000, 6850, 'pt', 'Guadagna 50.000 punti in totale, tra missioni, prenotazioni e check-in.'),
+  A('punti-100k', 'Punti', '100.000 pt', '100.000 punti', 'img/trPunti', 4, 100000, 6850, 'pt', 'Guadagna 100.000 punti in totale, tra missioni, prenotazioni e check-in.'),
+  A('lezioni-1', 'Lezioni', 'Prima lezione', 'Prima lezione', 'img/trLezioni', 1, 1, 1, 'lezioni', 'Hai fatto il check-in alla tua prima lezione.', '3 nov'),
+  A('lezioni-10', 'Lezioni', '10 lezioni', '10 lezioni', 'img/trLezioni', 2, 10, 4, 'lezioni', 'Fai il check-in a 10 lezioni.'),
+  A('sport-3', 'Lezioni', '3 sport', '3 sport diversi', 'img/trLezioni', 3, 3, 2, 'sport', 'Prova 3 sport diversi con un check-in.'),
+  A('risparmio-10', 'Risparmio', 'Primi €10', 'Primi €10 risparmiati', 'img/trRisparmio', 1, 10, 25, '€', 'Hai risparmiato i tuoi primi €10 con i buoni.', '8 nov'),
+  A('risparmio-50', 'Risparmio', 'Primi €50', 'Primi €50 risparmiati', 'img/trRisparmio', 2, 50, 25, '€', 'Risparmia €50 in totale con i buoni.'),
+];

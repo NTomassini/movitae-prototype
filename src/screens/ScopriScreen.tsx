@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Icon } from '../ui/Icon';
 import { VenueSheet } from '../ui/booking/VenueSheet';
 import { CheckoutSheet } from '../ui/booking/CheckoutSheet';
-import { bookings, useDemo } from '../state/bookings';
+import { bookings, useAppState, useDemo } from '../state/bookings';
+import { Img } from '../ui/Img';
 import { activities, euro, user, venueOf, venues, type Activity } from '../data/data';
 import { useScreenChrome } from '../app/chrome';
 import { MapView, type MapPinData } from '../ui/scopri/MapView';
@@ -23,6 +24,7 @@ export function ScopriScreen() {
   const [detent, setDetent] = useState<Detent>('small');
   const [selected, setSelected] = useState<string | null>(null);
   const demo = useDemo();
+  const voucherActive = useAppState().voucherActive;
   const denied = demo.location === 'denied';
   const navigate = useNavigate();
   const { activityId } = useParams();
@@ -58,7 +60,13 @@ export function ScopriScreen() {
         <SearchField />
         <GlassIconButton icon="UI/Filters" label="Filtri" badge={sport ? 1 : 0} />
       </div>
-      {denied && !sport && (
+      {voucherActive && !sport && (
+        <div className="voucher-pill">
+          <Img name="img/buono-bronzo" style={{ width: 28, height: 28 }} />
+          <span className="t-subheadline-emphasized">Buono da €5 attivo</span>
+        </div>
+      )}
+      {denied && !sport && !voucherActive && (
         <div className="glass-banner glass-control">
           <Icon name="UI/Location" size={24} />
           <div>

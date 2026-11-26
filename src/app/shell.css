@@ -60,3 +60,6 @@
 
 /* Schermate a tutto schermo (Scopri): niente scorrimento della pagina, niente spazi. */
 .screen--fixed { overflow: hidden; padding: 0; }
+
+/* Livelli fissi delle schermate (intestazioni, sheet modali): coprono la cornice, i figli riattivano i tocchi */
+#overlay { position: absolute; inset: 0; z-index: 25; pointer-events: none; }

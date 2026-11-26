@@ -1,0 +1,15 @@
+/* Pagina aperta da un'altra pagina, titolo piccolo (Header C): riga a y 62, contenuto da y 116 */
+.trophies-page { display: flex; flex-direction: column; gap: 32px; padding: 62px var(--size-margin) 0; }
+.page-header { position: absolute; left: 0; right: 0; top: 0; z-index: 15; height: calc(var(--device-top) + 52px); pointer-events: none; }
+.page-header .scroll-edge { height: 100% !important; }
+.back-button { position: absolute; left: 16px; top: calc(var(--device-top) + 8px); width: 44px; height: 44px; border-radius: 22px; background: var(--bg-surface); color: var(--text-primary); display: grid; place-items: center; pointer-events: auto; transition: box-shadow 0.2s; }
+.page-header__title { position: absolute; left: 0; right: 0; top: calc(var(--device-top) + 8px); height: 44px; display: grid; place-items: center; }
+
+.trophy-group { display: flex; flex-direction: column; gap: 12px; }
+.trophy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }
+.trophy-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border-radius: var(--radius-24); background: var(--bg-surface); text-align: center; }
+.stars { display: inline-flex; }
+.mini-bar { width: 80px; height: 8px; border-radius: 4px; background: var(--fill-tertiary); overflow: hidden; margin-top: 4px; }
+.mini-bar span { display: block; height: 100%; border-radius: 4px; background: var(--brand-accent); }
+.trophy-sheet { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 32px 16px 42px; text-align: center; }
+.trophy-sheet .stars { margin-top: 8px; }
