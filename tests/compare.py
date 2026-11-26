@@ -136,6 +136,14 @@ def go_doc_scaduto(pg):
     pg.wait_for_timeout(300)
 def go_doc_caricato(pg): checkout(pg, 'nuoto', 'Mar 17', '07:30', DOCS_OK)
 
+def go_scopri_offline(pg): state(pg, '/scopri?theme=light', "s => { s.demo = {...(s.demo||{}), network:'offline'}; return s }"); pg.wait_for_timeout(600)
+def go_scopri_caricamento(pg):
+    go_scopri_offline(pg); pg.locator('.offline-cta button').click(); pg.add_style_tag(content=FLAT); pg.wait_for_timeout(500); return True
+def go_orario_esaurito(pg):
+    state(pg, '/scopri/yoga-flow?theme=light', "s => { s.demo = {...(s.demo||{}), soldOut:true}; return s }"); pg.wait_for_timeout(300)
+    pg.evaluate("document.querySelector('.venue-sheet__body').scrollTop=400"); pg.wait_for_timeout(200)
+    pg.get_by_role('button', name='18:30', exact=True).evaluate('el => el.click()'); pg.locator('.bottom-bar .button--primary').click(); pg.wait_for_timeout(1000)
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -206,6 +214,9 @@ SCREENS = [
     ('doc-5-controlla', go_doc_controlla, [(0, 0, 402, 62)]),
     ('doc-e4-scaduto', go_doc_scaduto, [(0, 0, 402, 62)]),
     ('doc-c2-caricato', go_doc_caricato, [(0, 0, 402, 56)]),
+    ('scopri-offline', go_scopri_offline, [(0, 108, 402, 560)]),
+    ('scopri-caricamento', go_scopri_caricamento, [(0, 108, 402, 650)]),
+    ('orario-esaurito', go_orario_esaurito, [(0, 0, 402, 56)]),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):

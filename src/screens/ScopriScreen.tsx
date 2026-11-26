@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { Icon } from '../ui/Icon';
@@ -27,11 +27,20 @@ export function ScopriScreen() {
   const demo = useDemo();
   const voucherActive = useAppState().voucherActive;
   const denied = demo.location === 'denied';
+  // Offline (scopri/offline): niente pin, lista a media altezza con "Sei offline" e "Riprova".
+  // "Riprova" o il ritorno della rete mostrano il caricamento (scopri/caricamento) prima della lista.
+  const offline = demo.network === 'offline';
+  const [loading, setLoading] = useState(false);
+  const wasOffline = useRef(offline);
+  const retry = () => { setLoading(true); setTimeout(() => setLoading(false), 1100); };
+  useEffect(() => { if (wasOffline.current && !offline) retry(); wasOffline.current = offline; }, [offline]);
+  const showOffline = offline && !loading;
+  useEffect(() => { if (showOffline) setDetent('medium'); else if (loading) setDetent('small'); }, [showOffline, loading]);
   const navigate = useNavigate();
   const { activityId } = useParams();
   const [checkout, setCheckout] = useState<{ dayId: string; time: string } | null>(null);
   // Tab bar visibile solo con lo sheet piccolo e senza scheda aperta; la pagina non scorre (mappa a tutto schermo).
-  useScreenChrome({ tabBar: (detent === 'small' || detent === 'hidden') && !activityId, bottomEdge: false, pageScroll: false });
+  useScreenChrome({ tabBar: (detent === 'small' || detent === 'hidden') && !activityId && !showOffline, bottomEdge: false, pageScroll: false });
 
   const list = useMemo(() => {
     // ordine della lista come nella tavola Figma: Boxe, Yoga Flow, Padel Ostiense, poi il resto
@@ -56,7 +65,7 @@ export function ScopriScreen() {
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <MapView key={denied ? 'roma' : 'qui'} center={denied ? ROMA_CENTRO : user.location} showUser={!denied} pins={pins} selected={activityId ? activities.find((a) => a.id === activityId)?.venueId ?? null : selected} onSelect={onSelect} />
+      <MapView key={denied ? 'roma' : 'qui'} center={denied ? ROMA_CENTRO : user.location} showUser={!denied} pins={offline || loading ? [] : pins} selected={activityId ? activities.find((a) => a.id === activityId)?.venueId ?? null : selected} onSelect={onSelect} />
       <div className="scopri-top">
         <SearchField />
         <GlassIconButton icon="UI/Filters" label="Filtri" badge={sport ? 1 : 0} />
@@ -87,12 +96,27 @@ export function ScopriScreen() {
           </motion.button>
         )}
       </AnimatePresence>
-      <ListSheet title={title} detent={detent} onDetent={setDetent}>
-        {list.map((a) => {
+      <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : title} muted={loading} detent={detent} onDetent={showOffline || loading ? () => {} : setDetent}>
+        {showOffline ? (
+          <div className="offline-state" role="status">
+            <Icon name="UI/Wifi-Off" size={40} />
+            <h2 className="t-title-3">Sei offline</h2>
+            <p className="t-subheadline secondary">Controlla la connessione: mappa e attività tornano appena sei di nuovo online.</p>
+          </div>
+        ) : loading ? [0, 1, 2].map((i) => (
+          <div key={i} className="skeleton-row" aria-hidden="true"><i /><span><i /><i /><i /></span></div>
+        )) : list.map((a) => {
           const v = venueOf(a);
           return <ActivityRow key={a.id} title={a.title} place={`${v.name} · ${v.distance}`} price={priceLabel(a)} points={a.points} photo={a.photo} onPress={() => navigate(`/scopri/${a.id}${sport ? `?sport=${sport}` : ''}`)} />;
         })}
       </ListSheet>
+      <AnimatePresence>
+        {showOffline && !activityId && (
+          <motion.div className="offline-cta" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+            <button className="button button--primary t-headline" onClick={retry}>Riprova</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {activityId && (
         <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${sport ? `?sport=${sport}` : ''}`); }}
           onBook={(dayId, time) => setCheckout({ dayId, time })} />
@@ -102,7 +126,7 @@ export function ScopriScreen() {
       <AnimatePresence>
         {activityId && checkout && (
           <CheckoutSheet activityId={activityId} dayId={checkout.dayId} time={checkout.time} onCancel={() => setCheckout(null)}
-            onPaid={(r) => { const b = bookings.add({ activityId, dayId: checkout.dayId, time: checkout.time, ...r }); navigate(`/prenotato/${b.id}`); }} />
+            onPaid={(r) => { const b = bookings.add({ activityId, dayId: checkout.dayId, ...r }); navigate(`/prenotato/${b.id}`); }} />
         )}
       </AnimatePresence>
       </div></ScreenOverlay>

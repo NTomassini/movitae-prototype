@@ -91,11 +91,11 @@ export function MoviScreen() {
     const b = id ? app.bookings.find((x) => x.id === id) : undefined;
     return b && b.status !== 'cancelled' ? b.time : null;
   };
-  const paid = (c: Checkout, r: { voucher: boolean; paid: number; points: number }) => {
-    const b = bookings.add({ activityId: c.card.activityId, dayId: c.dayId, time: c.time, ...r });
+  const paid = (c: Checkout, r: { voucher: boolean; paid: number; points: number; time: string }) => {
+    const b = bookings.add({ activityId: c.card.activityId, dayId: c.dayId, ...r });
     const m = chat.get().messages.find((x) => x.id === c.msgId);
     if (m && m.role === 'movi') chat.update(m.id, { booked: { ...(m.booked ?? {}), [c.card.activityId]: b.id } });
-    chat.add({ role: 'movi', text: bookedLine(c.card.activityId, c.dayId, c.time), actions: [{ label: 'Vedi prenotazione', to: `/prenotazioni/${b.id}` }] });
+    chat.add({ role: 'movi', text: bookedLine(c.card.activityId, c.dayId, r.time), actions: [{ label: 'Vedi prenotazione', to: `/prenotazioni/${b.id}` }] });
     setPicked(null);
     navigate(`/prenotato/${b.id}?from=movi`);
   };

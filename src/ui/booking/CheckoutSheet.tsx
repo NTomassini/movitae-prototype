@@ -5,7 +5,7 @@ import { VOUCHER, activity, days, endTime, euro, euroCents, fmtPoints, user, ven
 import { Icon } from '../Icon';
 import { balance, store, useBookings, useDemo } from '../../state/bookings';
 import { Img } from '../Img';
-import { ActivityBlock, AppleLogo, Toggle } from './BookingParts';
+import { ActivityBlock, AppleLogo, Chip, Toggle } from './BookingParts';
 import '../modal-sheet.css';
 import '../page-header.css';
 
@@ -13,16 +13,21 @@ import '../page-header.css';
  * Riepilogo (flusso-movi/2): sheet modale che copre la tab bar, con "Annulla" e titolo.
  * Il buono da €5 c'è ma parte spento (handoff › Punti e premi). Apple Pay simulato.
  */
-export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back }: {
+export function CheckoutSheet({ activityId, dayId, time: chosen, onCancel, onPaid, back }: {
   activityId: string; dayId: string; time: string;
   /** aperto sopra la scheda (flusso-movi/7): freccia indietro e maniglia al posto di "Annulla" */
   back?: boolean;
   onCancel: () => void;
-  onPaid: (r: { voucher: boolean; paid: number; points: number }) => void;
+  onPaid: (r: { voucher: boolean; paid: number; points: number; time: string }) => void;
 }) {
   const a = activity(activityId);
   const v = venueOf(a);
   const d = days.find((x) => x.id === dayId)!;
+  const demo = useDemo();
+  // errori/2: con "Orario esaurito" nel pannello demo, l'orario scelto è appena finito; si sceglie un altro orario qui
+  const [time, setTime] = useState(chosen);
+  const soldOut = demo.soldOut && time === chosen;
+  const others = a.slots.filter((s) => s.time !== chosen && !(s.soldOut && dayId === 'oggi')).map((s) => s.time);
   const end = endTime(a, time);
   const bal = balance(useBookings(), user.points, user.saved);
   const canVoucher = bal.points >= VOUCHER.points;
@@ -30,7 +35,6 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back 
   const [voucher, setVoucher] = useState(() => store.get().voucherActive && bal.points >= VOUCHER.points);
   const [paying, setPaying] = useState(false);
   const [failed, setFailed] = useState(false);
-  const demo = useDemo();
   const total = a.price - (voucher ? VOUCHER.value : 0);
   const points = total * 10;
   const label = a.people ? `Campo da ${a.people}` : a.duration === 'ingresso singolo' || a.sport === 'nuoto' ? 'Ingresso' : 'Lezione';
@@ -46,7 +50,7 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back 
     setTimeout(() => {
       setPaying(false);
       if (demo.payment === 'fail') setFailed(true); // errori/3: il messaggio prende il posto del totale
-      else onPaid({ voucher, paid: total, points });
+      else onPaid({ voucher, paid: total, points, time });
     }, 900);
   };
 
@@ -74,6 +78,16 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back 
         <div className="checkout__body">
           <div className="card">
             <ActivityBlock photo={a.photo} title={a.title} when={`${d.long} · ${end ? `${time}–${end}` : `dalle ${time}`}`} where={`${v.name} · ${v.street}`} />
+            <AnimatePresence initial={false}>
+              {soldOut && (
+                <motion.div className="soldout" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ type: 'spring', visualDuration: 0.35, bounce: 0 }}>
+                  <p className="soldout__error t-subheadline" role="alert"><Icon name="UI/Alert" size={16} />Le {chosen} non sono più disponibili. Scegli un altro orario:</p>
+                  <div className="soldout__times" role="group" aria-label="Altri orari">
+                    {others.map((t) => <Chip key={t} big label={t} onPress={() => setTime(t)} />)}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           {v.documents && <DocCard venueId={v.id} kind={v.documents === 'form' ? 'form' : 'certificate'} onOpenForm={() => setFormOpen(true)} onUpload={upload.open} />}
           {canVoucher && (
@@ -117,9 +131,10 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back 
             </button>
           </div>
           )}
+          {soldOut ? <button className="button t-headline checkout-bar__pick" disabled>Scegli un orario</button> :
           <button className="apple-pay" onClick={pay} aria-busy={paying} aria-label={`Paga ${euroCents(total)} con Apple Pay`} disabled={paying}>
             <AppleLogo /><span>Pay</span>
-          </button>
+          </button>}
         </div>
       </motion.div>
       <AnimatePresence>{formOpen && <FormSheet key="form" venueId={v.id} onClose={() => setFormOpen(false)} />}</AnimatePresence>

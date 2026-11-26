@@ -89,3 +89,11 @@
 
 .checkout-layer { position: absolute; inset: 0; z-index: 21; pointer-events: none; }
 .checkout-layer > * { pointer-events: auto; }
+
+/* errori/2 orario esaurito: dentro la card dell'attività, riga d'errore e orari vicini; Apple Pay → "Scegli un orario" spento */
+.soldout { overflow: hidden; }
+.soldout__error { display: flex; gap: 6px; align-items: flex-start; padding: 0 16px; color: var(--feedback-error); }
+.soldout__error svg { flex: none; margin-top: 2px; }
+.soldout__times { display: flex; gap: 8px; padding: 12px 16px 16px; }
+.checkout-bar__pick { height: 56px; align-self: flex-start; }
+.soldout__times .chip { min-height: 44px; padding: 10px 16px; }

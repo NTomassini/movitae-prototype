@@ -64,3 +64,16 @@
 
 /* FilterSummary kind=voucher — capsula verde: il buono è attivo fino al pagamento (flusso-buono/2b) */
 .voucher-pill { position: absolute; left: 16px; top: calc(var(--device-top) + 62px); z-index: 12; height: 40px; padding: 6px 16px 6px 6px; border-radius: 999px; background: var(--earn-subtle); color: var(--earn-default); display: inline-flex; align-items: center; gap: 8px; }
+
+/* scopri/offline: icona 40 a +72, titolo title-3, testo centrato; "Riprova" in basso a sinistra */
+.offline-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding-top: 42px; color: var(--text-tertiary); }
+.offline-state h2 { color: var(--text-primary); }
+.offline-cta { position: absolute; left: 16px; bottom: calc(var(--safe-bottom-live) + 4px); z-index: 15; }
+/* scopri/caricamento: righe segnaposto 72 */
+.skeleton-row { display: flex; gap: 12px; animation: movi-pulse 1.4s ease-in-out infinite; }
+.skeleton-row > i { width: 72px; height: 72px; border-radius: 14px; background: var(--fill-tertiary); flex: none; }
+.skeleton-row span { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; }
+.skeleton-row span i { display: block; height: 12px; border-radius: 6px; background: var(--fill-tertiary); width: 170px; }
+.skeleton-row span i:nth-child(2) { width: 120px; } .skeleton-row span i:nth-child(3) { width: 80px; }
+@keyframes movi-pulse { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { .skeleton-row { animation: none; } }
