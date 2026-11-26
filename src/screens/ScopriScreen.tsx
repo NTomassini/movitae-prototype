@@ -1,5 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
+import { VenueSheet } from '../ui/booking/VenueSheet';
+import { CheckoutSheet } from '../ui/booking/CheckoutSheet';
+import { bookings } from '../state/bookings';
 import { activities, euro, user, venueOf, venues, type Activity } from '../data/data';
 import { useScreenChrome } from '../app/chrome';
 import { MapView, type MapPinData } from '../ui/scopri/MapView';
@@ -15,8 +19,10 @@ export function ScopriScreen() {
   const [detent, setDetent] = useState<Detent>('small');
   const [selected, setSelected] = useState<string | null>(null);
   const navigate = useNavigate();
-  // Tab bar visibile solo con lo sheet piccolo; la pagina non scorre (mappa a tutto schermo).
-  useScreenChrome({ tabBar: detent === 'small', bottomEdge: false, pageScroll: false });
+  const { activityId } = useParams();
+  const [checkout, setCheckout] = useState<{ dayId: string; time: string } | null>(null);
+  // Tab bar visibile solo con lo sheet piccolo e senza scheda aperta; la pagina non scorre (mappa a tutto schermo).
+  useScreenChrome({ tabBar: detent === 'small' && !activityId, bottomEdge: false, pageScroll: false });
 
   const list = useMemo(() => {
     const base = sport ? activities.filter((a) => a.sport === sport || (sport === 'calcio' && a.sport === 'calcio')) : activities;
@@ -45,9 +51,19 @@ export function ScopriScreen() {
       <ListSheet title={title} detent={detent} onDetent={setDetent}>
         {list.map((a) => {
           const v = venueOf(a);
-          return <ActivityRow key={a.id} title={a.title} place={`${v.name} · ${v.distance}`} price={priceLabel(a)} points={a.points} photo={a.photo} onPress={() => navigate(`/scopri/${a.id}`)} />;
+          return <ActivityRow key={a.id} title={a.title} place={`${v.name} · ${v.distance}`} price={priceLabel(a)} points={a.points} photo={a.photo} onPress={() => navigate(`/scopri/${a.id}${sport ? `?sport=${sport}` : ''}`)} />;
         })}
       </ListSheet>
+      {activityId && (
+        <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${sport ? `?sport=${sport}` : ''}`); }}
+          onBook={(dayId, time) => setCheckout({ dayId, time })} />
+      )}
+      <AnimatePresence>
+        {activityId && checkout && (
+          <CheckoutSheet activityId={activityId} dayId={checkout.dayId} time={checkout.time} onCancel={() => setCheckout(null)}
+            onPaid={(r) => { const b = bookings.add({ activityId, dayId: checkout.dayId, time: checkout.time, ...r }); navigate(`/prenotato/${b.id}`); }} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

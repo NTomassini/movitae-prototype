@@ -1,0 +1,88 @@
+import { useState } from 'react';
+import { motion } from 'motion/react';
+import { VOUCHER, activity, days, endTime, euro, euroCents, fmtPoints, user, venueOf } from '../../data/data';
+import { Icon } from '../Icon';
+import { balance, useBookings } from '../../state/bookings';
+import { Img } from '../Img';
+import { ActivityBlock, AppleLogo, Toggle } from './BookingParts';
+
+/**
+ * Riepilogo (flusso-movi/2): sheet modale che copre la tab bar, con "Annulla" e titolo.
+ * Il buono da €5 c'è ma parte spento (handoff › Punti e premi). Apple Pay simulato.
+ */
+export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid }: {
+  activityId: string; dayId: string; time: string;
+  onCancel: () => void;
+  onPaid: (r: { voucher: boolean; paid: number; points: number }) => void;
+}) {
+  const a = activity(activityId);
+  const v = venueOf(a);
+  const d = days.find((x) => x.id === dayId)!;
+  const end = endTime(a, time);
+  const bal = balance(useBookings(), user.points, user.saved);
+  const canVoucher = bal.points >= VOUCHER.points;
+  const [voucher, setVoucher] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const total = a.price - (voucher ? VOUCHER.value : 0);
+  const points = total * 10;
+  const label = a.people ? `Campo da ${a.people}` : a.duration === 'ingresso singolo' ? 'Ingresso' : 'Lezione';
+
+  const pay = () => {
+    setPaying(true);
+    setTimeout(() => onPaid({ voucher, paid: total, points }), 900);
+  };
+
+  return (
+    <>
+      <motion.div className="scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onCancel} />
+      <motion.div className="checkout" role="dialog" aria-modal="true" aria-label="Riepilogo"
+        style={{ top: 'calc(var(--device-top) + 2px)' }}
+        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', visualDuration: 0.5, bounce: 0 }}>
+        <div className="checkout__head">
+          <button className="t-body" onClick={onCancel}>Annulla</button>
+          <h2 className="t-headline">Riepilogo</h2>
+          <span />
+        </div>
+        <div className="checkout__body">
+          <div className="card">
+            <ActivityBlock photo={a.photo} title={a.title} when={`${d.long} · ${end ? `${time}–${end}` : `dalle ${time}`}`} where={`${v.name} · ${v.street}`} />
+          </div>
+          {canVoucher && (
+            <div className="card voucher-card">
+              <Img name="img/buono-bronzo" style={{ width: 44, height: 44, flex: 'none' }} />
+              <div className="voucher-card__text">
+                <span className="t-headline">{voucher ? `Buono da €${VOUCHER.value} attivo` : `Hai un buono da €${VOUCHER.value}`}</span>
+                <span className="t-subheadline secondary">{voucher ? `Userai ${fmtPoints(VOUCHER.points)} pt` : `Attivalo e paghi ${euro(a.price - VOUCHER.value)}`}</span>
+              </div>
+              <Toggle checked={voucher} onChange={setVoucher} label={`Usa il buono da €${VOUCHER.value}`} />
+            </div>
+          )}
+          <div className="card price-card">
+            <div className="price-card__row"><span className="t-body secondary">{label}</span><span className="t-headline">{euro(a.price)}</span></div>
+            {voucher && <div className="price-card__row"><span className="t-body secondary">Buono</span><span className="t-headline" style={{ color: 'var(--earn-default)' }}>−{euro(VOUCHER.value)}</span></div>}
+            <div className="price-card__rule" />
+            <div className="price-card__row"><span className="t-title-3">Totale</span><span className="t-title-2">{euro(total)}</span></div>
+            <span className="points-pill t-footnote-emphasized">+{fmtPoints(points)} pt in arrivo dopo il check-in</span>
+          </div>
+          <p className="t-footnote secondary">Puoi disdire gratis fino a 2 ore prima: ti rimborsiamo sul metodo di pagamento.</p>
+        </div>
+        <div className="checkout-bar">
+          <div className="checkout-bar__summary">
+            <div className="checkout-bar__total">
+              <span className="t-footnote secondary">Totale</span>
+              <span className="t-title-3">{euroCents(total)}</span>
+            </div>
+            <button className="pay-method pressable">
+              <span className="t-footnote secondary">Paga con</span>
+              <span className="t-subheadline-emphasized">Apple Pay</span>
+              <Icon name="UI/Chevron-Down" size={16} />
+            </button>
+          </div>
+          <button className="apple-pay" onClick={pay} aria-busy={paying} aria-label={`Paga ${euroCents(total)} con Apple Pay`} disabled={paying}>
+            <AppleLogo /><span>Pay</span>
+          </button>
+        </div>
+      </motion.div>
+    </>
+  );
+}

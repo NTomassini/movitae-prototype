@@ -1,3 +1,6 @@
+import { days } from '../data/data';
+import { balance, useBookings } from '../state/bookings';
+import { fmtPoints } from '../data/data';
 import { activities, activity, euro, nearby, shelfSports, upcomingBooking, user, venueOf } from '../data/data';
 import { Avatar, BookingCard, MissionCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from '../ui/home/HomeParts';
 import { ScrollEdge } from '../ui/ScrollEdge';
@@ -7,7 +10,12 @@ import './HomeScreen.css';
 
 // Home — DS · Schermate › "home — chiaro" (1461:439). Contenuto: padding 16 ai lati, sezioni a 24.
 export function HomeScreen() {
-  const booking = activity(upcomingBooking.activityId);
+  // Dopo una prenotazione nel prototipo, "Prossima prenotazione" mostra quella appena fatta.
+  const all = useBookings();
+  const made = all[0];
+  const bal = balance(all, user.points, user.saved);
+  const booking = activity(made ? made.activityId : upcomingBooking.activityId);
+  const when = made ? `${days.find((d) => d.id === made.dayId)!.id === 'oggi' ? 'Oggi' : days.find((d) => d.id === made.dayId)!.short}, ${made.time}` : `${upcomingBooking.day}, ${upcomingBooking.time}`;
   void activities;
   // Comportamenti §4: il titolo grande scorre via; quando è sparito compaiono il titolo piccolo
   // centrato e il bordo sfocato in alto (alto 106, quanto la riga d'intestazione). L'avatar resta fisso.
@@ -37,12 +45,12 @@ export function HomeScreen() {
 
       <section className="home__section">
         <SectionHeader title="Prossima prenotazione" link="Vedi tutte" to="/prenotazioni" />
-        <BookingCard title={booking.title} subtitle={`${upcomingBooking.day}, ${upcomingBooking.time} · ${venueOf(booking).name}`} photo="img/yoga" to="/prenotazioni/1" />
+        <BookingCard title={booking.title} subtitle={`${when} · ${venueOf(booking).name}`} photo={made ? booking.photo : 'img/yoga'} to="/prenotazioni/1" />
       </section>
 
       <div className="stat-tiles">
-        <StatTile kind="points" points={user.points} nextVoucher={8000} note="Hai un buono da €5" to="/premi" />
-        <StatTile kind="savings" amount={user.saved} note="Con 3 buoni usati da settembre" to="/premi" />
+        <StatTile kind="points" points={bal.points} nextVoucher={bal.points >= 2500 ? 8000 : 2500} note={bal.points >= 2500 ? 'Hai un buono da €5' : `Mancano ${fmtPoints(2500 - bal.points)} pt al buono da €5`} to="/premi" />
+        <StatTile kind="savings" amount={bal.saved} note={`Con ${3 + bal.vouchersUsed} buoni usati da settembre`} to="/premi" />
       </div>
 
       <section className="home__section">

@@ -73,3 +73,36 @@ export const activity = (id: string) => activities.find((a) => a.id === id)!;
 export const euro = (n: number) => `€${n}`;
 // Separatore delle migliaia anche a 4 cifre (6.000), come nelle schermate: Intl it-IT lo omette sotto 10.000.
 export const fmtPoints = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+// Servizi mostrati nella scheda (di esempio, come nelle bozze).
+export const services: Record<string, string> = {
+  zen: 'Spogliatoi e docce · Tappetini inclusi',
+  'palestra-testaccio': 'Spogliatoi e docce · Guantoni a noleggio €2',
+  fitlab: 'Spogliatoi e docce · Armadietti',
+  'sporting-testaccio': 'Spogliatoi · Racchette a noleggio €3',
+  dojo: 'Spogliatoi e docce',
+  'padel-ostiense': 'Spogliatoi e docce · Racchette a noleggio €3',
+  'piscina-aventino': 'Spogliatoi e docce · Cuffia obbligatoria',
+  'padel-aventino': 'Campi coperti · Racchette a noleggio €3',
+  'cs-ostiense': 'Spogliatoi e docce · Pettorine',
+};
+
+/** Giorni scelti nella scheda: il prototipo vive venerdì 13 novembre. */
+export const days = [
+  { id: 'oggi', short: 'Oggi', long: 'Venerdì 13 novembre', sentence: 'oggi' },
+  { id: '14', short: 'Sab 14', long: 'Sabato 14 novembre', sentence: 'sabato' },
+  { id: '15', short: 'Dom 15', long: 'Domenica 15 novembre', sentence: 'domenica' },
+  { id: '16', short: 'Lun 16', long: 'Lunedì 16 novembre', sentence: 'lunedì' },
+  { id: '17', short: 'Mar 17', long: 'Martedì 17 novembre', sentence: 'martedì' },
+];
+
+/** Orario di fine (es. 18:30 + 60 min = 19:30); null per l'ingresso libero. */
+export const endTime = (a: Activity, time: string) => {
+  const m = parseInt(a.duration, 10);
+  if (!m) return null;
+  const [hh, mm] = time.split(':').map(Number);
+  const t = hh * 60 + mm + m;
+  return `${String(Math.floor(t / 60) % 24).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+};
+export const euroCents = (n: number) => `€${n.toFixed(2).replace('.', ',')}`;
+export const VOUCHER = { value: 5, points: 2500 };
