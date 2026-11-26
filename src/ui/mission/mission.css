@@ -1,0 +1,57 @@
+.ring { position: relative; display: inline-grid; place-items: center; flex: none; }
+.ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring__label { position: relative; display: flex; flex-direction: column; align-items: center; }
+
+/* MissionCard health-off: alta 196, pulsante bianco 56 con testo rosso */
+.mission-card--tall { align-items: center; }
+.mission-card__connect { align-self: flex-start; height: 56px; padding: 0 16px; border-radius: 999px; background: #fff; color: var(--brand-default); }
+
+/* StreakDay */
+.streak-day { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 36px; }
+.streak-day__letter { color: var(--text-tertiary); }
+.streak-day__letter.is-today { color: var(--text-primary); }
+.streak-day__dot { width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; }
+.streak-day__dot--done { background: var(--brand-default); color: #fff; }
+.streak-day__dot--pause { background: #dbedff; }
+[data-theme='dark'] .streak-day__dot--pause { background: #1d3a57; }
+
+/* Sheet "La tua serie" — padding 32/16/42, contenuto centrato */
+.streak-sheet { display: flex; flex-direction: column; align-items: center; padding: 32px 16px 42px; text-align: center; }
+.streak-week { margin-top: 24px; align-self: stretch; display: flex; justify-content: space-between; padding: 16px 12px; border-radius: var(--radius-24); background: var(--bg-default); }
+.streak-facts { margin-top: 16px; align-self: stretch; border-radius: var(--radius-24); background: var(--bg-default); text-align: left; }
+.streak-facts__row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; min-height: 52px; }
+.streak-facts__row--between { justify-content: space-between; padding: 14px 16px; }
+.streak-facts__text { display: flex; flex-direction: column; gap: 2px; }
+.streak-facts__sep { height: 1px; margin-left: 16px; background: var(--border-separator); }
+
+/* Celebrazione — schermo intero bg/elevated; anello 220 a y 124, titolo a y 376 */
+.celebration { pointer-events: auto; position: absolute; inset: 0; z-index: 28; background: var(--bg-elevated); display: flex; flex-direction: column; align-items: center; padding: calc(var(--device-top) + 70px) 16px 0; overflow-y: auto; }
+.celebration__close { position: absolute; top: calc(var(--device-top) + 12px); right: 16px; }
+.celebration__title { margin-top: 32px; text-align: center; }
+.celebration__pills { display: flex; gap: 8px; margin-top: 12px; }
+.earn-pill { padding: 6px 14px; border-radius: 999px; background: var(--earn-subtle); color: var(--earn-default); }
+.celebration__streak { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.celebration__more { align-self: stretch; margin-top: 60px; }
+.proposal { align-self: stretch; margin-top: 12px; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-24); background: var(--bg-default); text-align: left; }
+.proposal__text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.celebration__done { position: absolute; left: 16px; bottom: calc(var(--safe-bottom-live) + 4px); }
+
+/* Flusso E — spiegazione */
+.health-sheet { display: flex; flex-direction: column; align-items: center; padding: 32px 24px 34px; text-align: center; }
+.health-sheet__list { list-style: none; align-self: stretch; display: flex; flex-direction: column; gap: 12px; margin-top: 24px; text-align: left; }
+.health-sheet__list li { display: flex; gap: 12px; align-items: center; }
+.check-dot { width: 24px; height: 24px; border-radius: 12px; background: var(--earn-subtle); color: var(--earn-default); display: grid; place-items: center; flex: none; }
+
+/* Foglio di sistema di Salute (simulato) */
+.health-system { box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35); pointer-events: auto; position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--device-top) + 10px); z-index: 29; background: var(--bg-default); border-radius: 12px 12px 0 0; display: flex; flex-direction: column; }
+.health-system__bar { white-space: nowrap; display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border-separator); }
+.health-system__bar > :last-child { justify-self: end; }
+.health-system__bar > :first-child { justify-self: start; color: var(--system-blue); }
+.health-system__body { display: flex; flex-direction: column; align-items: center; padding: 24px 16px; text-align: center; }
+.health-system__list { align-self: stretch; margin-top: 6px; border-radius: 12px; background: var(--bg-surface); }
+.health-system__list label { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; min-height: 44px; text-align: left; }
+.health-system__list label + label { border-top: 1px solid var(--border-separator); }
+.health-system__list input { appearance: none; width: 51px; height: 31px; border-radius: 16px; background: var(--fill-tertiary); position: relative; transition: background 0.2s; }
+.health-system__list input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); transition: transform 0.25s; }
+.health-system__list input:checked { background: var(--earn-default); }
+.health-system__list input:checked::after { transform: translateX(20px); }

@@ -28,39 +28,6 @@ export function SectionHeader({ title, link, to }: { title: string; link?: strin
   );
 }
 
-/** MissionCard state=active — anello: spessore 6 (innerRadius 0,89), parte da ore 12, estremi piatti. */
-export function MissionCard({ goal, steps, points, streak, onPress }: { goal: number; steps: number; points: number; streak: number; onPress?: () => void }) {
-  const left = Math.max(goal - steps, 0);
-  const progress = Math.min(steps / goal, 1);
-  const r = 53;
-  const c = 2 * Math.PI * r;
-  return (
-    <button className="mission-card pressable" onClick={onPress} aria-label={`Missione di oggi: ${fmtPoints(goal)} passi, ne mancano ${fmtPoints(left)}. ${streak} giorni di fila.`}>
-      <span className="mission-card__text">
-        <span className="mission-card__lines">
-          <span className="t-footnote-emphasized mission-card__muted">Missione di oggi</span>
-          <span className="t-title-3">{fmtPoints(goal)} passi · +{points} pt</span>
-          <span className="t-subheadline mission-card__muted">Ne mancano {fmtPoints(left)}</span>
-        </span>
-        <span className="mission-card__streak">
-          <span className="mission-card__flame"><Img name="img/fiamma" style={{ width: 20, height: 20 }} /></span>
-          <span className="t-subheadline-emphasized">{streak} giorni di fila</span>
-        </span>
-      </span>
-      <span className="mission-card__ring" aria-hidden="true">
-        <svg width="112" height="112" viewBox="0 0 112 112">
-          <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="6" />
-          <circle cx="56" cy="56" r={r} fill="none" stroke="#fff" strokeWidth="6" strokeDasharray={`${c * progress} ${c}`} />
-        </svg>
-        <span className="mission-card__ring-label">
-          <span className="t-number-large">{fmtPoints(steps)}</span>
-          <span className="t-caption mission-card__muted">passi</span>
-        </span>
-      </span>
-    </button>
-  );
-}
-
 export function SportShelfItem({ label, image, to }: { label: string; image: string; to: string }) {
   return (
     <Link to={to} className="sport-tile pressable" aria-label={label}>

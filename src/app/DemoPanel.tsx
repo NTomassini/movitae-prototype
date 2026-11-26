@@ -11,7 +11,7 @@ export const openDemo = () => window.dispatchEvent(new Event('movitae:demo'));
 
 type Opt<K extends keyof Demo> = { key: K; label: string; options: { v: Demo[K]; l: string }[]; ready?: boolean };
 const groups: Opt<keyof Demo>[] = [
-  { key: 'mission', label: 'Missione in Home', options: [{ v: 'active', l: 'Attiva' }, { v: 'first-day', l: 'Primo giorno' }, { v: 'no-health', l: 'Senza Salute' }, { v: 'completed', l: 'Completata' }] },
+  { key: 'mission', label: 'Missione in Home', options: [{ v: 'active', l: 'Attiva' }, { v: 'first-day', l: 'Primo giorno' }, { v: 'no-health', l: 'Senza Salute' }, { v: 'completed', l: 'Fatta' }, { v: 'completed-7', l: '7 giorni' }] },
   { key: 'location', label: 'Posizione', options: [{ v: 'granted', l: 'Concessa' }, { v: 'denied', l: 'Negata' }] },
   { key: 'network', label: 'Connessione', options: [{ v: 'online', l: 'Online' }, { v: 'offline', l: 'Offline' }] },
   { key: 'payment', label: 'Pagamento', options: [{ v: 'ok', l: 'Riuscito' }, { v: 'fail', l: 'Non riuscito' }] },
@@ -44,7 +44,7 @@ export function DemoPanel() {
                 <div className="demo-seg">
                   {g.options.map((o) => (
                     <button key={String(o.v)} className={`t-footnote-emphasized${demo[g.key] === o.v ? ' is-on' : ''}`}
-                      onClick={() => store.setDemo({ [g.key]: o.v } as Partial<Demo>)}>{o.l}</button>
+                      onClick={() => { store.setDemo({ [g.key]: o.v } as Partial<Demo>); if (g.key === 'mission') store.setCelebrated(null); }}>{o.l}</button>
                   ))}
                 </div>
               </div>

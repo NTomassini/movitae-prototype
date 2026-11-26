@@ -67,7 +67,7 @@ export function PremiScreen() {
       <section className="premi__section">
         <SectionHeader title="Traguardi" link="Vedi tutti" to="/premi/traguardi" />
         <div className="trophies">
-          {achievements.filter((a) => a.unlocked).map((a) => (
+          {['risparmio-10', 'punti-5k', 'serie-7', 'lezioni-1'].map((id) => achievements.find((a) => a.id === id)!).filter((a) => a.unlocked).map((a) => (
             <Link key={a.id} to={`/premi/traguardi?t=${a.id}`} className="trophy pressable">
               <Img name={a.image} style={{ width: 64, height: 64 }} />
               <Img name="img/stella" style={{ width: 18, height: 18 }} />

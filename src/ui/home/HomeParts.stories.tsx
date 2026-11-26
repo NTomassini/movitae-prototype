@@ -1,10 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { BookingCard, MissionCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from './HomeParts';
+import { BookingCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from './HomeParts';
+import { MissionCard, StreakDay } from '../mission/Mission';
 
 const meta: Meta = { title: 'Home/Componenti' };
 export default meta;
 
-export const Missione: StoryObj = { render: () => <MissionCard goal={6000} steps={4120} points={7} streak={5} /> };
+export const MissioneAttiva: StoryObj = { render: () => <MissionCard state="active" /> };
+export const MissionePrimoGiorno: StoryObj = { render: () => <MissionCard state="first-day" /> };
+export const MissioneSenzaSalute: StoryObj = { render: () => <MissionCard state="no-health" /> };
+export const MissioneCompletata: StoryObj = { render: () => <MissionCard state="completed" /> };
+export const GiorniSerie: StoryObj = { render: () => <div style={{ display: 'flex', gap: 16 }}><StreakDay letter="L" state="done" /><StreakDay letter="M" state="pause" /><StreakDay letter="V" state="today" /><StreakDay letter="S" state="future" /></div> };
 export const TitoloSezione: StoryObj = { render: () => <SectionHeader title="Cosa ti va oggi?" link="Altro" /> };
 export const SportScaffale: StoryObj = { render: () => <div style={{ display: 'flex', gap: 8 }}><SportShelfItem label="Padel" image="img/padel" to="#" /><SportShelfItem label="Yoga" image="img/yoga" to="#" /></div> };
 export const Prenotazione: StoryObj = { render: () => <BookingCard title="Yoga Flow" subtitle="Oggi, 18:30 · Zen Studio" photo="img/yoga" to="#" /> };

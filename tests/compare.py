@@ -42,6 +42,19 @@ def go_sheet_buono(pg): go_premi(pg); pg.wait_for_timeout(500); pg.locator('.use
 def go_scopri_buono(pg): go_sheet_buono(pg); pg.get_by_role('button', name="Trova un'attività").click(); pg.wait_for_timeout(1500)
 def go_dettaglio(pg): reset(pg); pg.goto(f'{URL}/premi/traguardi?t=serie-30&theme=light'); pg.wait_for_timeout(900)
 
+def demo(pg, mission, path='/'):
+    pg.goto(f'{URL}/'); pg.evaluate("m => { localStorage.clear(); localStorage.setItem('movitae-prototipo-v1', JSON.stringify({demo:{mission:m,location:'granted',network:'online',payment:'ok',soldOut:false}, celebrated: m.startsWith('completed') ? m : null})) }", mission)
+    pg.goto(f'{URL}{path}'); pg.wait_for_timeout(1200)
+def go_primo(pg): demo(pg, 'first-day')
+def go_senza_salute(pg): demo(pg, 'no-health')
+def go_completata(pg): demo(pg, 'completed')
+def go_sheet_serie(pg): demo(pg, 'active'); pg.locator('.mission-card').click(); pg.wait_for_timeout(900)
+def go_celebrazione(pg):
+    demo(pg, 'active'); pg.evaluate("() => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v1')); s.demo.mission='completed'; s.celebrated=null; localStorage.setItem('movitae-prototipo-v1', JSON.stringify(s)) }"); pg.goto(f'{URL}/'); pg.wait_for_timeout(2200)
+def go_celebrazione7(pg):
+    demo(pg, 'active'); pg.evaluate("() => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v1')); s.demo.mission='completed-7'; s.celebrated=null; localStorage.setItem('movitae-prototipo-v1', JSON.stringify(s)) }"); pg.goto(f'{URL}/'); pg.wait_for_timeout(2200)
+def go_spiegazione(pg): demo(pg, 'no-health'); pg.locator('.mission-card__connect').click(); pg.wait_for_timeout(900)
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -55,6 +68,13 @@ SCREENS = [
     ('sheet-buono', go_sheet_buono, [(0, 0, 402, 470)]),
     ('scopri-buono', go_scopri_buono, [(0, 160, 402, 650)]),
     ('dettaglio-traguardo', go_dettaglio, [(0, 0, 402, 523)]),
+    ('home-primo-giorno', go_primo, []),
+    ('home-senza-salute', go_senza_salute, []),
+    ('home-completata', go_completata, []),
+    ('sheet-serie', go_sheet_serie, [(0, 0, 402, 364)]),
+    ('celebrazione', go_celebrazione, []),
+    ('celebrazione-7', go_celebrazione7, []),
+    ('salute-spiegazione', go_spiegazione, [(0, 0, 402, 345)]),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):
@@ -75,7 +95,9 @@ def main():
     rows = []
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path='/usr/bin/google-chrome')
+        only = __import__('sys').argv[1:]
         for name, go, masks in SCREENS:
+            if only and name not in only: continue
             pg = b.new_page(viewport={'width': 1000, 'height': 1000}, device_scale_factor=1)
             go(pg)
             pg.add_style_tag(content=FLAT)

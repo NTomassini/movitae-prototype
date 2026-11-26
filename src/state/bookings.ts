@@ -7,17 +7,17 @@ import { useSyncExternalStore } from 'react';
  */
 export type Booking = { id: string; activityId: string; dayId: string; time: string; voucher: boolean; paid: number; points: number; status?: 'upcoming' | 'checked-in' | 'cancelled' };
 export type Demo = {
-  mission: 'active' | 'first-day' | 'no-health' | 'completed';
+  mission: 'active' | 'first-day' | 'no-health' | 'completed' | 'completed-7';
   location: 'granted' | 'denied';
   network: 'online' | 'offline';
   payment: 'ok' | 'fail';
   soldOut: boolean;
 };
-export type AppState = { bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; demo: Demo };
+export type AppState = { bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; celebrated: string | null; demo: Demo };
 
 const KEY = 'movitae-prototipo-v1';
 export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false };
-const initial = (): AppState => ({ bookings: [], favorites: [], onboarded: true, voucherActive: false, demo: { ...initialDemo } });
+const initial = (): AppState => ({ bookings: [], favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
 
 const load = (): AppState => {
   try {
@@ -47,6 +47,8 @@ export const store = {
   setOnboarded(v: boolean) { set({ onboarded: v }); },
   /** flusso C: "Trova un'attività" dallo sheet del buono lo attiva fino al pagamento */
   setVoucherActive(v: boolean) { set({ voucherActive: v }); },
+  /** la celebrazione si vede una volta sola per ogni missione completata */
+  setCelebrated(key: string | null) { set({ celebrated: key }); },
   reset() { state = initial(); save(); subs.forEach((f) => f()); },
 };
 

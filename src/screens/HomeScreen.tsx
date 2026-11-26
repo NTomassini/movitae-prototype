@@ -2,7 +2,13 @@ import { days } from '../data/data';
 import { balance, useBookings } from '../state/bookings';
 import { fmtPoints } from '../data/data';
 import { activities, activity, euro, nearby, shelfSports, upcomingBooking, user, venueOf } from '../data/data';
-import { Avatar, BookingCard, MissionCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from '../ui/home/HomeParts';
+import { Avatar, BookingCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from '../ui/home/HomeParts';
+import { Celebration, HealthExplain, HealthSystemSheet, MissionCard, StreakSheetContent } from '../ui/mission/Mission';
+import { ModalSheet } from '../ui/ModalSheet';
+import { AnimatePresence } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { store, useAppState } from '../state/bookings';
 import { ScrollEdge } from '../ui/ScrollEdge';
 import { useScreenScroll } from '../app/useScreenScroll';
 import { ScreenOverlay } from '../app/ScreenOverlay';
@@ -12,9 +18,21 @@ import './HomeScreen.css';
 // Home — DS · Schermate › "home — chiaro" (1461:439). Contenuto: padding 16 ai lati, sezioni a 24.
 export function HomeScreen() {
   // Dopo una prenotazione nel prototipo, "Prossima prenotazione" mostra quella appena fatta.
+  const app = useAppState();
+  const mission = app.demo.mission;
+  const navigate = useNavigate();
+  const [sheet, setSheet] = useState<null | 'streak' | 'health'>(null);
+  const [system, setSystem] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
+  // celebrazione a schermo intero alla prima apertura dopo il traguardo, una volta sola
+  useEffect(() => {
+    if (mission.startsWith('completed') && app.celebrated !== mission) { setCelebrate(true); store.setCelebrated(mission); }
+  }, [mission, app.celebrated]);
   const all = useBookings();
   const made = all[0];
-  const bal = balance(all, user.points, user.saved);
+  // primo giorno = utente appena iscritto: niente prenotazioni, 0 pt, €0 (home/stato-primo-giorno)
+  const isNew = mission === 'first-day';
+  const bal = isNew ? { points: 0, saved: 0, vouchersUsed: 0 } : balance(all, user.points, user.saved);
   const booking = activity(made ? made.activityId : upcomingBooking.activityId);
   const when = made ? `${days.find((d) => d.id === made.dayId)!.id === 'oggi' ? 'Oggi' : days.find((d) => d.id === made.dayId)!.short}, ${made.time}` : `${upcomingBooking.day}, ${upcomingBooking.time}`;
   void activities;
@@ -35,7 +53,7 @@ export function HomeScreen() {
         <h1 className="t-large-title">Ciao, {user.name}</h1>
       </header>
 
-      <MissionCard goal={user.mission.goal} steps={user.mission.steps} points={user.mission.points} streak={user.streak} />
+      <MissionCard state={mission} onPress={() => setSheet('streak')} onConnect={() => setSheet('health')} />
 
       <section className="home__section">
         <SectionHeader title="Cosa ti va oggi?" link="Altro" to="/scopri" />
@@ -44,14 +62,14 @@ export function HomeScreen() {
         </div>
       </section>
 
-      <section className="home__section">
+      {!isNew && <section className="home__section">
         <SectionHeader title="Prossima prenotazione" link="Vedi tutte" to="/prenotazioni" />
         <BookingCard title={booking.title} subtitle={`${when} · ${venueOf(booking).name}`} photo={made ? booking.photo : 'img/yoga'} to="/prenotazioni/1" />
-      </section>
+      </section>}
 
       <div className="stat-tiles">
-        <StatTile kind="points" points={bal.points} nextVoucher={bal.points >= 2500 ? 8000 : 2500} note={bal.points >= 2500 ? 'Hai un buono da €5' : `Mancano ${fmtPoints(2500 - bal.points)} pt al buono da €5`} to="/premi" />
-        <StatTile kind="savings" amount={bal.saved} note={`Con ${3 + bal.vouchersUsed} buoni usati da settembre`} to="/premi" />
+        <StatTile kind="points" points={bal.points} nextVoucher={bal.points >= 2500 ? 8000 : 2500} note={isNew ? 'Il primo buono a 2.500 pt' : bal.points >= 2500 ? 'Hai un buono da €5' : `Mancano ${fmtPoints(2500 - bal.points)} pt al buono da €5`} to="/premi" />
+        <StatTile kind="savings" amount={bal.saved} note={isNew ? 'Qui vedi quanto risparmi con i buoni' : `Con ${3 + bal.vouchersUsed} buoni usati da settembre`} to="/premi" />
       </div>
 
       <section className="home__section">
@@ -65,6 +83,30 @@ export function HomeScreen() {
           })}
         </div>
       </section>
+
+      <AnimatePresence>
+        {sheet === 'streak' && (
+          <ModalSheet visible={510} label="La tua serie" onClose={() => setSheet(null)}>
+            {() => <StreakSheetContent state={mission} />}
+          </ModalSheet>
+        )}
+        {sheet === 'health' && (
+          <ModalSheet visible={529} label="Collega Salute" closeButton={false} onClose={() => setSheet(null)}>
+            {(close) => <HealthExplain onContinue={() => { close(); setTimeout(() => setSystem(true), 300); }} />}
+          </ModalSheet>
+        )}
+      </AnimatePresence>
+      <ScreenOverlay>
+        <AnimatePresence>
+          {system && (
+            <HealthSystemSheet onAllow={() => { setSystem(false); store.setDemo({ mission: 'active' }); }} onDeny={() => setSystem(false)} />
+          )}
+          {celebrate && (
+            <Celebration seven={mission === 'completed-7'} onClose={() => setCelebrate(false)}
+              onProposal={() => { setCelebrate(false); navigate('/scopri/yoga-flow'); }} />
+          )}
+        </AnimatePresence>
+      </ScreenOverlay>
     </div>
   );
 }
