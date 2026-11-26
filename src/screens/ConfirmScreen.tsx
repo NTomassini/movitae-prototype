@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { VOUCHER, activity, days, endTime, fmtPoints, user, venueOf } from '../data/data';
 import { balance, bookings } from '../state/bookings';
@@ -9,6 +9,8 @@ import { ActionsCard, ActivityBlock, Button, QR } from '../ui/booking/BookingPar
 export function ConfirmScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
+  // "Fatto" riporta da dove sei partito: Scopri, oppure la chat di Movi (flusso-movi/4)
+  const from = useSearchParams()[0].get('from');
   useScreenChrome({ tabBar: false, bottomEdge: false, pageScroll: false });
   const b = id ? bookings.get(id) : undefined;
   if (!b) return <Navigate to="/" replace />;
@@ -39,7 +41,7 @@ export function ConfirmScreen() {
       <ActionsCard mapsQuery={`${v.name}, ${v.street}, ${v.city}`} />
     </motion.div>
     <div className="confirm__done">
-      <Button onPress={() => navigate('/scopri')}>Fatto</Button>
+      <Button onPress={() => navigate(from === 'movi' ? '/movi' : '/scopri', { replace: true })}>Fatto</Button>
     </div>
     </div>
   );

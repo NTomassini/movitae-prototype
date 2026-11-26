@@ -1,3 +1,4 @@
+import { chat } from '../state/movi';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { initialDemo, store, upcoming, useDemo, type Demo } from '../state/bookings';
@@ -55,7 +56,7 @@ export function DemoPanel() {
             </div>
             <div className="demo-panel__actions">
               <button className="t-subheadline-emphasized" onClick={() => store.setDemo(initialDemo)}>Stati normali</button>
-              <button className="t-subheadline-emphasized danger" onClick={() => { store.reset(); setOpen(false); location.assign('/'); }}>Ripristina demo</button>
+              <button className="t-subheadline-emphasized danger" onClick={() => { store.reset(); chat.reset(); setOpen(false); location.assign('/'); }}>Ripristina demo</button>
             </div>
           </motion.div>
         </>

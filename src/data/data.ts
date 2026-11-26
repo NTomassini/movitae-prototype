@@ -21,18 +21,18 @@ export const user = {
   locationGranted: true,
 };
 
-export type Venue = { id: string; name: string; street: string; city: string; lat: number; lng: number; distance: string; documents?: 'certificate' | 'form' };
+export type Venue = { id: string; name: string; /** nome corto per le card di Movi (come in Figma) */ short?: string; street: string; city: string; lat: number; lng: number; distance: string; documents?: 'certificate' | 'form' };
 
 export const venues: Venue[] = [
   { id: 'zen', name: 'Zen Studio', street: 'Via Marmorata 12', city: 'Roma', lat: 41.8797, lng: 12.4774, distance: '600 m' },
-  { id: 'palestra-testaccio', name: 'Palestra Testaccio', street: 'Via Zabaglia 8', city: 'Roma', lat: 41.879, lng: 12.4745, distance: '800 m' },
+  { id: 'palestra-testaccio', name: 'Palestra Testaccio', short: 'Testaccio', street: 'Via Zabaglia 8', city: 'Roma', lat: 41.879, lng: 12.4745, distance: '800 m' },
   { id: 'fitlab', name: 'FitLab Testaccio', street: 'Via Galvani 24', city: 'Roma', lat: 41.8762, lng: 12.4728, distance: '900 m', documents: 'form' },
   { id: 'sporting-testaccio', name: 'Sporting Testaccio', street: 'Via Galvani 42', city: 'Roma', lat: 41.8755, lng: 12.4715, distance: '900 m' },
   { id: 'dojo', name: 'Dojo Aventino', street: 'Via di San Saba 10', city: 'Roma', lat: 41.8805, lng: 12.4885, distance: '950 m' },
   { id: 'padel-ostiense', name: 'Padel Ostiense', street: 'Via Ostiense 131', city: 'Roma', lat: 41.8653, lng: 12.4789, distance: '1,2 km' },
   { id: 'piscina-aventino', name: 'Piscina Aventino', street: 'Viale Aventino 32', city: 'Roma', lat: 41.881, lng: 12.4861, distance: '1,4 km', documents: 'certificate' },
   { id: 'padel-aventino', name: 'Padel Aventino', street: 'Via Aventina 20', city: 'Roma', lat: 41.882, lng: 12.485, distance: '1,6 km' },
-  { id: 'cs-ostiense', name: 'Centro Sportivo Ostiense', street: 'Via del Porto Fluviale 20', city: 'Roma', lat: 41.868, lng: 12.4765, distance: '1,8 km' },
+  { id: 'cs-ostiense', name: 'Centro Sportivo Ostiense', short: 'CS Ostiense', street: 'Via del Porto Fluviale 20', city: 'Roma', lat: 41.868, lng: 12.4765, distance: '1,8 km' },
 ];
 
 export type Slot = { time: string; soldOut?: boolean };

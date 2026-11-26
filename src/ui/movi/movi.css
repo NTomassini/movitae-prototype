@@ -1,0 +1,86 @@
+/* Movi — DS · Schermate › movi — apertura (1461:689), risposta (1461:735), sta-pensando, fuori-tema, errori/7, flusso-movi/1–7 */
+
+/* ---- messaggi ---- */
+.movi-user { display: flex; justify-content: flex-end; }
+.movi-user p { max-width: 300px; padding: 12px 16px; border-radius: 20px; background: var(--fill-tertiary); color: var(--text-primary); overflow-wrap: anywhere; }
+.movi-msg { display: flex; align-items: center; gap: 8px; }
+.movi-msg p { flex: 1 1 auto; min-width: 0; }
+
+.movi-sugg { width: 100%; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-radius: 24px; background: var(--bg-surface); color: var(--text-primary); text-align: left; }
+.movi-sugg span { flex: 1 1 auto; }
+.movi-sugg .chevron, .movi-card .chevron { color: var(--text-tertiary); flex: none; }
+.movi-suggs { display: flex; flex-direction: column; gap: 8px; }
+
+.movi-pill { align-self: flex-start; height: 44px; padding: 0 16px; border-radius: 999px; background: var(--fill-tertiary); color: var(--text-primary); display: inline-flex; align-items: center; gap: 8px; }
+.movi-pill--big { padding: 0 20px; }
+
+/* ---- card: 370×138, raggio 24, padding 12, gap 12 ---- */
+.movi-card { display: flex; flex-direction: column; gap: 12px; padding: 12px; border-radius: 24px; background: var(--bg-surface); }
+.movi-card__top { display: flex; align-items: center; gap: 12px; text-align: left; color: var(--text-primary); width: 100%; }
+.movi-card__top:active { opacity: 0.7; }
+.movi-card__text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.movi-card__text span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.movi-card__price { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; }
+.movi-points { padding: 1px 6px; border-radius: 6px; background: var(--earn-subtle); color: var(--earn-default); }
+.movi-card__times { display: flex; align-items: center; gap: 8px; min-height: 46px; overflow-x: auto; scrollbar-width: none; margin-right: -12px; padding-right: 12px; }
+.movi-card__times::-webkit-scrollbar { display: none; }
+.movi-card__times > span { flex: none; white-space: nowrap; }
+/* capsula con bordo: 46 (bordo compreso), esaurita 44 senza bordo */
+.movi-card__times .chip { flex: none; }
+.movi-card__times .chip:not(:disabled) { min-height: 46px; padding: 13px 17px; }
+.movi-card__times .chip.is-selected { padding: 13px 17px; }
+.movi-card__booked { display: flex; align-items: center; gap: 8px; height: 44px; color: var(--earn-default); }
+.movi-dot { width: 8px; height: 8px; border-radius: 4px; background: var(--earn-default); }
+
+/* ---- segnaposto ---- */
+.movi-skeleton i { display: block; height: 12px; border-radius: 6px; background: var(--fill-tertiary); }
+.movi-skeleton__top { display: flex; align-items: center; gap: 12px; }
+.movi-skeleton__top > div { display: flex; flex-direction: column; gap: 8px; }
+.movi-skeleton__chips { display: flex; gap: 8px; }
+.movi-skeleton__chips i { width: 64px; height: 32px; border-radius: 16px; }
+.movi-skeleton { animation: movi-pulse 1.4s ease-in-out infinite; }
+@keyframes movi-pulse { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { .movi-skeleton { animation: none; } }
+
+/* ---- input: capsula di vetro 370×50 a y 729 (sopra la tab bar), padding 0/6/0/16 ---- */
+.movi-input { position: absolute; left: 16px; right: 16px; bottom: calc(var(--tabbar-bottom) + var(--size-tabbar) + 12px); height: 50px; z-index: 14;
+  display: flex; align-items: center; gap: 8px; padding: 0 6px 0 16px; border-radius: 999px; pointer-events: auto;
+  background: var(--glass-thick); border: 1px solid var(--glass-edge); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
+.movi-input--map { bottom: 34px; }
+.movi-input input { flex: 1 1 auto; min-width: 0; height: 100%; border: 0; background: none; outline: none; color: var(--text-primary); padding: 0; font: inherit; }
+.movi-input input::placeholder { color: var(--text-secondary); opacity: 1; }
+.movi-send { width: 38px; height: 38px; border-radius: 19px; flex: none; display: grid; place-items: center; background: var(--fill-tertiary); color: var(--text-disabled); transition: background-color var(--motion-ease-fade), color var(--motion-ease-fade), transform var(--motion-ease-press) ease-out; }
+.movi-send.is-on { background: var(--brand-default); color: var(--brand-on); }
+.movi-send.is-on:active { transform: scale(0.92); }
+@media (prefers-reduced-transparency: reduce) { .movi-input { background: var(--bg-surface); backdrop-filter: none; -webkit-backdrop-filter: none; } }
+
+/* ---- apertura ---- */
+.movi { padding: 8px var(--size-margin) 38px; }
+.movi__header { display: flex; align-items: center; height: 44px; }
+.movi-hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 34px; }
+.movi-hero h2 { margin-top: 16px; }
+.movi-hero p { margin-top: 16px; }
+.movi-open .movi-suggs { margin-top: 24px; }
+.movi-ai-note { margin-top: 24px; color: var(--text-tertiary); text-align: center; }
+
+/* ---- conversazione: primo messaggio a y 116, blocchi a 12 ---- */
+.movi-chat { display: flex; flex-direction: column; gap: 12px; padding-top: 54px; }
+.movi-turn { display: flex; flex-direction: column; gap: 12px; }
+/* fuori tema e senza connessione: suggerimenti e Riprova a 16 dal messaggio */
+.movi-turn > .movi-suggs, .movi-turn > .movi-pill--big { margin-top: 4px; }
+
+/* livello modale (scheda e riepilogo aperti da Movi) */
+.movi-layer { position: absolute; inset: 0; pointer-events: auto; z-index: 21; }
+.movi-layer--checkout { z-index: 22; }
+.movi-layer .scrim--venue { position: absolute; inset: 0; z-index: 15; background: rgba(0, 0, 0, 0.35); }
+
+/* ---- mappa in Movi (flusso-movi/5) ---- */
+.movi-map { position: absolute; inset: 0; z-index: 20; pointer-events: auto; background: var(--bg-default); }
+.movi-map .scopri-map { position: absolute; inset: 0; }
+.movi-map__close { position: absolute; left: 16px; top: calc(var(--device-top) + 8px); width: 44px; height: 44px; border-radius: 22px; display: grid; place-items: center; color: var(--text-primary); z-index: 2; }
+.movi-map__all { position: absolute; right: 12px; top: calc(var(--device-top) + 7px); height: 46px; padding: 0 16px; border-radius: 20px; color: var(--brand-accent); display: flex; align-items: center; z-index: 2; }
+.movi-carousel { position: absolute; left: 0; right: 0; bottom: 80px; z-index: 2; display: flex; gap: 12px; overflow-x: auto; padding: 4px 16px 20px; scroll-snap-type: x mandatory; scroll-padding: 0 16px; scrollbar-width: none; }
+.movi-carousel::-webkit-scrollbar { display: none; }
+.movi-carousel .movi-card { flex: 0 0 354px; scroll-snap-align: start; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); }
+.movi-carousel::after { content: ''; flex: 0 0 4px; }

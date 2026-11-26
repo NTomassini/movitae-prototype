@@ -10,12 +10,14 @@ import { store, useAppState } from '../../state/bookings';
 type D = 'half' | 'large';
 // Figma: mezza altezza con il bordo a y 392, grande a y 54 (su 874).
 const tops = (h: number) => ({ half: Math.max(h - 482, 54), large: 54 });
+// Da Movi (flusso-movi/6) la scheda parte più alta, con il bordo a y 190, sopra un velo.
+const topsMovi = (h: number) => ({ half: Math.max(h - 684, 54), large: 54 });
 
 /**
  * Scheda della struttura (flusso-sport/3). Toccare un orario lo sceglie; "Prenota alle …" è spento
  * finché non scegli. In fondo restano sempre Indicazioni e Prenota (BottomBar kind=venue).
  */
-export function VenueSheet({ activityId, onClose, onBook }: { activityId: string; onClose: () => void; onBook: (dayId: string, time: string) => void }) {
+export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { activityId: string; onClose: () => void; onBook: (dayId: string, time: string) => void; from?: 'scopri' | 'movi' }) {
   const a = activity(activityId);
   const v = venueOf(a);
   const [detent, setDetent] = useState<D>('half');
@@ -32,15 +34,17 @@ export function VenueSheet({ activityId, onClose, onBook }: { activityId: string
     onClose();
   };
   const d = days.find((x) => x.id === day)!;
-  const sub = [a.people ? `Campo da ${a.people}` : a.title.split(',')[0], a.duration, v.distance].join(' · ');
+  // Da Scopri hai scelto la struttura sulla mappa: titolo = struttura. Da Movi hai scelto una lezione: titolo = lezione.
+  const sub = from === 'movi' ? [v.name, a.duration, v.distance].join(' · ') : [a.people ? `Campo da ${a.people}` : a.title.split(',')[0], a.duration, v.distance].join(' · ');
+  const title = from === 'movi' ? a.title : v.name;
 
   return (
     <>
-      <DetentSheet ref={sheet} className={`venue-sheet venue-sheet--${detent}`} tops={tops} detent={detent} onDetent={setDetent} label={v.name} onDismiss={() => close(true)}>
+      <DetentSheet ref={sheet} className={`venue-sheet venue-sheet--${detent}`} tops={from === 'movi' ? topsMovi : tops} detent={detent} onDetent={setDetent} label={title} modal={from === 'movi'} onDismiss={() => close(true)}>
         <div className="venue-sheet__grab"><button aria-label="Cambia altezza della scheda" onClick={() => setDetent(detent === 'half' ? 'large' : 'half')} style={{ padding: '0 40px', height: 16, display: 'flex', justifyContent: 'center' }}><span /></button></div>
         <div className="venue-sheet__head">
           <div className="venue-sheet__head-text">
-            <h2 className="t-title-2">{v.name}</h2>
+            <h2 className="t-title-2">{title}</h2>
             <span className="t-subheadline secondary">{sub}</span>
           </div>
           <div className="venue-sheet__actions">

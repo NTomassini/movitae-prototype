@@ -67,6 +67,29 @@ def go_pren_avviso(pg): state(pg, '/prenotazioni/s-yoga', "s => { s.bookings = s
 def go_pren_avviso_tardi(pg): state(pg, '/prenotazioni/s-yoga', "s => { s.demo = {...(s.demo||{}), clock:'after'}; s.bookings = s.bookings.map(b => b.id === 's-yoga' ? {...b, voucher:true, paid:13, points:130} : b); return s }"); pg.locator('.cancel-row').click(); pg.wait_for_timeout(700)
 def go_pren_vuote(pg): state(pg, '/prenotazioni', "s => { s.bookings = s.bookings.map(b => b.status === 'upcoming' ? {...b, status:'cancelled'} : b); return s }")
 
+def movi(pg, theme='light', net='online'):
+    state(pg, f'/movi?theme={theme}', f"s => {{ s.demo = {{...(s.demo||{{}}), network:'{net}'}}; return s }}")
+    pg.evaluate('sessionStorage.clear()'); pg.goto(f'{URL}/movi?theme={theme}'); pg.wait_for_timeout(700)
+def ask(pg, text='Cosa faccio stasera?', wait=1900):
+    pg.get_by_role('button', name=text).first.evaluate('el => el.click()'); pg.wait_for_timeout(wait)
+def go_movi_apertura(pg): movi(pg)
+def go_movi_pensando(pg): movi(pg); ask(pg, wait=500)
+def go_movi_risposta(pg): movi(pg); ask(pg)
+def go_movi_risposta_scuro(pg): movi(pg, 'dark'); ask(pg)
+def go_movi_offline(pg): movi(pg, net='offline'); ask(pg, wait=1200)
+def go_movi_fuori_tema(pg):
+    movi(pg); pg.get_by_label('Chiedi a Movi').fill('Che tempo fa domani?'); pg.get_by_label('Invia').click(); pg.wait_for_timeout(1300)
+def go_movi_1_orario(pg):
+    movi(pg); ask(pg); pg.add_style_tag(content=FLAT); pg.locator('.movi-card .chip').first.evaluate('el => el.click()'); pg.wait_for_timeout(120); return True
+def go_movi_4_ritorno(pg):
+    movi(pg); ask(pg); pg.locator('.movi-card .chip').first.evaluate('el => el.click()'); pg.wait_for_timeout(900)
+    pg.locator('.apple-pay').click(); pg.wait_for_timeout(1500); pg.get_by_role('button', name='Fatto').click(); pg.wait_for_timeout(1200)
+def go_movi_5_mappa(pg): movi(pg); ask(pg); pg.locator('.movi-pill', has_text='Vedi sulla mappa').evaluate('el => el.click()'); pg.wait_for_timeout(1200)
+def go_movi_6_scheda(pg): movi(pg); ask(pg); pg.locator('.movi-card__top').first.evaluate('el => el.click()'); pg.wait_for_timeout(1100)
+def go_movi_7_riepilogo(pg):
+    go_movi_6_scheda(pg); pg.get_by_role('button', name='18:30', exact=True).last.evaluate('el => el.click()')
+    pg.locator('.bottom-bar .button--primary').evaluate('el => el.click()'); pg.wait_for_timeout(1000)
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -94,6 +117,17 @@ SCREENS = [
     ('pren-avviso', go_pren_avviso, []),
     ('pren-avviso-tardi', go_pren_avviso_tardi, []),
     ('pren-vuote', go_pren_vuote, []),
+    ('movi-apertura', go_movi_apertura, []),
+    ('movi-pensando', go_movi_pensando, []),
+    ('movi-risposta', go_movi_risposta, []),
+    ('movi-risposta-scuro', go_movi_risposta_scuro, []),
+    ('movi-fuori-tema', go_movi_fuori_tema, []),
+    ('movi-offline', go_movi_offline, []),
+    ('movi-1-orario', go_movi_1_orario, []),
+    ('movi-4-ritorno', go_movi_4_ritorno, []),
+    ('movi-5-mappa', go_movi_5_mappa, [(0, 108, 402, 630)]),   # mappa
+    ('movi-6-scheda', go_movi_6_scheda, [(0, 0, 402, 190)]),     # chat sotto il velo
+    ('movi-7-riepilogo-scheda', go_movi_7_riepilogo, [(0, 0, 402, 56)]),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):
@@ -118,9 +152,9 @@ def main():
         for name, go, masks in SCREENS:
             if only and name not in only: continue
             pg = b.new_page(viewport={'width': 1000, 'height': 1000}, device_scale_factor=1)
-            go(pg)
+            quick = go(pg)  # True: lo stato dura un istante (es. capsula rossa prima del riepilogo), niente attesa
             pg.add_style_tag(content=FLAT)
-            pg.wait_for_timeout(700)
+            if not quick: pg.wait_for_timeout(700)
             pg.locator('.device').screenshot(path=str(OUT / f'{name}-codice.png'))
             pg.close()
             fig = Image.open(ROOT / 'figma' / f'{name}.png').convert('RGB').resize((402, 874))

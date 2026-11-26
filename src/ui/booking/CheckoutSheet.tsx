@@ -5,13 +5,17 @@ import { Icon } from '../Icon';
 import { balance, store, useBookings, useDemo } from '../../state/bookings';
 import { Img } from '../Img';
 import { ActivityBlock, AppleLogo, Toggle } from './BookingParts';
+import '../modal-sheet.css';
+import '../page-header.css';
 
 /**
  * Riepilogo (flusso-movi/2): sheet modale che copre la tab bar, con "Annulla" e titolo.
  * Il buono da €5 c'è ma parte spento (handoff › Punti e premi). Apple Pay simulato.
  */
-export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid }: {
+export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back }: {
   activityId: string; dayId: string; time: string;
+  /** aperto sopra la scheda (flusso-movi/7): freccia indietro e maniglia al posto di "Annulla" */
+  back?: boolean;
   onCancel: () => void;
   onPaid: (r: { voucher: boolean; paid: number; points: number }) => void;
 }) {
@@ -46,11 +50,21 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid }: {
       <motion.div className="checkout" role="dialog" aria-modal="true" aria-label="Riepilogo"
         style={{ top: 'calc(var(--device-top) + 2px)' }}
         initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', visualDuration: 0.5, bounce: 0 }}>
-        <div className="checkout__head">
-          <button className="t-body" onClick={onCancel}>Annulla</button>
-          <h2 className="t-headline">Riepilogo</h2>
-          <span />
-        </div>
+        {back ? (
+          <div className="checkout__head checkout__head--back">
+            <span />
+            <h2 className="t-headline">Riepilogo</h2>
+            <span />
+            <span className="modal-sheet__grabber" aria-hidden="true" />
+            <button className="back-button pressable" aria-label="Torna alla scheda" onClick={onCancel}><Icon name="UI/Chevron-Left" size={24} /></button>
+          </div>
+        ) : (
+          <div className="checkout__head">
+            <button className="t-body" onClick={onCancel}>Annulla</button>
+            <h2 className="t-headline">Riepilogo</h2>
+            <span />
+          </div>
+        )}
         <div className="checkout__body">
           <div className="card">
             <ActivityBlock photo={a.photo} title={a.title} when={`${d.long} · ${end ? `${time}–${end}` : `dalle ${time}`}`} where={`${v.name} · ${v.street}`} />
