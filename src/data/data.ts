@@ -71,4 +71,5 @@ export const upcomingBooking = { activityId: 'yoga-flow', day: 'Oggi', time: '18
 export const venueOf = (a: Activity) => venues.find((v) => v.id === a.venueId)!;
 export const activity = (id: string) => activities.find((a) => a.id === id)!;
 export const euro = (n: number) => `€${n}`;
-export const fmtPoints = (n: number) => n.toLocaleString('it-IT');
+// Separatore delle migliaia anche a 4 cifre (6.000), come nelle schermate: Intl it-IT lo omette sotto 10.000.
+export const fmtPoints = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');

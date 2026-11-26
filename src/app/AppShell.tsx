@@ -16,6 +16,7 @@ export function AppShell() {
         <main className="screen" id="screen">
           <Outlet />
         </main>
+        <div id="overlay" />
         <ScrollEdge position="bottom" height={83} />
         <TabBar />
         <HomeIndicator />

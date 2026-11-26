@@ -1,0 +1,56 @@
+/* Componenti della Home. Misure da DS · Schermate › "home — chiaro" (1461:439). */
+
+/* Pressione: scala 0,97 con ease/press (comportamenti §15). */
+.pressable { transition: transform var(--motion-ease-press) ease-out; -webkit-user-select: none; user-select: none; }
+.pressable:active { transform: scale(0.97); }
+
+/* Avatar 44 — fill/tertiary, iniziale 17 Semi Bold */
+.avatar { width: 44px; height: 44px; border-radius: 22px; display: grid; place-items: center; background: var(--fill-tertiary); color: var(--text-primary); }
+
+/* SectionHeader — titolo 22/28 Bold + link 15/20 Semi Bold rosso */
+.section-header { display: flex; justify-content: space-between; align-items: center; min-height: 28px; }
+.section-header__link { color: var(--brand-accent); min-height: 44px; margin: -8px 0; display: inline-flex; align-items: center; text-decoration: none; }
+
+/* MissionCard (state=active) — 370×152, padding 20, gap 16, raggio 24, brand/default */
+.mission-card { display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: var(--radius-24); background: var(--brand-default); color: var(--brand-on); width: 100%; text-align: left; }
+.mission-card__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.mission-card__lines { display: flex; flex-direction: column; gap: 4px; }
+.mission-card__muted { color: rgba(255, 255, 255, 0.82); }
+.mission-card__streak { display: flex; align-items: center; gap: 8px; }
+.mission-card__flame { width: 28px; height: 28px; border-radius: 999px; background: #fff; display: grid; place-items: center; flex: none; }
+.mission-card__ring { position: relative; width: 112px; height: 112px; flex: none; }
+.mission-card__ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.mission-card__ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* SportShelfItem — 76×86, padding 12/0/8, gap 4, raggio 20, bg/surface, immagine 46 */
+.shelf { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 16px; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
+.shelf::-webkit-scrollbar { display: none; }
+.shelf > * { scroll-snap-align: start; flex: none; }
+.shelf::after { content: ''; flex: 0 0 4px; } /* l'ultimo elemento si ferma a 16 dal bordo */
+.sport-tile { width: 76px; height: 86px; padding: 12px 0 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: var(--radius-20); background: var(--bg-surface); color: var(--text-primary); }
+
+/* Card prenotazione — padding 16, gap 12, raggio 24, foto 48 raggio 12 */
+.booking-card { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: var(--radius-24); background: var(--bg-surface); width: 100%; text-align: left; color: var(--text-primary); text-decoration: none; }
+.booking-card__body { flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.chevron { color: var(--text-tertiary); flex: none; }
+
+/* StatTile — padding 16, gap 8, raggio 24, freccia 18 in alto a destra */
+.stat-tiles { display: flex; gap: 12px; align-items: flex-start; }
+.stat-tile { position: relative; flex: 1 1 0; display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: var(--radius-24); background: var(--bg-surface); text-align: left; color: var(--text-primary); min-width: 0; }
+.stat-tile__chevron { position: absolute; top: 16px; right: 16px; color: var(--text-tertiary); }
+.stat-tile__label { color: var(--text-secondary); }
+.stat-tile__progress { height: 6px; border-radius: 3px; background: var(--fill-tertiary); overflow: hidden; }
+.stat-tile__progress span { display: block; height: 100%; border-radius: 3px; background: var(--brand-default); }
+
+/* VenueCard — 240 di larghezza, foto 240×180 raggio 16, gap 12 */
+.carousel { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 16px; margin: 0 -16px; padding: 0 16px; scrollbar-width: none; }
+.carousel::-webkit-scrollbar { display: none; }
+.carousel > * { scroll-snap-align: start; flex: none; }
+.carousel::after { content: ''; flex: 0 0 4px; }
+.venue-card { width: 240px; display: flex; flex-direction: column; gap: 12px; text-align: left; color: var(--text-primary); }
+.venue-card__body { display: flex; flex-direction: column; gap: 2px; }
+.venue-card__price { display: flex; align-items: center; gap: 8px; }
+.points-badge { padding: 1px 6px; border-radius: 6px; background: var(--earn-subtle); color: var(--earn-default); }
+.secondary { color: var(--text-secondary); }
+
+@media (prefers-reduced-motion: reduce) { .pressable:active { transform: none; opacity: 0.7; } }

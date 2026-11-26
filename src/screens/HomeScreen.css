@@ -1,0 +1,22 @@
+/* Home: riga d'intestazione 44 a y 62 (8 sotto la barra di stato), primo contenuto a y 116, sezioni a 24. */
+.home { display: flex; flex-direction: column; gap: 24px; padding: 8px var(--size-margin) 0; }
+.home__header { display: flex; align-items: center; height: 44px; margin-bottom: -14px; padding-right: 60px; }
+.home__section { display: flex; flex-direction: column; gap: 12px; }
+
+/* Riga fissa: avatar sempre visibile, titolo piccolo e bordo sfocato solo scorrendo. */
+.home__bar {
+  position: absolute;
+  top: 0; left: 0; right: 0; z-index: 15;
+  height: calc(var(--device-top) + 52px);
+  pointer-events: none;
+}
+.home__bar .scroll-edge { height: 100% !important; opacity: 0; transition: opacity var(--motion-ease-fade) ease; }
+.home__bar.is-scrolled .scroll-edge { opacity: 1; }
+.home__bar-title {
+  position: absolute; left: 0; right: 0; top: calc(var(--device-top) + 8px); height: 44px;
+  display: grid; place-items: center; color: var(--text-primary);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity var(--motion-ease-fade) ease, transform var(--motion-ease-fade) ease;
+}
+.home__bar.is-scrolled .home__bar-title { opacity: 1; transform: none; }
+.home__bar-avatar { position: absolute; right: var(--size-margin); top: calc(var(--device-top) + 8px); pointer-events: auto; }
