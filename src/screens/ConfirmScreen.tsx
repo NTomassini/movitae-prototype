@@ -21,7 +21,7 @@ export function ConfirmScreen() {
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 25 }}>
     <motion.div className="confirm" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', visualDuration: 0.5, bounce: 0 }}>
-      <h1 className="t-large-title" style={{ marginTop: 10 }}>Prenotato</h1>
+      <h1 className="t-large-title" style={{ marginBottom: -12 }}>Prenotato</h1>
       <div className="card ticket">
         <ActivityBlock photo={a.photo} title={a.title} when={`${d.long} · ${end ? `${b.time}–${end}` : `dalle ${b.time}`}`} where={`${v.name} · ${v.street}`} />
         <div className="ticket__sep" />

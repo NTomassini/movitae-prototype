@@ -8,7 +8,8 @@ import { activities, euro, user, venueOf, venues, type Activity } from '../data/
 import { useScreenChrome } from '../app/chrome';
 import { MapView, type MapPinData } from '../ui/scopri/MapView';
 import { ListSheet, type Detent } from '../ui/scopri/ListSheet';
-import { ActivityRow, GlassIconButton, SearchField, sportIcon } from '../ui/scopri/ScopriParts';
+import { ActivityRow, FilterSummary, GlassIconButton, SearchField, sportIcon } from '../ui/scopri/ScopriParts';
+import { shelfSports } from '../data/data';
 
 // Scopri — DS · Schermate › "scopri — chiaro" (1461:1083) e sheet piccolo / medio / grande.
 const priceLabel = (a: Activity) => (a.pricePerPerson ? `${euro(a.price)} · ${euro(a.pricePerPerson)} a persona` : euro(a.price));
@@ -25,7 +26,10 @@ export function ScopriScreen() {
   useScreenChrome({ tabBar: detent === 'small' && !activityId, bottomEdge: false, pageScroll: false });
 
   const list = useMemo(() => {
-    const base = sport ? activities.filter((a) => a.sport === sport || (sport === 'calcio' && a.sport === 'calcio')) : activities;
+    // ordine della lista come nella tavola Figma: Boxe, Yoga Flow, Padel Ostiense, poi il resto
+    const first = ['boxe', 'yoga-flow', 'padel-ostiense'];
+    const ordered = [...activities].sort((x, y) => (first.indexOf(x.id) + 1 || 99) - (first.indexOf(y.id) + 1 || 99));
+    const base = sport ? ordered.filter((a) => a.sport === sport) : ordered;
     return selected ? base.filter((a) => a.venueId === selected) : base;
   }, [sport, selected]);
 
@@ -43,11 +47,12 @@ export function ScopriScreen() {
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <MapView center={user.location} pins={pins} selected={selected} onSelect={onSelect} />
+      <MapView center={user.location} pins={pins} selected={activityId ? activities.find((a) => a.id === activityId)?.venueId ?? null : selected} onSelect={onSelect} />
       <div className="scopri-top">
         <SearchField />
-        <GlassIconButton icon="UI/Filters" label="Filtri" />
+        <GlassIconButton icon="UI/Filters" label="Filtri" badge={sport ? 1 : 0} />
       </div>
+      {sport && <FilterSummary label={shelfSports.find((x) => x.sport === sport)?.label ?? sport} />}
       <ListSheet title={title} detent={detent} onDetent={setDetent}>
         {list.map((a) => {
           const v = venueOf(a);

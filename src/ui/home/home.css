@@ -12,7 +12,7 @@
 .section-header__link { color: var(--brand-accent); min-height: 44px; margin: -8px 0; display: inline-flex; align-items: center; text-decoration: none; }
 
 /* MissionCard (state=active) — 370×152, padding 20, gap 16, raggio 24, brand/default */
-.mission-card { display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: var(--radius-24); background: var(--brand-default); color: var(--brand-on); width: 100%; text-align: left; }
+.mission-card { display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: var(--radius-24); background: var(--brand-default); color: var(--brand-on); width: 100%; text-align: left; box-shadow: var(--effect-shadow-brand-card); }
 .mission-card__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .mission-card__lines { display: flex; flex-direction: column; gap: 4px; }
 .mission-card__muted { color: rgba(255, 255, 255, 0.82); }

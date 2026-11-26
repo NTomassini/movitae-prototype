@@ -88,7 +88,7 @@ export function StatTile(p: StatTileProps) {
       <span className="t-footnote-emphasized stat-tile__label">{p.kind === 'points' ? 'I tuoi punti' : 'Hai risparmiato'}</span>
       {p.kind === 'points' ? (
         <>
-          <span><span className="t-number-large">{fmtPoints(p.points)}</span><span className="t-headline"> pt</span></span>
+          <span style={{ lineHeight: '34px', height: 34 }}><span className="t-number-large" style={{ lineHeight: 'inherit' }}>{fmtPoints(p.points)}</span><span className="t-headline" style={{ lineHeight: 'inherit', letterSpacing: '-0.02em' }}> pt</span></span>
           <span className="stat-tile__progress"><span style={{ width: `${Math.min(p.points / p.nextVoucher, 1) * 100}%` }} /></span>
         </>
       ) : (

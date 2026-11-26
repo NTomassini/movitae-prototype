@@ -22,10 +22,22 @@ export function SearchField({ placeholder = 'Cerca sport o struttura', onPress }
   );
 }
 
-export function GlassIconButton({ icon, label, onPress }: { icon: IconName; label: string; onPress?: () => void }) {
+/** IconButton size=48: style=glass, oppure filled-red con badge quando ci sono filtri attivi. */
+export function GlassIconButton({ icon, label, onPress, badge }: { icon: IconName; label: string; onPress?: () => void; badge?: number }) {
   return (
-    <button className="icon-button-glass glass-control pressable" aria-label={label} onClick={onPress}>
+    <button className={`icon-button-glass pressable ${badge ? 'icon-button--filled' : 'glass-control'}`} aria-label={badge ? `${label}, ${badge} attivo` : label} onClick={onPress}>
       <Icon name={icon} size={24} />
+      {!!badge && <span className="icon-button__badge" aria-hidden="true">{badge}</span>}
+    </button>
+  );
+}
+
+/** FilterSummary kind=filters — capsula di vetro con il filtro attivo e chevron.down (riapre il pannello). */
+export function FilterSummary({ label, onPress }: { label: string; onPress?: () => void }) {
+  return (
+    <button className="filter-summary glass-control pressable" onClick={onPress}>
+      <span className="t-subheadline-emphasized">{label}</span>
+      <Icon name="UI/Chevron-Down" size={20} />
     </button>
   );
 }
