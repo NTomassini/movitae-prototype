@@ -13,7 +13,11 @@
   box-shadow: var(--effect-glass-bar);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease;
 }
+
+/* Coperta dallo sheet a media o grande altezza: scende sotto il bordo. */
+.tabbar--hidden { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
 
 .tabbar-tab {
   flex: 1 1 0;

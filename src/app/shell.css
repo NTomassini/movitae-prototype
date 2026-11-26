@@ -57,3 +57,6 @@
   }
   .device-home span { width: 144px; height: 5px; border-radius: 3px; background: var(--text-primary); margin-top: 8px; }
 }
+
+/* Schermate a tutto schermo (Scopri): niente scorrimento della pagina, niente spazi. */
+.screen--fixed { overflow: hidden; padding: 0; }
