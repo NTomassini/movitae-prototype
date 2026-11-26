@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { VOUCHER, activity, days, endTime, euro, fmtPoints, venueOf } from '../data/data';
 import { checkInPoints, store, useAppState } from '../state/bookings';
 import { PageHeader } from '../ui/PageHeader';
@@ -14,7 +15,7 @@ const minus2h = (t: string) => { const [h, m] = t.split(':').map(Number); return
 
 export function BookingDetailScreen() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const navigate = useNav();
   const app = useAppState();
   const b = app.bookings.find((x) => x.id === id);
   const [alert, setAlert] = useState(false);
@@ -35,7 +36,7 @@ export function BookingDetailScreen() {
   const cancel = () => {
     store.updateBooking(b.id, { status: 'cancelled', refunded: !late });
     setAlert(false);
-    navigate('/prenotazioni?tab=passate', { replace: true });
+    navigate('/prenotazioni?tab=passate', { replace: true, kind: 'pop' }); // si torna alla lista: passaggio all'indietro
   };
 
   return (
@@ -61,7 +62,7 @@ export function BookingDetailScreen() {
           )}
         </AnimatePresence>
       </div>
-      <ActionsCard mapsQuery={`${v.name}, ${v.street}, ${v.city}`} />
+      <ActionsCard mapsQuery={`${v.name}, ${v.street}, ${v.city}`} event={{ id: b.id, title: `${a.title} · ${v.name}`, dayId: b.dayId, time: b.time, minutes: parseInt(a.duration, 10) || 60, location: `${v.name}, ${v.street}, ${v.city}` }} />
       {b.status === 'upcoming' && (
         <div>
           <button className="card cancel-row t-body pressable" onClick={() => setAlert(true)}>Disdici prenotazione</button>

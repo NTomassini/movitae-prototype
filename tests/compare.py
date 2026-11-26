@@ -144,6 +144,23 @@ def go_orario_esaurito(pg):
     pg.evaluate("document.querySelector('.venue-sheet__body').scrollTop=400"); pg.wait_for_timeout(200)
     pg.get_by_role('button', name='18:30', exact=True).evaluate('el => el.click()'); pg.locator('.bottom-bar .button--primary').click(); pg.wait_for_timeout(1000)
 
+def scopri0(pg): state(pg, '/scopri?theme=light'); pg.evaluate('sessionStorage.clear()'); pg.goto(f'{URL}/scopri?theme=light'); pg.wait_for_timeout(700)
+def go_ricerca(pg): scopri0(pg); pg.locator('.search-field').click(); pg.wait_for_timeout(500)
+def go_ricerca_vuota(pg): go_ricerca(pg); pg.get_by_label('Cerca sport o struttura').fill('arrampicata'); pg.wait_for_timeout(300)
+def panel(pg, tab=None):
+    scopri0(pg); pg.get_by_role('button', name='Filtri').click(); pg.wait_for_timeout(500)
+    if tab: pg.get_by_role('tab', name=tab).click(); pg.wait_for_timeout(200)
+def go_filtri_sport(pg):
+    panel(pg); pg.locator('.filter-sport').first.click(); pg.locator('.filter-sport').nth(3).click(); pg.wait_for_timeout(300)
+def go_filtri_prezzo(pg): panel(pg, 'Prezzo'); pg.locator('.filter-slider').fill('15'); pg.wait_for_timeout(300)
+def go_filtri_distanza(pg): panel(pg, 'Distanza'); pg.locator('.filter-slider').fill('2'); pg.wait_for_timeout(300)
+def go_filtri_attivo(pg): go_filtri_prezzo(pg); pg.locator('.filter-show').click(); pg.wait_for_timeout(600)
+def go_filtri_nessuno(pg):
+    panel(pg); pg.locator('.filter-sport').first.click()
+    pg.get_by_role('tab', name='Prezzo').click(); pg.locator('.filter-slider').fill('10')
+    pg.get_by_role('tab', name='Distanza').click(); pg.locator('.filter-slider').fill('1'); pg.locator('.filter-show').evaluate('el => el.click()')
+    pg.mouse.click(650, 600); pg.wait_for_timeout(900)
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -217,6 +234,13 @@ SCREENS = [
     ('scopri-offline', go_scopri_offline, [(0, 108, 402, 560)]),
     ('scopri-caricamento', go_scopri_caricamento, [(0, 108, 402, 650)]),
     ('orario-esaurito', go_orario_esaurito, [(0, 0, 402, 56)]),
+    ('ricerca', go_ricerca, [(0, 400, 402, 874)]),          # tastiera di sistema in Figma
+    ('ricerca-vuota', go_ricerca_vuota, [(0, 400, 402, 874)]),
+    ('filtri-sport', go_filtri_sport, [(0, 430, 402, 874)]), # mappa e lista (24 attività in Figma, 11 nei dati)
+    ('filtri-prezzo', go_filtri_prezzo, [(0, 430, 402, 874)]),
+    ('filtri-distanza', go_filtri_distanza, [(0, 430, 402, 874)]),
+    ('filtri-attivo', go_filtri_attivo, [(0, 160, 402, 874)]),
+    ('filtri-nessuno', go_filtri_nessuno, [(0, 160, 402, 560)]),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):

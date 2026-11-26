@@ -67,3 +67,30 @@
 /* Splash (onboarding/0): sopra tutto tranne la barra di stato, che diventa bianca */
 .splash { position: absolute; inset: 0; z-index: 29; background: var(--brand-default); display: grid; place-items: center; }
 .device.is-splash .device-status { color: #fff; }
+
+/* ---- Passaggio tra le pagine (Q48): View Transitions. Si muovono pagina e intestazione; tab bar e barra di stato restano ferme. ---- */
+.page-layer { position: absolute; inset: 0; }
+/* il nome solo durante il passaggio: sempre attivo crea un contesto di sovrapposizione e i fogli finiscono sotto la tab bar */
+html[data-nav] .page-layer { view-transition-name: page; }
+.screen { background: var(--bg-default); }
+.tabbar { view-transition-name: tabbar; }
+.device-status { view-transition-name: status; }
+.device-home { view-transition-name: home-indicator; }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+::view-transition-group(*) { animation-duration: 0.45s; }
+html[data-nav='push']::view-transition-old(page) { animation: 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both vt-push-out; }
+html[data-nav='push']::view-transition-new(page) { animation: 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both vt-push-in; }
+html[data-nav='pop']::view-transition-old(page) { animation: 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both vt-pop-out; z-index: 1; }
+html[data-nav='pop']::view-transition-new(page) { animation: 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both vt-pop-in; }
+html[data-nav='fade']::view-transition-old(page) { animation: 0.25s ease both vt-fade-out; }
+html[data-nav='fade']::view-transition-new(page) { animation: 0.3s ease both vt-fade-in; }
+::view-transition-image-pair(page) { isolation: auto; }
+::view-transition-old(page), ::view-transition-new(page) { mix-blend-mode: normal; }
+/* ombra sul bordo sinistro della pagina che sta sopra (come iOS) */
+html[data-nav='push']::view-transition-new(page), html[data-nav='pop']::view-transition-old(page) { box-shadow: -10px 0 30px rgba(0, 0, 0, 0.12); }
+@keyframes vt-push-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes vt-push-out { from { transform: none; filter: none; } to { transform: translateX(-30%); filter: brightness(0.92); } }
+@keyframes vt-pop-out { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes vt-pop-in { from { transform: translateX(-30%); filter: brightness(0.92); } to { transform: none; filter: none; } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }

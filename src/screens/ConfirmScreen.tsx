@@ -1,4 +1,5 @@
-import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { motion } from 'motion/react';
 import { VOUCHER, activity, days, endTime, fmtPoints, user, venueOf } from '../data/data';
 import { balance, bookings } from '../state/bookings';
@@ -8,7 +9,7 @@ import { ActionsCard, ActivityBlock, Button, QR } from '../ui/booking/BookingPar
 /** Conferma a biglietto (flusso-movi/3): "Prenotato", biglietto con QR, risparmio se c'è il buono, azioni, "Fatto". */
 export function ConfirmScreen() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const navigate = useNav();
   // "Fatto" riporta da dove sei partito: Scopri, oppure la chat di Movi (flusso-movi/4)
   const from = useSearchParams()[0].get('from');
   useScreenChrome({ tabBar: false, bottomEdge: false, pageScroll: false });
@@ -38,7 +39,7 @@ export function ConfirmScreen() {
           <span className="t-subheadline secondary">Ti restano {fmtPoints(left)} pt. Altri {fmtPoints(b.points)} arrivano al check-in.</span>
         </div>
       )}
-      <ActionsCard mapsQuery={`${v.name}, ${v.street}, ${v.city}`} />
+      <ActionsCard mapsQuery={`${v.name}, ${v.street}, ${v.city}`} event={{ id: b.id, title: `${a.title} · ${v.name}`, dayId: b.dayId, time: b.time, minutes: parseInt(a.duration, 10) || 60, location: `${v.name}, ${v.street}, ${v.city}` }} />
     </motion.div>
     <div className="confirm__done">
       <Button onPress={() => navigate(from === 'movi' ? '/movi' : '/scopri', { replace: true })}>Fatto</Button>

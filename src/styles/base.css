@@ -11,7 +11,15 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 106.25%; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Inter Variable', system-ui, sans-serif; background: var(--bg-default); color: var(--text-primary); overscroll-behavior: none; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; touch-action: manipulation; }
+/* sensazione da app: niente menu del tocco prolungato, trascinamento delle immagini o selezione sui controlli */
+button, a, img, [role='button'] { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+img { -webkit-user-drag: none; }
+/* Telefono: la pagina non scorre mai (scorre solo #screen); evita il rimbalzo dell'intera app e gli spostamenti
+   dei livelli fissi dopo la tastiera nell'app installata (WebKit 237961, iOS 26 visualViewport). */
+@media not ((min-width: 600px) and (pointer: fine)) {
+  html, body { position: fixed; inset: 0; overflow: hidden; }
+}
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
 #root { min-height: 100dvh; }

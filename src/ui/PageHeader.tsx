@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { ScreenOverlay } from '../app/ScreenOverlay';
 import { useScreenScroll } from '../app/useScreenScroll';
 import { Icon } from './Icon';
@@ -12,7 +12,7 @@ import './page-header.css';
  * Bordo sfocato in alto (106) solo quando il contenuto passa sotto.
  */
 export function PageHeader({ title, type, onBack }: { title: string; type: 'B' | 'C'; onBack?: () => void }) {
-  const navigate = useNavigate();
+  const navigate = useNav();
   const y = useScreenScroll();
   const showSmall = type === 'C' || y > 44;
   return (

@@ -13,7 +13,9 @@
 .onb__head { padding: 10px 16px 0; display: flex; flex-direction: column; gap: 8px; }
 
 /* pulsante principale in basso a sinistra (y 786) */
-.onb__cta { position: absolute; left: 16px; bottom: calc(var(--safe-bottom-live) + 4px); z-index: 3; }
+.onb__cta { position: absolute; left: 16px; right: 16px; bottom: calc(var(--safe-bottom-live) + 4px); z-index: 3; }
+/* Q49: nell'onboarding il pulsante principale è largo quanto lo schermo meno i margini (HIG › Layout: inset full-width buttons) */
+.onb .onb__cta { width: auto; }
 
 /* ---- intro ---- */
 .onb__signin { position: absolute; right: 16px; top: calc(var(--device-top) + 8px); height: 44px; color: var(--brand-accent); z-index: 3; }

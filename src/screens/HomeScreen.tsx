@@ -7,7 +7,7 @@ import { Celebration, HealthExplain, HealthSystemSheet, MissionCard, StreakSheet
 import { ModalSheet } from '../ui/ModalSheet';
 import { AnimatePresence } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { store, useAppState } from '../state/bookings';
 import { ScrollEdge } from '../ui/ScrollEdge';
 import { useScreenScroll } from '../app/useScreenScroll';
@@ -19,7 +19,7 @@ import './HomeScreen.css';
 export function HomeScreen() {
   const app = useAppState();
   const mission = app.demo.mission;
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [sheet, setSheet] = useState<null | 'streak' | 'health'>(null);
   const [system, setSystem] = useState(false);
   const [celebrate, setCelebrate] = useState(false);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { AnimatePresence } from 'motion/react';
 import { achievements, activity, euro, fmtPoints, pickSports, user, venueOf, venues } from '../data/data';
 import { GOALS } from '../data/profile';
@@ -24,7 +24,7 @@ const sportNames = (ids: string[]) => ids.map((s) => pickSports.find((p) => p.sp
 
 // ---------- profilo/1 ----------
 export function ProfileScreen() {
-  const navigate = useNavigate();
+  const navigate = useNav();
   const app = useAppState();
   const [sheet, setSheet] = useState(false);
   const fav = app.favSports ?? user.favoriteSports;
@@ -86,7 +86,7 @@ function SportsSheet({ value, onClose }: { value: string[]; onClose: () => void 
 
 // ---------- Preferiti (non disegnata: come la lista delle prenotazioni) ----------
 export function FavoritesScreen() {
-  const navigate = useNavigate();
+  const navigate = useNav();
   const { favorites } = useAppState();
   return (
     <div className="settings-page">
@@ -113,7 +113,7 @@ export function FavoritesScreen() {
 
 // ---------- impostazioni/1 ----------
 export function SettingsScreen() {
-  const navigate = useNavigate();
+  const navigate = useNav();
   const app = useAppState();
   const [sheet, setSheet] = useState<null | 'health' | 'explain' | 'system'>(null);
   const [alert, setAlert] = useState<null | 'delete' | 'logout'>(null);
@@ -213,7 +213,7 @@ export function NotificationsScreen() {
 
 // ---------- impostazioni/4 obiettivo passi ----------
 export function GoalScreen() {
-  const navigate = useNavigate();
+  const navigate = useNav();
   const app = useAppState();
   useScreenChrome({ tabBar: false });
   const current = app.settings.nextGoal ?? user.mission.goal;

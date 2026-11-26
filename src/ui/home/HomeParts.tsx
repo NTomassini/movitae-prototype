@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { TLink } from '../../app/TLink';
 import { Icon } from '../Icon';
 import { Img } from '../Img';
 import { fmtPoints } from '../../data/data';
@@ -23,30 +23,30 @@ export function SectionHeader({ title, link, to }: { title: string; link?: strin
   return (
     <div className="section-header">
       <h2 className="t-title-2">{title}</h2>
-      {link && <Link to={to ?? '#'} className="section-header__link t-subheadline-emphasized">{link}</Link>}
+      {link && <TLink to={to ?? '#'} className="section-header__link t-subheadline-emphasized">{link}</TLink>}
     </div>
   );
 }
 
 export function SportShelfItem({ label, image, to }: { label: string; image: string; to: string }) {
   return (
-    <Link to={to} className="sport-tile pressable" aria-label={label}>
+    <TLink to={to} className="sport-tile pressable" aria-label={label}>
       <Img name={image} style={{ width: 46, height: 46 }} />
       <span className="t-caption">{label}</span>
-    </Link>
+    </TLink>
   );
 }
 
 export function BookingCard({ title, subtitle, photo, to }: { title: string; subtitle: string; photo: string; to: string }) {
   return (
-    <Link to={to} className="booking-card pressable">
+    <TLink to={to} className="booking-card pressable">
       <Img name={photo} style={{ width: 48, height: 48, borderRadius: 12, flex: 'none' }} />
       <span className="booking-card__body">
         <span className="t-headline">{title}</span>
         <span className="t-subheadline secondary">{subtitle}</span>
       </span>
       <Icon name="UI/Chevron-Right" size={20} className="chevron" />
-    </Link>
+    </TLink>
   );
 }
 
@@ -57,7 +57,7 @@ type StatTileProps =
 /** StatTile kind=points | savings, hasChevron=true (porta altrove → freccia in alto a destra). */
 export function StatTile(p: StatTileProps) {
   return (
-    <Link to={p.to} className="stat-tile pressable" style={{ textDecoration: 'none' }}>
+    <TLink to={p.to} className="stat-tile pressable" style={{ textDecoration: 'none' }}>
       <Icon name="UI/Chevron-Right" size={18} className="stat-tile__chevron" />
       <span className="t-footnote-emphasized stat-tile__label">{p.kind === 'points' ? 'I tuoi punti' : 'Hai risparmiato'}</span>
       {p.kind === 'points' ? (
@@ -69,13 +69,13 @@ export function StatTile(p: StatTileProps) {
         <span className="t-number-large" style={{ color: 'var(--earn-default)' }}>€{p.amount}</span>
       )}
       <span className="t-footnote stat-tile__label" style={{ fontWeight: 400 }}>{p.note}</span>
-    </Link>
+    </TLink>
   );
 }
 
 export function VenueCard({ title, place, price, points, photo, to }: { title: string; place: string; price: string; points: number; photo: string; to: string }) {
   return (
-    <Link to={to} className="venue-card pressable" style={{ textDecoration: 'none' }}>
+    <TLink to={to} className="venue-card pressable" style={{ textDecoration: 'none' }}>
       <Img name={photo} style={{ width: 240, height: 180, borderRadius: 16 }} />
       <span className="venue-card__body">
         <span className="t-headline">{title}</span>
@@ -85,6 +85,6 @@ export function VenueCard({ title, place, price, points, photo, to }: { title: s
           <span className="points-badge t-footnote-emphasized">+{fmtPoints(points)} pt</span>
         </span>
       </span>
-    </Link>
+    </TLink>
   );
 }

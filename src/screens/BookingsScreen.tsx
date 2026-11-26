@@ -1,5 +1,7 @@
+import { TLink } from '../app/TLink';
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { activity, days, venueOf } from '../data/data';
 import { checkInPoints, past, upcoming, useBookings, type Booking } from '../state/bookings';
 import { PageHeader } from '../ui/PageHeader';
@@ -33,7 +35,7 @@ export function BookingsScreen() {
   const setTab = (t: 'arrivo' | 'passate') => setParams(t === 'arrivo' ? {} : { tab: t }, { replace: true });
   const all = useBookings();
   const list = tab === 'arrivo' ? upcoming(all) : past(all);
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [pressed, setPressed] = useState<string | null>(null);
   void pressed;
 
@@ -54,7 +56,7 @@ export function BookingsScreen() {
             const a = activity(b.activityId);
             const v = venueOf(a);
             return (
-              <Link key={b.id} to={`/prenotazioni/${b.id}`} className="booking-row pressable" onPointerDown={() => setPressed(b.id)}>
+              <TLink key={b.id} to={`/prenotazioni/${b.id}`} className="booking-row pressable" onPointerDown={() => setPressed(b.id)}>
                 <Img name={a.photo} style={{ width: 56, height: 56, borderRadius: 12, flex: 'none' }} />
                 <span className="booking-row__text">
                   <span className="t-headline">{a.title}</span>
@@ -63,7 +65,7 @@ export function BookingsScreen() {
                   {b.status === 'cancelled' && <span className="t-footnote-emphasized" style={{ color: 'var(--text-tertiary)' }}>Disdetta</span>}
                 </span>
                 <Icon name="UI/Chevron-Right" size={b.status === 'upcoming' ? 24 : 18} className="chevron" />
-              </Link>
+              </TLink>
             );
           })}
         </div>

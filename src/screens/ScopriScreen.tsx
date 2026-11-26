@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { AnimatePresence, motion } from 'motion/react';
 import { Icon } from '../ui/Icon';
 import { VenueSheet } from '../ui/booking/VenueSheet';
@@ -12,7 +13,14 @@ import { ScreenOverlay } from '../app/ScreenOverlay';
 import { MapView, type MapPinData } from '../ui/scopri/MapView';
 import { ListSheet, type Detent } from '../ui/scopri/ListSheet';
 import { ActivityRow, FilterSummary, GlassIconButton, SearchField, sportIcon } from '../ui/scopri/ScopriParts';
-import { shelfSports } from '../data/data';
+import { FilterPanel } from '../ui/scopri/FilterPanel';
+import { SearchView, type Pick } from '../ui/scopri/SearchView';
+import { ListGroup, ListRow } from '../ui/settings/List';
+import { NO_FILTERS, apply, countFilters, listTitle, summary, type Filters } from '../ui/scopri/filters';
+import type { Sport } from '../data/data';
+
+// I filtri restano mentre apri e chiudi la scheda di una struttura (la schermata si rimonta).
+let kept: Filters = NO_FILTERS;
 
 // Scopri — DS · Schermate › "scopri — chiaro" (1461:1083) e sheet piccolo / medio / grande.
 // Posizione negata: mappa su Roma centro, senza punto blu (scopri/posizione-negata).
@@ -22,8 +30,14 @@ const priceLabel = (a: Activity) => (a.pricePerPerson ? `${euro(a.price)} · ${e
 export function ScopriScreen() {
   const [params] = useSearchParams();
   const sport = params.get('sport');
+  // ?sport= arriva dallo scaffale della Home: diventa il filtro Sport
+  const [filters, setFiltersState] = useState<Filters>(() => (sport ? (kept = { ...NO_FILTERS, sports: [sport as Sport] }) : kept));
+  const setFilters = (f: Filters) => { kept = f; setFiltersState(f); setSelected(f.venue); };
+  const [panel, setPanel] = useState(false);
+  const [search, setSearch] = useState(false);
+  const nFilters = countFilters(filters);
   const [detent, setDetent] = useState<Detent>('small');
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(() => kept.venue);
   const demo = useDemo();
   const voucherActive = useAppState().voucherActive;
   const denied = demo.location === 'denied';
@@ -36,47 +50,63 @@ export function ScopriScreen() {
   useEffect(() => { if (wasOffline.current && !offline) retry(); wasOffline.current = offline; }, [offline]);
   const showOffline = offline && !loading;
   useEffect(() => { if (showOffline) setDetent('medium'); else if (loading) setDetent('small'); }, [showOffline, loading]);
-  const navigate = useNavigate();
+  const navigate = useNav();
   const { activityId } = useParams();
   const [checkout, setCheckout] = useState<{ dayId: string; time: string } | null>(null);
   // Tab bar visibile solo con lo sheet piccolo e senza scheda aperta; la pagina non scorre (mappa a tutto schermo).
-  useScreenChrome({ tabBar: (detent === 'small' || detent === 'hidden') && !activityId && !showOffline, bottomEdge: false, pageScroll: false });
 
-  const list = useMemo(() => {
-    // ordine della lista come nella tavola Figma: Boxe, Yoga Flow, Padel Ostiense, poi il resto
-    const first = ['boxe', 'yoga-flow', 'padel-ostiense'];
-    const ordered = [...activities].sort((x, y) => (first.indexOf(x.id) + 1 || 99) - (first.indexOf(y.id) + 1 || 99));
-    const base = sport ? ordered.filter((a) => a.sport === sport) : ordered;
-    return selected ? base.filter((a) => a.venueId === selected) : base;
-  }, [sport, selected]);
+  // ordine della lista come nella tavola Figma: Boxe, Yoga Flow, Padel Ostiense, poi il resto
+  const first = ['boxe', 'yoga-flow', 'padel-ostiense'];
+  const filtered = useMemo(() => apply({ ...filters, venue: null }).sort((x, y) => (first.indexOf(x.id) + 1 || 99) - (first.indexOf(y.id) + 1 || 99)), [filters]); // eslint-disable-line react-hooks/exhaustive-deps
+  const list = useMemo(() => (selected ? filtered.filter((a) => a.venueId === selected) : filtered), [filtered, selected]);
+  const noResults = !filtered.length && !showOffline && !loading;
+  useEffect(() => { if (noResults) setDetent('medium'); }, [noResults]);
+  // Tab bar visibile solo con lo sheet piccolo, senza scheda, ricerca o "nessun risultato"; la pagina non scorre.
+  useScreenChrome({ tabBar: (detent === 'small' || detent === 'hidden') && !activityId && !showOffline && !search && !noResults, bottomEdge: false, pageScroll: false });
 
   const pins: MapPinData[] = useMemo(() => venues
     .map((v) => {
-      const acts = activities.filter((a) => a.venueId === v.id && (!sport || a.sport === sport));
+      const acts = filtered.filter((a) => a.venueId === v.id);
       if (!acts.length) return null;
       const cheapest = Math.min(...acts.map((a) => a.pricePerPerson ?? a.price));
       return { id: v.id, lat: v.lat, lng: v.lng, icon: sportIcon[acts[0].sport], count: acts.length, label: `${v.name} · ${euro(cheapest)}` };
     })
-    .filter(Boolean) as MapPinData[], [sport]);
+    .filter(Boolean) as MapPinData[], [filtered]);
 
   // toccare un pin mostra la lista di quella struttura (se la lista era nascosta, risale)
   const onSelect = useCallback((id: string | null) => { setSelected(id); if (id) setDetent((d) => (d === 'hidden' ? 'small' : d)); }, []);
-  const title = selected ? venues.find((v) => v.id === selected)!.name : `${list.length} attività ${denied ? 'a Roma' : 'vicino a te'}`;
+  const title = selected ? venues.find((v) => v.id === selected)!.name : listTitle(list.length, filters, denied);
+  const qs = sport ? `?sport=${sport}` : '';
+  // ricerca: uno sport filtra, una struttura seleziona il suo pin, un'attività apre la scheda
+  const onPick = (p: Pick) => {
+    setSearch(false);
+    if (p.kind === 'sport') setFilters({ ...NO_FILTERS, sports: [p.sport], maxDist: p.near ? 1 : null });
+    else if (p.kind === 'venue') { setFilters({ ...NO_FILTERS, venue: p.id }); setDetent('small'); }
+    else navigate(`/scopri/${p.id}`);
+  };
+  // errori/5: tre modi per uscirne, con quante attività trovi
+  const ways = [
+    filters.maxDist != null && { label: 'Allarga a 5 km', n: apply({ ...filters, maxDist: Math.max(5, filters.maxDist) }).length, go: () => setFilters({ ...filters, maxDist: Math.max(5, filters.maxDist!) }) },
+    filters.maxPrice != null && { label: 'Togli il prezzo', n: apply({ ...filters, maxPrice: null }).length, go: () => setFilters({ ...filters, maxPrice: null }) },
+    (filters.day || filters.moment) && { label: 'Togli l’orario', n: apply({ ...filters, day: null, moment: null }).length, go: () => setFilters({ ...filters, day: null, moment: null }) },
+    filters.indoor != null && { label: 'Al chiuso e all’aperto', n: apply({ ...filters, indoor: null }).length, go: () => setFilters({ ...filters, indoor: null }) },
+  ].filter(Boolean).filter((w) => (w as { n: number }).n > 0).slice(0, 2) as { label: string; n: number; go: () => void }[];
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <MapView key={denied ? 'roma' : 'qui'} center={denied ? ROMA_CENTRO : user.location} showUser={!denied} pins={offline || loading ? [] : pins} selected={activityId ? activities.find((a) => a.id === activityId)?.venueId ?? null : selected} onSelect={onSelect} />
+      <MapView key={denied ? 'roma' : 'qui'} center={denied ? ROMA_CENTRO : user.location} showUser={!denied} pins={offline || loading ? [] : pins} selected={activityId ? activities.find((a) => a.id === activityId)?.venueId ?? null : selected} onSelect={(id) => { if (panel) { setPanel(false); return; } onSelect(id); }} />
       <div className="scopri-top">
-        <SearchField />
-        <GlassIconButton icon="UI/Filters" label="Filtri" badge={sport ? 1 : 0} />
+        <SearchField onPress={() => { setPanel(false); setSearch(true); }} />
+        <GlassIconButton icon="UI/Filters" label="Filtri" badge={nFilters} onPress={() => setPanel(!panel)} />
       </div>
-      {voucherActive && !sport && (
+      <AnimatePresence>{panel && <FilterPanel key="p" value={filters} onChange={setFilters} onClose={() => setPanel(false)} />}</AnimatePresence>
+      {voucherActive && !nFilters && !panel && (
         <div className="voucher-pill">
           <Img name="img/buono-bronzo" style={{ width: 28, height: 28 }} />
           <span className="t-subheadline-emphasized">Buono da €5 attivo</span>
         </div>
       )}
-      {denied && !sport && !voucherActive && (
+      {denied && !nFilters && !voucherActive && !panel && (
         <div className="glass-banner glass-control">
           <Icon name="UI/Location" size={24} />
           <div>
@@ -85,7 +115,13 @@ export function ScopriScreen() {
           </div>
         </div>
       )}
-      {sport && <FilterSummary label={shelfSports.find((x) => x.sport === sport)?.label ?? sport} />}
+      <AnimatePresence>
+        {nFilters > 0 && !panel && (
+          <motion.div key="sum" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <FilterSummary label={summary(filters, filters.venue ? venues.find((v) => v.id === filters.venue)?.name : undefined)} onPress={() => setPanel(true)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {detent === 'hidden' && !activityId && (
           <motion.button className="show-list glass-control" onClick={() => setDetent('small')}
@@ -96,8 +132,18 @@ export function ScopriScreen() {
           </motion.button>
         )}
       </AnimatePresence>
-      <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : title} muted={loading} detent={detent} onDetent={showOffline || loading ? () => {} : setDetent}>
-        {showOffline ? (
+      <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={detent}
+        action={nFilters > 0 && !showOffline && !loading ? <button className="list-sheet__clear t-subheadline-emphasized" onClick={() => { setFilters(NO_FILTERS); setDetent('small'); }}>Cancella tutto</button> : undefined}
+        onDetent={showOffline || loading ? () => {} : setDetent}>
+        {noResults ? (
+          <div className="no-results">
+            <p className="t-subheadline secondary">Con questi filtri non c’è niente qui vicino. Prova così:</p>
+            <ListGroup>
+              {ways.map((w) => <ListRow key={w.label} title={w.label} value={`${w.n} attività`} onPress={() => { w.go(); setDetent('small'); }} />)}
+              <ListRow title="Chiedi a Movi" onPress={() => navigate(`/movi?q=${encodeURIComponent(summary(filters))}`)} />
+            </ListGroup>
+          </div>
+        ) : showOffline ? (
           <div className="offline-state" role="status">
             <Icon name="UI/Wifi-Off" size={40} />
             <h2 className="t-title-3">Sei offline</h2>
@@ -107,7 +153,7 @@ export function ScopriScreen() {
           <div key={i} className="skeleton-row" aria-hidden="true"><i /><span><i /><i /><i /></span></div>
         )) : list.map((a) => {
           const v = venueOf(a);
-          return <ActivityRow key={a.id} title={a.title} place={`${v.name} · ${v.distance}`} price={priceLabel(a)} points={a.points} photo={a.photo} onPress={() => navigate(`/scopri/${a.id}${sport ? `?sport=${sport}` : ''}`)} />;
+          return <ActivityRow key={a.id} title={a.title} place={`${v.name} · ${v.distance}`} price={priceLabel(a)} points={a.points} photo={a.photo} onPress={() => navigate(`/scopri/${a.id}${qs}`)} />;
         })}
       </ListSheet>
       <AnimatePresence>
@@ -117,8 +163,11 @@ export function ScopriScreen() {
           </motion.div>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {search && <SearchView key="s" onClose={() => setSearch(false)} onPick={onPick} onAskMovi={(q) => navigate(`/movi?q=${encodeURIComponent(q)}`)} />}
+      </AnimatePresence>
       {activityId && (
-        <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${sport ? `?sport=${sport}` : ''}`); }}
+        <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${qs}`); }}
           onBook={(dayId, time) => setCheckout({ dayId, time })} />
       )}
       {/* il riepilogo sta nel livello comune degli sheet, così modulo e certificato si aprono sopra */}

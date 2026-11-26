@@ -1,6 +1,7 @@
+import { TLink } from '../app/TLink';
 import { useState } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { achievements, fmtPoints, user, vouchers } from '../data/data';
 import { balance, store, useBookings } from '../state/bookings';
 import { Icon } from '../ui/Icon';
@@ -13,7 +14,7 @@ import './PremiScreen.css';
 // Premi — DS · Schermate › "premi — chiaro" (1461:915); sheet del buono (flusso-buono/2, 1461:2141) e "Come arrivarci" (premi/1, 1461:5332).
 export function PremiScreen() {
   const bal = balance(useBookings(), user.points, user.saved);
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [sheet, setSheet] = useState<null | { kind: 'use' } | { kind: 'path'; id: string }>(null);
   const next = vouchers.find((v) => v.points > bal.points) ?? vouchers[vouchers.length - 1];
   const progress = Math.min(bal.points / next.points, 1);
@@ -68,11 +69,11 @@ export function PremiScreen() {
         <SectionHeader title="Traguardi" link="Vedi tutti" to="/premi/traguardi" />
         <div className="trophies">
           {['risparmio-10', 'punti-5k', 'serie-7', 'lezioni-1'].map((id) => achievements.find((a) => a.id === id)!).filter((a) => a.unlocked).map((a) => (
-            <Link key={a.id} to={`/premi/traguardi?t=${a.id}`} className="trophy pressable">
+            <TLink key={a.id} to={`/premi/traguardi?t=${a.id}`} className="trophy pressable">
               <Img name={a.image} style={{ width: 64, height: 64 }} />
               <Img name="img/stella" style={{ width: 18, height: 18 }} />
               <span className="t-footnote-emphasized secondary">{a.label}</span>
-            </Link>
+            </TLink>
           ))}
         </div>
       </section>

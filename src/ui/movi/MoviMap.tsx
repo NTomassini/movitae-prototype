@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../../app/nav';
 import { activity, euro, user, venueOf } from '../../data/data';
 import type { Card } from '../../movi/engine';
 import { Icon } from '../Icon';
@@ -16,7 +16,7 @@ export function MoviMap({ cards, booked, selected, onClose, onOpen, onTime, onSe
   cards: Card[]; booked: (activityId: string) => string | null; selected: (activityId: string) => string | null;
   onClose: () => void; onOpen: (c: Card) => void; onTime: (c: Card, time: string) => void; onSend: (t: string) => void;
 }) {
-  const navigate = useNavigate();
+  const navigate = useNav();
   const [current, setCurrent] = useState(0);
   const strip = useRef<HTMLDivElement>(null);
   const pins: MapPinData[] = useMemo(() => cards.map((c) => {

@@ -6,7 +6,8 @@ const useLateFocus = () => {
   useEffect(() => { const t = setTimeout(() => ref.current?.focus({ preventScroll: true }), 480); return () => clearTimeout(t); }, []);
   return ref;
 };
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNav } from '../app/nav';
 import { AnimatePresence, motion } from 'motion/react';
 import { useScreenChrome } from '../app/chrome';
 import { ScreenOverlay } from '../app/ScreenOverlay';
@@ -48,7 +49,7 @@ let lastIndex = 0;
 export function OnboardingScreen() {
   const { step = 'intro' } = useParams();
   const s = (ORDER.includes(step as Step) ? step : 'intro') as Step;
-  const navigate = useNavigate();
+  const navigate = useNav();
   useScreenChrome({ tabBar: false, bottomEdge: false, pageScroll: false });
   const [draft, setDraftState] = useState<Draft>(loadDraft);
   const setDraft = (p: Partial<Draft>) => setDraftState((d) => { const n = { ...d, ...p }; try { sessionStorage.setItem(KEY, JSON.stringify(n)); } catch { /* ignora */ } return n; });

@@ -48,13 +48,43 @@ export function QR({ value }: { value: string }) {
   return <span role="img" aria-label="Codice QR della prenotazione" dangerouslySetInnerHTML={{ __html: svg }} />;
 }
 
-export function ActionsCard({ mapsQuery }: { mapsQuery: string }) {
+/** Evento per il calendario (Q50): file .ics vero; su iPhone si apre "Aggiungi a Calendario". */
+export type CalEvent = { id: string; title: string; dayId: string; time: string; minutes: number; location: string };
+const icsDate = (dayId: string, time: string, plus = 0) => {
+  const day = dayId === 'oggi' ? 13 : Number(dayId) || 13;
+  const [h, m] = time.split(':').map(Number);
+  const d = new Date(2026, 10, day, h, m + plus);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+};
+const addToCalendar = (e: CalEvent) => {
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Movitae//Prototipo//IT', 'BEGIN:VEVENT', `UID:${e.id}@movitae`,
+    `DTSTART;TZID=Europe/Rome:${icsDate(e.dayId, e.time)}`, `DTEND;TZID=Europe/Rome:${icsDate(e.dayId, e.time, e.minutes)}`,
+    `SUMMARY:${e.title}`, `LOCATION:${e.location}`, 'DESCRIPTION:Prenotato con Movitae. Mostra il QR all’ingresso.', 'BEGIN:VALARM', 'TRIGGER:-PT1H', 'ACTION:DISPLAY', 'DESCRIPTION:Tra un’ora', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+  a.download = 'movitae-prenotazione.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+};
+const CAL_KEY = 'movitae-calendario';
+const added = () => { try { return JSON.parse(sessionStorage.getItem(CAL_KEY) || '[]') as string[]; } catch { return []; } };
+
+export function ActionsCard({ mapsQuery, event }: { mapsQuery: string; event?: CalEvent }) {
+  const [done, setDone] = useState(() => !!event && added().includes(event.id));
+  const add = () => {
+    if (!event || done) return;
+    addToCalendar(event);
+    try { sessionStorage.setItem(CAL_KEY, JSON.stringify([...added(), event.id])); } catch { /* ignora */ }
+    setDone(true);
+  };
   return (
     <div className="card actions-card">
-      <button className="pressable">
+      <button className="pressable" onClick={add} aria-disabled={done}>
         <Icon name="UI/Calendar" size={24} />
-        <span className="t-body" style={{ flex: 1 }}>Aggiungi al calendario</span>
-        <Icon name="UI/Chevron-Right" size={18} className="chevron" />
+        {done
+          ? <span className="t-body" style={{ flex: 1, color: 'var(--earn-default)', display: 'flex', alignItems: 'center', gap: 4 }}>Aggiunto al calendario<Icon name="UI/Check" size={18} /></span>
+          : <span className="t-body" style={{ flex: 1 }}>Aggiungi al calendario</span>}
+        {!done && <Icon name="UI/Chevron-Right" size={18} className="chevron" />}
       </button>
       <div className="sep" />
       <a className="pressable" href={`https://maps.apple.com/?q=${encodeURIComponent(mapsQuery)}`} target="_blank" rel="noreferrer">

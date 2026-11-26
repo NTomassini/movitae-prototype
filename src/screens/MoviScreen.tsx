@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNav } from '../app/nav';
+import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { useScreenChrome } from '../app/chrome';
 import { ScreenOverlay } from '../app/ScreenOverlay';
@@ -23,7 +24,7 @@ type Checkout = Target & { time: string; dayId: string; fromSheet: boolean };
 const THINK_MS = { search: 1300, text: 650 };
 
 export function MoviScreen() {
-  const navigate = useNavigate();
+  const navigate = useNav();
   const app = useAppState();
   const { messages, pending } = useChat();
   const [sheet, setSheet] = useState<Target | null>(null);
@@ -77,6 +78,15 @@ export function MoviScreen() {
       chat.add({ role: 'movi', text: r.text, cards: r.cards, actions: r.actions, suggestions: r.suggestions });
     }, r.search ? THINK_MS.search : THINK_MS.text);
   };
+  // "Chiedi a Movi “arrampicata”" (errori/6) o dai filtri senza risultati: la domanda arriva già fatta
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    const q = params.get('q');
+    if (!q) return;
+    setParams({}, { replace: true });
+    setTimeout(() => send(q), 350);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const send = (text: string) => {
     if (chat.get().pending) return;
     setMap(null);
