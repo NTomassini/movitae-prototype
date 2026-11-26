@@ -111,6 +111,31 @@ def go_onb_codice_errato(pg):
 def go_onb_benvenuto(pg): onb(pg, 'benvenuto', "sessionStorage.setItem('movitae-onboarding', JSON.stringify({name:'Marco', health:true}))")
 def go_onb_benvenuto_senza(pg): onb(pg, 'benvenuto', "sessionStorage.setItem('movitae-onboarding', JSON.stringify({name:'Marco', health:false}))")
 
+DOCS_OK = "s => { s.docs = {certificate:{type:'non',issued:'2026-09-12',expires:'2027-09-12'}, forms:{fitlab:'2026-11-13'}}; return s }"
+def pro(path, patch='s=>s'):
+    def f(pg): state(pg, path + ('&' if '?' in path else '?') + 'theme=light', patch)
+    return f
+def go_pro_sport(pg): pro('/profilo')(pg); pg.get_by_role('button', name='Sport preferiti').click(); pg.wait_for_timeout(800)
+def go_imp_salute(pg): pro('/impostazioni')(pg); pg.get_by_role('button', name='Apple Salute').click(); pg.wait_for_timeout(900)
+def go_imp_elimina(pg): pro('/impostazioni')(pg); pg.get_by_role('button', name='Elimina account').click(); pg.wait_for_timeout(600)
+def go_doc_elimina(pg): pro('/documenti', DOCS_OK)(pg); pg.get_by_role('button', name='Elimina', exact=True).click(); pg.wait_for_timeout(600)
+def checkout(pg, act, day=None, time='18:00', patch='s=>s'):
+    state(pg, f'/scopri/{act}?theme=light', patch); pg.wait_for_timeout(300)
+    if day: pg.get_by_role('button', name=day).evaluate('el => el.click()')
+    pg.evaluate("document.querySelector('.venue-sheet__body').scrollTop=400"); pg.wait_for_timeout(200)
+    pg.get_by_role('button', name=time, exact=True).evaluate('el => el.click()'); pg.locator('.bottom-bar .button--primary').click(); pg.wait_for_timeout(1000)
+def go_doc_mod(pg): checkout(pg, 'palestra')
+def go_doc_sheet(pg): go_doc_mod(pg); pg.locator('.doc-card').click(); pg.wait_for_timeout(800)
+def go_doc_firmato(pg): checkout(pg, 'palestra', patch="s => { s.docs = {certificate:null, forms:{fitlab:'2026-11-13'}}; return s }")
+def go_doc_cert(pg): checkout(pg, 'nuoto', 'Mar 17', '07:30')
+def go_doc_menu(pg): go_doc_cert(pg); pg.get_by_role('button', name='Caricalo ora').click(); pg.wait_for_timeout(600)
+def go_doc_controlla(pg): go_doc_menu(pg); pg.get_by_role('menuitem', name='Scansiona documento').click(); pg.wait_for_timeout(900)
+def go_doc_scaduto(pg):
+    go_doc_controlla(pg)
+    pg.evaluate("() => { const i = document.querySelector('input[aria-label=\"Rilasciato il\"]'); const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set; set.call(i, '2025-10-03'); i.dispatchEvent(new Event('input', {bubbles:true})); }")
+    pg.wait_for_timeout(300)
+def go_doc_caricato(pg): checkout(pg, 'nuoto', 'Mar 17', '07:30', DOCS_OK)
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -163,6 +188,24 @@ SCREENS = [
     ('onb-7b-quanto', go_onb_quanto, []),
     ('onb-8-benvenuto', go_onb_benvenuto, []),
     ('onb-8b-benvenuto-senza', go_onb_benvenuto_senza, []),
+    ('pro-1-profilo', pro('/profilo'), []),
+    ('pro-2-sport', go_pro_sport, [(0, 0, 402, 62)]),
+    ('imp-1', pro('/impostazioni'), []),
+    ('imp-2-salute', go_imp_salute, [(0, 0, 402, 510)]),
+    ('imp-3-notifiche', pro('/impostazioni/notifiche'), []),
+    ('imp-6-notifiche-spente', pro('/impostazioni/notifiche', "s => { s.demo = {...(s.demo||{}), iosNotifications:'off'}; return s }"), []),
+    ('imp-4-obiettivo', pro('/impostazioni/obiettivo'), []),
+    ('imp-5-elimina', go_imp_elimina, []),
+    ('doc-6-documenti', pro('/documenti', DOCS_OK), []),
+    ('doc-c5-elimina', go_doc_elimina, []),
+    ('doc-1-riepilogo-modulo', go_doc_mod, [(0, 0, 402, 56)]),
+    ('doc-2-sheet-modulo', go_doc_sheet, [(0, 0, 402, 62)]),
+    ('doc-c1-modulo-firmato', go_doc_firmato, [(0, 0, 402, 56)]),
+    ('doc-3-riepilogo-certificato', go_doc_cert, [(0, 0, 402, 56)]),
+    ('doc-4-menu', go_doc_menu, [(0, 0, 402, 56)]),
+    ('doc-5-controlla', go_doc_controlla, [(0, 0, 402, 62)]),
+    ('doc-e4-scaduto', go_doc_scaduto, [(0, 0, 402, 62)]),
+    ('doc-c2-caricato', go_doc_caricato, [(0, 0, 402, 56)]),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):

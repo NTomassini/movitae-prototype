@@ -8,6 +8,7 @@ import { bookings, useAppState, useDemo } from '../state/bookings';
 import { Img } from '../ui/Img';
 import { activities, euro, user, venueOf, venues, type Activity } from '../data/data';
 import { useScreenChrome } from '../app/chrome';
+import { ScreenOverlay } from '../app/ScreenOverlay';
 import { MapView, type MapPinData } from '../ui/scopri/MapView';
 import { ListSheet, type Detent } from '../ui/scopri/ListSheet';
 import { ActivityRow, FilterSummary, GlassIconButton, SearchField, sportIcon } from '../ui/scopri/ScopriParts';
@@ -96,12 +97,15 @@ export function ScopriScreen() {
         <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${sport ? `?sport=${sport}` : ''}`); }}
           onBook={(dayId, time) => setCheckout({ dayId, time })} />
       )}
+      {/* il riepilogo sta nel livello comune degli sheet, così modulo e certificato si aprono sopra */}
+      <ScreenOverlay><div className="checkout-layer">
       <AnimatePresence>
         {activityId && checkout && (
           <CheckoutSheet activityId={activityId} dayId={checkout.dayId} time={checkout.time} onCancel={() => setCheckout(null)}
             onPaid={(r) => { const b = bookings.add({ activityId, dayId: checkout.dayId, time: checkout.time, ...r }); navigate(`/prenotato/${b.id}`); }} />
         )}
       </AnimatePresence>
+      </div></ScreenOverlay>
     </div>
   );
 }

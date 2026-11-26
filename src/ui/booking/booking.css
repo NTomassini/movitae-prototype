@@ -86,3 +86,6 @@
 /* Pagamento non riuscito (errori/3): icona Alert + titolo rosso + spiegazione, al posto del totale */
 .checkout-bar__error { height: 100px; display: flex; gap: 8px; align-items: flex-start; color: var(--feedback-error); }
 .checkout-bar__error > div { display: flex; flex-direction: column; gap: 2px; }
+
+.checkout-layer { position: absolute; inset: 0; z-index: 21; pointer-events: none; }
+.checkout-layer > * { pointer-events: auto; }

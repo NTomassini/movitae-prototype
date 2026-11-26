@@ -21,13 +21,20 @@ export type Demo = {
   soldOut: boolean;
   clock: 'before' | 'after'; // ora del prototipo: prima o dopo il limite di disdetta gratuita (2 ore prima)
   emailCode: 'ok' | 'wrong'; // onboarding con email: il codice inserito è giusto o sbagliato (errori/1)
+  iosNotifications: 'on' | 'off'; // notifiche dell'app accese o spente nelle Impostazioni di iPhone (conferme/6)
 };
+/** Documenti (Q41): certificato medico personale e moduli firmati per struttura. Date in formato AAAA-MM-GG. */
+export type Certificate = { type: 'non' | 'ago'; issued: string; expires: string };
+export type Docs = { certificate: Certificate | null; forms: Record<string, string> };
+export const NOTIFS = ['Missione del mattino', 'Missione completata', 'Pausa usata', 'Buono pronto', 'Promemoria lezioni', 'Orario liberato', 'Scadenza certificato'] as const;
+export type Settings = { notifs: Record<string, boolean>; missionTime: string; nextGoal: number | null; exportRequested: boolean };
 /** Utente nuovo creato dall'onboarding (Q37): sostituisce i dati di Marco finché non si ripristina la demo. */
 export type Profile = { name: string; sports: string[]; goal: number; health: boolean };
-export type AppState = { profile: Profile | null; bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; celebrated: string | null; demo: Demo };
+export type AppState = { favSports: string[] | null; profile: Profile | null; docs: Docs; settings: Settings; bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; celebrated: string | null; demo: Demo };
 
 const KEY = 'movitae-prototipo-v1';
-export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false, clock: 'before', emailCode: 'ok' };
+export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false, clock: 'before', emailCode: 'ok', iosNotifications: 'on' };
+const initialSettings = (): Settings => ({ notifs: Object.fromEntries(NOTIFS.map((n) => [n, n !== 'Pausa usata'])), missionTime: '08:00', nextGoal: null, exportRequested: false });
 // Prenotazioni di Marco all'avvio (prenotazioni/1 e /2 in Figma)
 const seedBookings: Booking[] = [
   { id: 's-yoga', activityId: 'yoga-flow', dayId: 'oggi', time: '18:30', voucher: false, paid: 18, points: 180, status: 'upcoming', seed: true },
@@ -37,7 +44,7 @@ const seedBookings: Booking[] = [
   { id: 's-pilates', activityId: 'pilates-base', dayId: 'past', time: '18:00', voucher: false, paid: 18, points: 180, status: 'cancelled', refunded: true, seed: true, pastLabel: 'Ven 6 nov, 18:00' },
   { id: 's-palestra', activityId: 'palestra', dayId: 'past', time: '08:00', voucher: false, paid: 12, points: 120, status: 'checked-in', seed: true, pastLabel: 'Lun 2 nov, 08:00' },
 ];
-const initial = (): AppState => ({ profile: null, bookings: seedBookings.map((b) => ({ ...b })), favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
+const initial = (): AppState => ({ favSports: null, profile: null, docs: { certificate: null, forms: {} }, settings: initialSettings(), bookings: seedBookings.map((b) => ({ ...b })), favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
 
 const load = (): AppState => {
   try {
@@ -49,7 +56,7 @@ const load = (): AppState => {
       const bookings: Booking[] = saved.bookings ?? [];
       // (non per l'utente nuovo creato dall'onboarding, che parte senza prenotazioni)
       if (!saved.profile) for (const sb of base.bookings) if (!bookings.some((b) => b.id === sb.id)) bookings.push(sb);
-      return { ...base, ...saved, bookings, demo: { ...base.demo, ...(saved.demo ?? {}) } };
+      return { ...base, ...saved, bookings, demo: { ...base.demo, ...(saved.demo ?? {}) }, settings: { ...base.settings, ...(saved.settings ?? {}) }, docs: { ...base.docs, ...(saved.docs ?? {}) } };
     }
   } catch { /* storage non disponibile: si resta in memoria */ }
   return initial();
@@ -75,6 +82,12 @@ export const store = {
   },
   setDemo(patch: Partial<Demo>) { set({ demo: { ...state.demo, ...patch } }); },
   setOnboarded(v: boolean) { set({ onboarded: v }); },
+  setCertificate(c: Certificate | null) { set({ docs: { ...state.docs, certificate: c } }); },
+  signForm(venueId: string, date = '2026-11-13') { set({ docs: { ...state.docs, forms: { ...state.docs.forms, [venueId]: date } } }); },
+  setDocs(d: Docs) { set({ docs: d }); },
+  setSettings(p: Partial<Settings>) { set({ settings: { ...state.settings, ...p } }); },
+  /** Sport preferiti cambiati dal profilo (profilo/2): scaffale della Home e riga del profilo */
+  setFavoriteSports(sports: string[]) { set({ favSports: sports }); },
   /** flusso C: "Trova un'attività" dallo sheet del buono lo attiva fino al pagamento */
   setVoucherActive(v: boolean) { set({ voucherActive: v }); },
   /** la celebrazione si vede una volta sola per ogni missione completata */
@@ -83,7 +96,7 @@ export const store = {
   /** fine dell'onboarding: utente nuovo senza prenotazioni, missione al primo giorno o senza Salute */
   finishOnboarding(p: Profile, locationGranted: boolean) {
     applyProfile(p);
-    set({ profile: p, bookings: [], favorites: [], voucherActive: false, celebrated: null, onboarded: true,
+    set({ profile: p, favSports: null, bookings: [], favorites: [], voucherActive: false, celebrated: null, onboarded: true,
       demo: { ...state.demo, mission: p.health ? 'first-day' : 'no-health', location: locationGranted ? 'granted' : 'denied' } });
   },
 };

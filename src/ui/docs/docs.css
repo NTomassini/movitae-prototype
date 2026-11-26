@@ -1,0 +1,38 @@
+/* Documenti — DS · Schermate › documenti/1–6, conferme/1–2, 5, errori/4 */
+.doc-card { display: flex; align-items: center; gap: 12px; padding: 16px; text-align: left; color: var(--text-primary); width: 100%; }
+.doc-card--column { flex-direction: column; align-items: stretch; }
+.doc-card__row { display: flex; align-items: center; gap: 12px; }
+.doc-card__texts { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.doc-card .chevron { color: var(--text-tertiary); flex: none; }
+.doc-status { display: inline-flex; align-items: center; gap: 4px; }
+.doc-status svg { flex: none; }
+.doc-status--ok { color: var(--earn-default); }
+.doc-status--error { color: var(--feedback-error); }
+.doc-link { align-self: flex-start; color: var(--brand-accent); min-height: 24px; text-align: left; }
+.doc-error { display: flex; gap: 6px; align-items: flex-start; margin: 8px 16px 0; color: var(--feedback-error); }
+.doc-error svg { flex: none; margin-top: 2px; }
+
+/* sheet del modulo: 4 punti in una card grigia, "Ho letto e accetto" con interruttore */
+.doc-rules { list-style: none; margin: 24px 0 0; padding: 0; border-radius: 24px; background: var(--bg-default); }
+.doc-rules li { position: relative; padding: 14px 16px; }
+.doc-rules li + li::before { content: ''; position: absolute; top: 0; left: 16px; right: 0; height: 1px; background: var(--border-separator); }
+.doc-accept { margin-top: 24px; min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; border-radius: 24px; background: var(--bg-default); }
+
+/* menu di caricamento: 260 di larghezza, voci 48 */
+.upload-scrim { position: absolute; inset: 0; pointer-events: auto; z-index: 28; }
+.upload-menu { position: absolute; z-index: 29; width: 260px; pointer-events: auto; border-radius: 24px; background: var(--bg-elevated); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18); overflow: hidden; transform-origin: top left; }
+.upload-menu button { width: 100%; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; color: var(--text-primary); text-align: left; }
+.upload-menu button + button { border-top: 1px solid var(--border-separator); }
+.upload-menu button:active { background: var(--fill-tertiary); }
+
+/* Controlla i dati: miniatura 120×160 a +72, gruppi a +256 */
+.cert-thumb { width: 120px; height: 160px; margin: 0 auto; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px var(--border-separator); overflow: hidden; display: grid; place-items: center; }
+.cert-thumb > span { display: flex; flex-direction: column; gap: 6px; width: 100%; height: 100%; padding: 0 16px; }
+.cert-thumb i { display: block; height: 4px; border-radius: 2px; background: var(--fill-tertiary); }
+.cert-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cert-group { margin-top: 24px; }
+.cert-group .list-group__card { background: none; border-radius: 0; overflow: visible; }
+.cert-group:last-of-type .list-group__card { background: var(--bg-default); border-radius: 24px; overflow: hidden; }
+.cert-date { position: relative; min-height: 74px; }
+.cert-date input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.cert-date--error { color: var(--feedback-error); }

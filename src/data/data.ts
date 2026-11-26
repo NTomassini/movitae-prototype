@@ -52,7 +52,7 @@ export const activities: Activity[] = [
   { id: 'padel-aventino', title: 'Padel, campo da 4', sport: 'padel', venueId: 'padel-aventino', photo: 'foto/padel-coperto', price: 52, pricePerPerson: 13, people: 4, points: 520, duration: '90 min', indoor: true, slots: [{ time: '19:00' }, { time: '20:30' }] },
   { id: 'padel-sporting', title: 'Padel, campo da 4', sport: 'padel', venueId: 'sporting-testaccio', photo: 'foto/padel-aperto', price: 48, pricePerPerson: 12, people: 4, points: 480, duration: '90 min', indoor: false, slots: [{ time: '18:30' }, { time: '20:00' }] },
   { id: 'nuoto', title: 'Nuoto libero', sport: 'nuoto', venueId: 'piscina-aventino', photo: 'foto/nuoto', price: 12, points: 120, duration: '60 min', indoor: true, slots: [{ time: '07:30' }, { time: '13:00' }, { time: '19:00' }] },
-  { id: 'palestra', title: 'Palestra, ingresso', sport: 'palestra', venueId: 'fitlab', photo: 'foto/palestra', price: 12, points: 120, duration: 'ingresso singolo', indoor: true, slots: [{ time: '08:00' }, { time: '18:00' }] },
+  { id: 'palestra', title: 'Palestra, ingresso singolo', sport: 'palestra', venueId: 'fitlab', photo: 'foto/palestra', price: 12, points: 120, duration: 'ingresso singolo', indoor: true, slots: [{ time: '08:00' }, { time: '18:00' }] },
   { id: 'calcetto', title: 'Calcetto, campo da 10', sport: 'calcio', venueId: 'cs-ostiense', photo: 'foto/calcetto', price: 70, pricePerPerson: 7, people: 10, points: 700, duration: '60 min', indoor: false, slots: [{ time: '20:00' }, { time: '21:00' }] },
 ];
 

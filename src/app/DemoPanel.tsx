@@ -17,6 +17,7 @@ const groups: Opt<keyof Demo>[] = [
   { key: 'network', label: 'Connessione', options: [{ v: 'online', l: 'Online' }, { v: 'offline', l: 'Offline' }] },
   { key: 'payment', label: 'Pagamento', options: [{ v: 'ok', l: 'Riuscito' }, { v: 'fail', l: 'Non riuscito' }] },
   { key: 'clock', label: 'Ora (disdetta gratis fino a 2 ore prima)', options: [{ v: 'before', l: 'Prima del limite' }, { v: 'after', l: 'Dopo il limite' }] },
+  { key: 'iosNotifications', label: 'Notifiche di iPhone', options: [{ v: 'on', l: 'Accese' }, { v: 'off', l: 'Spente' }] },
   { key: 'emailCode', label: 'Codice email (onboarding)', options: [{ v: 'ok', l: 'Giusto' }, { v: 'wrong', l: 'Sbagliato' }] },
   { key: 'soldOut', label: 'Orario scelto', options: [{ v: false, l: 'Disponibile' }, { v: true, l: 'Esaurito' }] },
 ] as Opt<keyof Demo>[];
@@ -55,6 +56,12 @@ export function DemoPanel() {
             <div className="demo-panel__actions">
               <button className="t-subheadline-emphasized" onClick={() => { const b = upcoming(store.get().bookings)[0]; if (b) store.updateBooking(b.id, { status: 'checked-in' }); }}>Check-in della prossima</button>
               <button className="t-subheadline-emphasized" onClick={() => { setOpen(false); location.assign('/?onboarding'); }}>Rivedi onboarding</button>
+            </div>
+            <p className="t-footnote-emphasized" style={{ margin: '12px 0 6px' }}>Documenti (Q41)</p>
+            <div className="demo-panel__actions">
+              <button className="t-subheadline-emphasized" onClick={() => store.setDocs({ certificate: null, forms: {} })}>Nessuno</button>
+              <button className="t-subheadline-emphasized" onClick={() => store.setDocs({ certificate: { type: 'non', issued: '2026-09-12', expires: '2027-09-12' }, forms: { fitlab: '2026-11-13' } })}>Caricati</button>
+              <button className="t-subheadline-emphasized" onClick={() => store.setDocs({ certificate: { type: 'non', issued: '2025-10-03', expires: '2026-10-03' }, forms: store.get().docs.forms })}>Certificato scaduto</button>
             </div>
             <div className="demo-panel__actions">
               <button className="t-subheadline-emphasized" onClick={() => store.setDemo(initialDemo)}>Stati normali</button>

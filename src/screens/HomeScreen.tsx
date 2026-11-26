@@ -1,7 +1,7 @@
 import { balance, upcoming, useBookings } from '../state/bookings';
 import { whenShort } from './BookingsScreen';
 import { fmtPoints } from '../data/data';
-import { activities, activity, euro, homeShelf, nearby, upcomingBooking, user, venueOf } from '../data/data';
+import { type Sport, activities, activity, euro, homeShelf, nearby, upcomingBooking, user, venueOf } from '../data/data';
 import { Avatar, BookingCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from '../ui/home/HomeParts';
 import { Celebration, HealthExplain, HealthSystemSheet, MissionCard, StreakSheetContent } from '../ui/mission/Mission';
 import { ModalSheet } from '../ui/ModalSheet';
@@ -47,7 +47,7 @@ export function HomeScreen() {
         <div className={`home__bar${scrolled ? ' is-scrolled' : ''}`}>
           <ScrollEdge position="top" height={106} />
           <span className="home__bar-title t-headline" aria-hidden={!scrolled}>Ciao, {user.name}</span>
-          <span className="home__bar-avatar"><Avatar initial={user.initial} label="Profilo" onLongPress={openDemo} /></span>
+          <span className="home__bar-avatar"><Avatar initial={user.initial} label="Profilo" onLongPress={openDemo} onPress={() => navigate('/profilo')} /></span>
         </div>
       </ScreenOverlay>
       <header className="home__header">
@@ -59,7 +59,7 @@ export function HomeScreen() {
       <section className="home__section">
         <SectionHeader title="Cosa ti va oggi?" link="Altro" to="/scopri" />
         <div className="shelf">
-          {homeShelf(app.profile ? user.favoriteSports : null).map((s) => <SportShelfItem key={s.sport} label={s.label} image={s.image} to={`/scopri?sport=${s.sport}`} />)}
+          {homeShelf((app.favSports ?? (app.profile ? user.favoriteSports : null)) as Sport[] | null).map((s) => <SportShelfItem key={s.sport} label={s.label} image={s.image} to={`/scopri?sport=${s.sport}`} />)}
         </div>
       </section>
 

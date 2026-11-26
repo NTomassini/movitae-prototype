@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { DocCard, FormSheet, useUpload } from '../docs/Docs';
 import { VOUCHER, activity, days, endTime, euro, euroCents, fmtPoints, user, venueOf } from '../../data/data';
 import { Icon } from '../Icon';
 import { balance, store, useBookings, useDemo } from '../../state/bookings';
@@ -32,9 +33,14 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back 
   const demo = useDemo();
   const total = a.price - (voucher ? VOUCHER.value : 0);
   const points = total * 10;
-  const label = a.people ? `Campo da ${a.people}` : a.duration === 'ingresso singolo' ? 'Ingresso' : 'Lezione';
+  const label = a.people ? `Campo da ${a.people}` : a.duration === 'ingresso singolo' || a.sport === 'nuoto' ? 'Ingresso' : 'Lezione';
 
+  // documenti richiesti dalla struttura (handoff › Documenti): modulo da firmare o certificato
+  const [formOpen, setFormOpen] = useState(false);
+  const upload = useUpload();
+  const needsForm = v.documents === 'form' && !store.get().docs.forms[v.id];
   const pay = () => {
+    if (needsForm) { setFormOpen(true); return; } // Apple Pay resta attivo: senza firma apre prima il modulo
     setPaying(true);
     setFailed(false);
     setTimeout(() => {
@@ -69,6 +75,7 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back 
           <div className="card">
             <ActivityBlock photo={a.photo} title={a.title} when={`${d.long} · ${end ? `${time}–${end}` : `dalle ${time}`}`} where={`${v.name} · ${v.street}`} />
           </div>
+          {v.documents && <DocCard venueId={v.id} kind={v.documents === 'form' ? 'form' : 'certificate'} onOpenForm={() => setFormOpen(true)} onUpload={upload.open} />}
           {canVoucher && (
             <div className="card voucher-card">
               <Img name="img/buono-bronzo" style={{ width: 44, height: 44, flex: 'none' }} />
@@ -115,6 +122,8 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid, back 
           </button>
         </div>
       </motion.div>
+      <AnimatePresence>{formOpen && <FormSheet key="form" venueId={v.id} onClose={() => setFormOpen(false)} />}</AnimatePresence>
+      {upload.ui}
     </>
   );
 }
