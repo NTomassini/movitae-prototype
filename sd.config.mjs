@@ -4,7 +4,7 @@ const name = { name: 'name/figma', type: 'name', transform: (t) => t.path.filter
 StyleDictionary.registerTransform(name);
 StyleDictionary.registerFormat({
   name: 'css/typography-classes',
-  format: ({ dictionary }) => dictionary.allTokens.filter((t) => t.$type === 'typography').map((t) => { const v = t.$value; return `.t-${t.path.slice(1).join('-')} { font-family: '${v.fontFamily}', system-ui, sans-serif; font-weight: ${v.fontWeight}; font-size: ${+(parseFloat(v.fontSize) / 17).toFixed(4)}rem; line-height: ${+(parseFloat(v.lineHeight) / parseFloat(v.fontSize)).toFixed(4)}; }`; }).join('\n') + '\n',
+  format: ({ dictionary }) => dictionary.allTokens.filter((t) => t.$type === 'typography').map((t) => { const v = t.$value; return `.t-${t.path.slice(1).join('-')} { font-family: '${v.fontFamily}', system-ui, sans-serif; font-weight: ${v.fontWeight}; font-size: ${+(parseFloat(v.fontSize) / 17).toFixed(4)}rem; line-height: ${+(parseFloat(v.lineHeight) / parseFloat(v.fontSize)).toFixed(4)};${parseFloat(v.letterSpacing) ? ` letter-spacing: ${v.letterSpacing};` : ''} }`; }).join('\n') + '\n',
 });
 const transforms = ['attribute/cti', 'name/figma', 'color/css'];
 const run = async (files, source, selector, filter) => {

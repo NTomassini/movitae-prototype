@@ -16,5 +16,5 @@ export function Img({ name, alt = '', className, style }: { name: string; alt?: 
       </span>
     );
   }
-  return <img className={className} style={{ objectFit: 'cover', display: 'block', ...style }} src={src} alt={alt} onError={() => setMissing(true)} />;
+  return <img className={className} style={{ objectFit: name.startsWith('img/') ? 'contain' : 'cover', display: 'block', ...style }} src={src} alt={alt} onError={() => setMissing(true)} />;
 }

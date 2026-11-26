@@ -98,7 +98,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 700,
         "fontSize": "34px",
-        "lineHeight": "40px"
+        "lineHeight": "40px",
+        "letterSpacing": "-0.02em"
       }
     },
     "title-1": {
@@ -107,7 +108,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 700,
         "fontSize": "28px",
-        "lineHeight": "36px"
+        "lineHeight": "36px",
+        "letterSpacing": "-0.015em"
       }
     },
     "title-2": {
@@ -116,7 +118,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 700,
         "fontSize": "22px",
-        "lineHeight": "28px"
+        "lineHeight": "28px",
+        "letterSpacing": "-0.015em"
       }
     },
     "title-3": {
@@ -125,7 +128,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 600,
         "fontSize": "20px",
-        "lineHeight": "24px"
+        "lineHeight": "24px",
+        "letterSpacing": "-0.015em"
       }
     },
     "headline": {
@@ -134,7 +138,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 600,
         "fontSize": "17px",
-        "lineHeight": "24px"
+        "lineHeight": "24px",
+        "letterSpacing": "-0.005em"
       }
     },
     "body": {
@@ -143,7 +148,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 400,
         "fontSize": "17px",
-        "lineHeight": "24px"
+        "lineHeight": "24px",
+        "letterSpacing": "0em"
       }
     },
     "subheadline": {
@@ -152,7 +158,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 400,
         "fontSize": "15px",
-        "lineHeight": "20px"
+        "lineHeight": "20px",
+        "letterSpacing": "0em"
       }
     },
     "subheadline-emphasized": {
@@ -161,7 +168,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 600,
         "fontSize": "15px",
-        "lineHeight": "20px"
+        "lineHeight": "20px",
+        "letterSpacing": "0em"
       }
     },
     "footnote": {
@@ -170,7 +178,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 400,
         "fontSize": "13px",
-        "lineHeight": "16px"
+        "lineHeight": "16px",
+        "letterSpacing": "0em"
       }
     },
     "footnote-emphasized": {
@@ -179,7 +188,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 600,
         "fontSize": "13px",
-        "lineHeight": "16px"
+        "lineHeight": "16px",
+        "letterSpacing": "0em"
       }
     },
     "caption": {
@@ -188,7 +198,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 600,
         "fontSize": "12px",
-        "lineHeight": "16px"
+        "lineHeight": "16px",
+        "letterSpacing": "0em"
       }
     },
     "number-large": {
@@ -197,7 +208,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 800,
         "fontSize": "28px",
-        "lineHeight": "36px"
+        "lineHeight": "36px",
+        "letterSpacing": "0em"
       }
     },
     "number-small": {
@@ -206,7 +218,8 @@
         "fontFamily": "Inter Variable",
         "fontWeight": 700,
         "fontSize": "15px",
-        "lineHeight": "20px"
+        "lineHeight": "20px",
+        "letterSpacing": "0em"
       }
     }
   },
