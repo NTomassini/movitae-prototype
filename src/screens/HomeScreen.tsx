@@ -6,6 +6,7 @@ import { Avatar, BookingCard, MissionCard, SectionHeader, SportShelfItem, StatTi
 import { ScrollEdge } from '../ui/ScrollEdge';
 import { useScreenScroll } from '../app/useScreenScroll';
 import { ScreenOverlay } from '../app/ScreenOverlay';
+import { openDemo } from '../app/DemoPanel';
 import './HomeScreen.css';
 
 // Home — DS · Schermate › "home — chiaro" (1461:439). Contenuto: padding 16 ai lati, sezioni a 24.
@@ -27,7 +28,7 @@ export function HomeScreen() {
         <div className={`home__bar${scrolled ? ' is-scrolled' : ''}`}>
           <ScrollEdge position="top" height={106} />
           <span className="home__bar-title t-headline" aria-hidden={!scrolled}>Ciao, {user.name}</span>
-          <span className="home__bar-avatar"><Avatar initial={user.initial} label="Profilo" /></span>
+          <span className="home__bar-avatar"><Avatar initial={user.initial} label="Profilo" onLongPress={openDemo} /></span>
         </div>
       </ScreenOverlay>
       <header className="home__header">

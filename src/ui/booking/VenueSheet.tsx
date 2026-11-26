@@ -5,6 +5,7 @@ import { DetentSheet, type DetentSheetHandle } from '../DetentSheet';
 import { Icon } from '../Icon';
 import { Img } from '../Img';
 import { Button, Chip } from './BookingParts';
+import { store, useAppState } from '../../state/bookings';
 
 type D = 'half' | 'large';
 // Figma: mezza altezza con il bordo a y 392, grande a y 54 (su 874).
@@ -20,7 +21,8 @@ export function VenueSheet({ activityId, onClose, onBook }: { activityId: string
   const [detent, setDetent] = useState<D>('half');
   const [day, setDay] = useState(days[0].id);
   const [time, setTime] = useState<string | null>(null);
-  const [fav, setFav] = useState(false);
+  const fav = useAppState().favorites.includes(activityId);
+  const setFav = () => store.toggleFavorite(activityId);
   const sheet = useRef<DetentSheetHandle>(null);
   const [closing, setClosing] = useState(false);
   // chiusura animata: lo sheet scende, la barra esce, poi si torna a Scopri
@@ -42,7 +44,7 @@ export function VenueSheet({ activityId, onClose, onBook }: { activityId: string
             <span className="t-subheadline secondary">{sub}</span>
           </div>
           <div className="venue-sheet__actions">
-            <button className={`circle-button pressable${fav ? ' is-on' : ''}`} aria-label={fav ? 'Togli dai preferiti' : 'Aggiungi ai preferiti'} aria-pressed={fav} onClick={() => setFav(!fav)}>
+            <button className={`circle-button pressable${fav ? ' is-on' : ''}`} aria-label={fav ? 'Togli dai preferiti' : 'Aggiungi ai preferiti'} aria-pressed={fav} onClick={setFav}>
               <Icon name="UI/Favorite" size={22} />
             </button>
             <button className="circle-button pressable" aria-label="Chiudi" onClick={() => close()}><Icon name="UI/Close" size={22} /></button>

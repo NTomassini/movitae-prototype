@@ -79,3 +79,7 @@
 
 :root { --safe-bottom-live: max(env(safe-area-inset-bottom, 0px), 20px); }
 @media (min-width: 600px) and (pointer: fine) { :root { --safe-bottom-live: 34px; } }
+
+/* Pagamento non riuscito (errori/3): icona Alert + titolo rosso + spiegazione, al posto del totale */
+.checkout-bar__error { height: 100px; display: flex; gap: 8px; align-items: flex-start; color: var(--feedback-error); }
+.checkout-bar__error > div { display: flex; flex-direction: column; gap: 2px; }

@@ -4,6 +4,7 @@ import { TabBar } from '../ui/TabBar';
 import { ScrollEdge } from '../ui/ScrollEdge';
 import { StatusBar, HomeIndicator } from './DeviceChrome';
 import { ChromeProvider, useChrome } from './chrome';
+import { DemoPanel } from './DemoPanel';
 
 /**
  * Cornice dell'app. Sul telefono occupa tutto lo schermo e usa le safe area vere;
@@ -43,6 +44,7 @@ function Device() {
         {chrome.bottomEdge && <ScrollEdge position="bottom" height={83} />}
         <TabBar hidden={!chrome.tabBar} />
         <HomeIndicator />
+        <DemoPanel />
       </div>
     </div>
   );

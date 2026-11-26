@@ -6,9 +6,16 @@ import './home.css';
 
 // Nomi = componenti Figma (DS · Componenti). Props = proprietà dei componenti.
 
-export function Avatar({ initial, label }: { initial: string; label: string }) {
+/** Avatar 44: tocco = profilo; pressione lunga (0,6 s) = pannello demo (solo strumento, Q33). */
+export function Avatar({ initial, label, onPress, onLongPress }: { initial: string; label: string; onPress?: () => void; onLongPress?: () => void }) {
+  let timer: number | undefined;
+  let long = false;
+  const down = () => { long = false; timer = window.setTimeout(() => { long = true; onLongPress?.(); }, 600); };
+  const up = () => window.clearTimeout(timer);
   return (
-    <button className="avatar pressable t-headline" aria-label={label}>{initial}</button>
+    <button className="avatar pressable t-headline" aria-label={label}
+      onPointerDown={down} onPointerUp={up} onPointerLeave={up} onContextMenu={(e) => e.preventDefault()}
+      onClick={() => { if (!long) onPress?.(); }}>{initial}</button>
   );
 }
 

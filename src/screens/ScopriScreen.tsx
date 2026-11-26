@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Icon } from '../ui/Icon';
 import { VenueSheet } from '../ui/booking/VenueSheet';
 import { CheckoutSheet } from '../ui/booking/CheckoutSheet';
-import { bookings } from '../state/bookings';
+import { bookings, useDemo } from '../state/bookings';
 import { activities, euro, user, venueOf, venues, type Activity } from '../data/data';
 import { useScreenChrome } from '../app/chrome';
 import { MapView, type MapPinData } from '../ui/scopri/MapView';
@@ -13,6 +13,8 @@ import { ActivityRow, FilterSummary, GlassIconButton, SearchField, sportIcon } f
 import { shelfSports } from '../data/data';
 
 // Scopri — DS · Schermate › "scopri — chiaro" (1461:1083) e sheet piccolo / medio / grande.
+// Posizione negata: mappa su Roma centro, senza punto blu (scopri/posizione-negata).
+const ROMA_CENTRO = { lat: 41.8955, lng: 12.4823 };
 const priceLabel = (a: Activity) => (a.pricePerPerson ? `${euro(a.price)} · ${euro(a.pricePerPerson)} a persona` : euro(a.price));
 
 export function ScopriScreen() {
@@ -20,6 +22,8 @@ export function ScopriScreen() {
   const sport = params.get('sport');
   const [detent, setDetent] = useState<Detent>('small');
   const [selected, setSelected] = useState<string | null>(null);
+  const demo = useDemo();
+  const denied = demo.location === 'denied';
   const navigate = useNavigate();
   const { activityId } = useParams();
   const [checkout, setCheckout] = useState<{ dayId: string; time: string } | null>(null);
@@ -45,15 +49,24 @@ export function ScopriScreen() {
 
   // toccare un pin mostra la lista di quella struttura (se la lista era nascosta, risale)
   const onSelect = useCallback((id: string | null) => { setSelected(id); if (id) setDetent((d) => (d === 'hidden' ? 'small' : d)); }, []);
-  const title = selected ? venues.find((v) => v.id === selected)!.name : `${list.length} attività vicino a te`;
+  const title = selected ? venues.find((v) => v.id === selected)!.name : `${list.length} attività ${denied ? 'a Roma' : 'vicino a te'}`;
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
-      <MapView center={user.location} pins={pins} selected={activityId ? activities.find((a) => a.id === activityId)?.venueId ?? null : selected} onSelect={onSelect} />
+      <MapView key={denied ? 'roma' : 'qui'} center={denied ? ROMA_CENTRO : user.location} showUser={!denied} pins={pins} selected={activityId ? activities.find((a) => a.id === activityId)?.venueId ?? null : selected} onSelect={onSelect} />
       <div className="scopri-top">
         <SearchField />
         <GlassIconButton icon="UI/Filters" label="Filtri" badge={sport ? 1 : 0} />
       </div>
+      {denied && !sport && (
+        <div className="glass-banner glass-control">
+          <Icon name="UI/Location" size={24} />
+          <div>
+            <p className="t-subheadline">Attiva la posizione per vedere cosa c'è vicino a te.</p>
+            <a className="t-subheadline-emphasized" style={{ color: 'var(--brand-accent)' }} href="app-settings:">Impostazioni</a>
+          </div>
+        </div>
+      )}
       {sport && <FilterSummary label={shelfSports.find((x) => x.sport === sport)?.label ?? sport} />}
       <AnimatePresence>
         {detent === 'hidden' && !activityId && (

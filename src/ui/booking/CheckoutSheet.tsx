@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { VOUCHER, activity, days, endTime, euro, euroCents, fmtPoints, user, venueOf } from '../../data/data';
 import { Icon } from '../Icon';
-import { balance, useBookings } from '../../state/bookings';
+import { balance, useBookings, useDemo } from '../../state/bookings';
 import { Img } from '../Img';
 import { ActivityBlock, AppleLogo, Toggle } from './BookingParts';
 
@@ -23,13 +23,20 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid }: {
   const canVoucher = bal.points >= VOUCHER.points;
   const [voucher, setVoucher] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const demo = useDemo();
   const total = a.price - (voucher ? VOUCHER.value : 0);
   const points = total * 10;
   const label = a.people ? `Campo da ${a.people}` : a.duration === 'ingresso singolo' ? 'Ingresso' : 'Lezione';
 
   const pay = () => {
     setPaying(true);
-    setTimeout(() => onPaid({ voucher, paid: total, points }), 900);
+    setFailed(false);
+    setTimeout(() => {
+      setPaying(false);
+      if (demo.payment === 'fail') setFailed(true); // errori/3: il messaggio prende il posto del totale
+      else onPaid({ voucher, paid: total, points });
+    }, 900);
   };
 
   return (
@@ -67,6 +74,15 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid }: {
           <p className="t-footnote secondary">Puoi disdire gratis fino a 2 ore prima: ti rimborsiamo sul metodo di pagamento.</p>
         </div>
         <div className="checkout-bar">
+          {failed ? (
+            <div className="checkout-bar__error" role="alert">
+              <Icon name="UI/Alert" size={20} />
+              <div>
+                <span className="t-subheadline-emphasized" style={{ color: 'var(--feedback-error)', display: 'block' }}>Pagamento non riuscito</span>
+                <span className="t-footnote secondary">Non ti abbiamo addebitato nulla. Riprova o scegli un'altra carta nel Wallet.</span>
+              </div>
+            </div>
+          ) : (
           <div className="checkout-bar__summary">
             <div className="checkout-bar__total">
               <span className="t-footnote secondary">Totale</span>
@@ -78,6 +94,7 @@ export function CheckoutSheet({ activityId, dayId, time, onCancel, onPaid }: {
               <Icon name="UI/Chevron-Down" size={16} />
             </button>
           </div>
+          )}
           <button className="apple-pay" onClick={pay} aria-busy={paying} aria-label={`Paga ${euroCents(total)} con Apple Pay`} disabled={paying}>
             <AppleLogo /><span>Pay</span>
           </button>
