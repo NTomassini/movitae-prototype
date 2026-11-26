@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { applyProfile } from '../data/profile';
 
 /**
  * Stato del prototipo (Q32): salvato sul telefono (localStorage), così l'app resta coerente
@@ -19,11 +20,14 @@ export type Demo = {
   payment: 'ok' | 'fail';
   soldOut: boolean;
   clock: 'before' | 'after'; // ora del prototipo: prima o dopo il limite di disdetta gratuita (2 ore prima)
+  emailCode: 'ok' | 'wrong'; // onboarding con email: il codice inserito è giusto o sbagliato (errori/1)
 };
-export type AppState = { bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; celebrated: string | null; demo: Demo };
+/** Utente nuovo creato dall'onboarding (Q37): sostituisce i dati di Marco finché non si ripristina la demo. */
+export type Profile = { name: string; sports: string[]; goal: number; health: boolean };
+export type AppState = { profile: Profile | null; bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; celebrated: string | null; demo: Demo };
 
 const KEY = 'movitae-prototipo-v1';
-export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false, clock: 'before' };
+export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false, clock: 'before', emailCode: 'ok' };
 // Prenotazioni di Marco all'avvio (prenotazioni/1 e /2 in Figma)
 const seedBookings: Booking[] = [
   { id: 's-yoga', activityId: 'yoga-flow', dayId: 'oggi', time: '18:30', voucher: false, paid: 18, points: 180, status: 'upcoming', seed: true },
@@ -33,7 +37,7 @@ const seedBookings: Booking[] = [
   { id: 's-pilates', activityId: 'pilates-base', dayId: 'past', time: '18:00', voucher: false, paid: 18, points: 180, status: 'cancelled', refunded: true, seed: true, pastLabel: 'Ven 6 nov, 18:00' },
   { id: 's-palestra', activityId: 'palestra', dayId: 'past', time: '08:00', voucher: false, paid: 12, points: 120, status: 'checked-in', seed: true, pastLabel: 'Lun 2 nov, 08:00' },
 ];
-const initial = (): AppState => ({ bookings: seedBookings.map((b) => ({ ...b })), favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
+const initial = (): AppState => ({ profile: null, bookings: seedBookings.map((b) => ({ ...b })), favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
 
 const load = (): AppState => {
   try {
@@ -43,13 +47,15 @@ const load = (): AppState => {
       const base = initial();
       // le prenotazioni di partenza ci sono sempre (anche nei salvataggi di prima)
       const bookings: Booking[] = saved.bookings ?? [];
-      for (const sb of base.bookings) if (!bookings.some((b) => b.id === sb.id)) bookings.push(sb);
+      // (non per l'utente nuovo creato dall'onboarding, che parte senza prenotazioni)
+      if (!saved.profile) for (const sb of base.bookings) if (!bookings.some((b) => b.id === sb.id)) bookings.push(sb);
       return { ...base, ...saved, bookings, demo: { ...base.demo, ...(saved.demo ?? {}) } };
     }
   } catch { /* storage non disponibile: si resta in memoria */ }
   return initial();
 };
 let state: AppState = load();
+applyProfile(state.profile);
 try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignora */ }
 const subs = new Set<() => void>();
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignora */ } };
@@ -73,7 +79,13 @@ export const store = {
   setVoucherActive(v: boolean) { set({ voucherActive: v }); },
   /** la celebrazione si vede una volta sola per ogni missione completata */
   setCelebrated(key: string | null) { set({ celebrated: key }); },
-  reset() { state = initial(); save(); subs.forEach((f) => f()); },
+  reset() { state = initial(); applyProfile(null); save(); subs.forEach((f) => f()); },
+  /** fine dell'onboarding: utente nuovo senza prenotazioni, missione al primo giorno o senza Salute */
+  finishOnboarding(p: Profile, locationGranted: boolean) {
+    applyProfile(p);
+    set({ profile: p, bookings: [], favorites: [], voucherActive: false, celebrated: null, onboarded: true,
+      demo: { ...state.demo, mission: p.health ? 'first-day' : 'no-health', location: locationGranted ? 'granted' : 'denied' } });
+  },
 };
 
 export const useAppState = () => useSyncExternalStore(subscribe, () => state);

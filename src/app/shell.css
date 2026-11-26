@@ -9,7 +9,7 @@
 .device {
   position: relative;
   height: 100dvh;
-  overflow: hidden;
+  overflow: clip; /* clip: nessuno scorrimento nascosto (il focus non può spostare la cornice) */
   background: var(--bg-default);
 }
 
@@ -59,7 +59,11 @@
 }
 
 /* Schermate a tutto schermo (Scopri): niente scorrimento della pagina, niente spazi. */
-.screen--fixed { overflow: hidden; padding: 0; }
+.screen--fixed { overflow: clip; padding: 0; }
 
 /* Livelli fissi delle schermate (intestazioni, sheet modali): coprono la cornice, i figli riattivano i tocchi */
 #overlay { position: absolute; inset: 0; z-index: 25; pointer-events: none; }
+
+/* Splash (onboarding/0): sopra tutto tranne la barra di stato, che diventa bianca */
+.splash { position: absolute; inset: 0; z-index: 29; background: var(--brand-default); display: grid; place-items: center; }
+.device.is-splash .device-status { color: #fff; }

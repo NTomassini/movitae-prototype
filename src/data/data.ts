@@ -67,6 +67,19 @@ export const shelfSports: { sport: Sport; label: string; image: string }[] = [
   { sport: 'nuoto', label: 'Nuoto', image: 'img/nuoto' },
 ];
 
+/** Griglia degli sport preferiti (onboarding/5, profilo/2): 3×3. */
+export const pickSports: { sport: Sport; label: string; image: string }[] = [
+  { sport: 'padel', label: 'Padel', image: 'img/padel' }, { sport: 'yoga', label: 'Yoga', image: 'img/yoga' }, { sport: 'palestra', label: 'Palestra', image: 'img/gym' },
+  { sport: 'nuoto', label: 'Nuoto', image: 'img/nuoto' }, { sport: 'calcio', label: 'Calcio', image: 'img/calcio' }, { sport: 'tennis', label: 'Tennis', image: 'img/tennis' },
+  { sport: 'basket', label: 'Basket', image: 'img/basket' }, { sport: 'boxe', label: 'Boxe', image: 'img/boxe' }, { sport: 'corsa', label: 'Corsa', image: 'img/corsa' },
+];
+/** Scaffale della Home: prima gli sport scelti nell'onboarding, poi gli altri dello scaffale di partenza. */
+export const homeShelf = (chosen: Sport[] | null) => {
+  if (!chosen?.length) return shelfSports;
+  const first = chosen.map((s) => pickSports.find((x) => x.sport === s)!).filter(Boolean);
+  return [...first, ...shelfSports.filter((x) => !chosen.includes(x.sport))];
+};
+
 export const upcomingBooking = { activityId: 'yoga-flow', day: 'Oggi', time: '18:30', end: '19:30', dateLong: 'Venerdì 13 novembre' };
 
 export const venueOf = (a: Activity) => venues.find((v) => v.id === a.venueId)!;

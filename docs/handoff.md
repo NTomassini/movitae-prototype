@@ -299,7 +299,22 @@ Correzione in Figma: nella lista In arrivo la riga del padel ora segue la regola
     - Nomi corti delle strutture nelle card (come in Figma): Palestra Testaccio → "Testaccio" (campo `short` in data.ts).
     - Confronto: apertura 2,5%, pensando 1,3%, risposta 2,9% (scuro 2,7%), fuori tema 3,7%, offline 2,4%, orario scelto 2,9%, mappa 2,4%, riepilogo nella scheda 3,0%. Ritorno in chat 9,1% (in Figma l'intestazione è piena con separatore, nel codice è il bordo sfocato standard) e scheda da Movi 11,6% (foto e capsule degli orari, in Figma 50 alte invece di 48).
     - Figma: in flusso-movi/6 "Cosa portare" → "Servizi" come nella scheda di Scopri (componente unico).
-21. Prossimo: onboarding.
+21. Q36–Q40 (26 nov, decisi): Q36 B: l'onboarding si apre solo con `?onboarding` nell'indirizzo o con "Rivedi onboarding" nel pannello demo (nascosto: pressione lunga sull'avatar), così nei video non si vede niente di estraneo. Q37: "Inizia" porta alla Home dell'utente nuovo con le scelte fatte (nome, sport nello scaffale, obiettivo nella card; senza Salute → Home "Salute non collegata"; posizione rifiutata → Scopri da Roma centro); "Ripristina demo" torna a Marco. Q38: "Accedi" nelle intro = già cliente → Home completa di Marco; Apple e Google = breve caricamento sul pulsante, nessun foglio finto. Q39: percorso email con 3 schermate nuove (email, codice, nome), disegnate anche in Figma. Q40: splash a ogni apertura dell'app.
+22. (fatto 26 nov) Onboarding in codice (`src/screens/OnboardingScreen.tsx`, rotte `/onboarding/:step`):
+    - Splash (`src/app/Splash.tsx`): fondo rosso, logo bianco 180, barra di stato bianca, 0,75 s poi dissolvenza; non compare nei test automatici (a meno di `?splash`).
+    - Intro 1–3 da scorrere col dito (snap), pallini, "Avanti"/"Inizia", "Accedi" rosso in alto a destra.
+    - Passaggi con il push di iOS (la pagina nuova entra da destra, indietro esce a destra); barra di avanzamento a 5 tratti e freccia indietro.
+    - Crea account: Apple (pulsante di sistema: nero in Chiaro, bianco in Scuro), Google, email; termini in basso.
+    - Email → codice (6 cifre, formato "482 913"; dal pannello demo "Codice email: Sbagliato" mostra errori/1 con bordo rosso e messaggio; "Invia di nuovo il codice" svuota il campo) → nome. "Continua" spento finché il dato non è valido; sul telefono sale sopra la tastiera.
+    - Sport preferiti: griglia 3×3 con lo standard di scelta (bordo rosso 2 + spunta); "Continua" spento finché non scegli almeno uno sport (prevenzione, come in "Quanto cammini?").
+    - Salute → foglio di Salute simulato (Consenti / Non consentire); posizione → avviso di sistema con mappa (Consenti una volta / mentre usi l'app / Non consentire).
+    - Obiettivo passi (6.000 già scelto, "Mi impegno") oppure "Quanto cammini?" se hai rifiutato Salute (nessuna scelta di partenza, "Continua" spento).
+    - Benvenuto con Movi che entra con una molla, nome e obiettivo scelti; variante senza Salute.
+    - Utente nuovo: `profile` nello stato salvato (`src/data/profile.ts` applica nome, sport, obiettivo e punti a 0 a tutte le schermate); nessuna prenotazione, 0 pt, €0; scaffale della Home con prima gli sport scelti. Limite: i traguardi restano quelli di Marco.
+    - Correzione generale: la cornice usa `overflow: clip`, così un campo che prende il focus durante un'animazione non può più far scorrere tutta la schermata.
+    - Confronto: splash 0,4%, intro 6,6% / 1,1% / 1,2%, crea account 1,8%, codice sbagliato 3,8% (tastiera esclusa), sport 1,6%, Salute 3,0%, posizione 2,0%, avviso posizione 1,4%, obiettivo 2,2%, quanto cammini 4,6%, benvenuto 2,2%, senza Salute 2,1%. Scuro controllato a occhio (non ci sono tavole scure dell'onboarding): le immagini delle intro hanno un alone scuro sul fondo nero, da rivedere se l'onboarding scuro va nei video.
+    - Figma (DS · Schermate, riga onboarding): nuove tavole onboarding/4a-email (1529:5975), 4b-codice (1529:6007), 4c-nome (1529:6039) con didascalie; errori/1 e le tavole da "sport" in poi spostate a destra per tenere l'ordine del flusso.
+23. Prossimo: profilo, impostazioni e documenti.
 
 Messaggio da incollare in una nuova conversazione:
 "Riprendo il redesign di Movitae. Leggi claude/movitae-handoff.md e claude/movitae-flussi.md nel Project. Siamo nella fase 6, prototipo in codice (sezione PROSSIMO PASSO dell'handoff, dati in claude/movitae-dati-prototipo.md). Fammi le domande con grilling prima di decisioni nuove e controlla gli screenshot. File Figma: https://www.figma.com/design/6UqomibKpRWEhGOp1Y9oj0/Movitae-Design-System?node-id=1119-1375"

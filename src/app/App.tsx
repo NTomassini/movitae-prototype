@@ -8,6 +8,7 @@ import { BookingsScreen } from '../screens/BookingsScreen';
 import { BookingDetailScreen } from '../screens/BookingDetailScreen';
 import { TrophiesScreen } from '../screens/TrophiesScreen';
 import { MoviScreen } from '../screens/MoviScreen';
+import { OnboardingScreen } from '../screens/OnboardingScreen';
 
 export function App() {
   return (
@@ -18,6 +19,7 @@ export function App() {
         <Route path="scopri/:activityId" element={<ScopriScreen />} />
         <Route path="prenotato/:id" element={<ConfirmScreen />} />
         <Route path="movi" element={<MoviScreen />} />
+        <Route path="onboarding/:step" element={<OnboardingScreen />} />
         <Route path="prenotazioni" element={<BookingsScreen />} />
         <Route path="prenotazioni/:id" element={<BookingDetailScreen />} />
         <Route path="premi" element={<PremiScreen />} />

@@ -90,6 +90,27 @@ def go_movi_7_riepilogo(pg):
     go_movi_6_scheda(pg); pg.get_by_role('button', name='18:30', exact=True).last.evaluate('el => el.click()')
     pg.locator('.bottom-bar .button--primary').evaluate('el => el.click()'); pg.wait_for_timeout(1000)
 
+def onb(pg, step, prep=None):
+    pg.goto(f'{URL}/'); pg.evaluate('localStorage.clear(); sessionStorage.clear()')
+    if prep: pg.evaluate(prep)
+    pg.goto(f'{URL}/onboarding/{step}?theme=light'); pg.wait_for_timeout(900)
+def go_onb_splash(pg): pg.goto(f'{URL}/?splash&theme=light'); pg.add_style_tag(content=FLAT); pg.wait_for_timeout(150); return True
+def go_onb_intro(n):
+    def f(pg):
+        onb(pg, 'intro')
+        for _ in range(n - 1): pg.locator('.onb__cta').click(); pg.wait_for_timeout(700)
+    return f
+def go_onb_sport(pg):
+    onb(pg, 'sport')
+    for s in ['Padel', 'Yoga', 'Nuoto']: pg.get_by_role('button', name=s, exact=True).click()
+def go_onb_avviso(pg): onb(pg, 'posizione'); pg.locator('.onb__cta').click(); pg.wait_for_timeout(700)
+def go_onb_quanto(pg): onb(pg, 'quanto'); pg.get_by_role('radio', name='Abbastanza').evaluate('el => el.click()'); pg.evaluate("document.querySelector('.onb').scrollTop = 0")
+def go_onb_codice_errato(pg):
+    onb(pg, 'codice', "localStorage.setItem('movitae-prototipo-v1', JSON.stringify({demo:{emailCode:'wrong'}})); sessionStorage.setItem('movitae-onboarding', JSON.stringify({email:'marco.rossi@icloud.com'}))")
+    pg.get_by_label('Codice').fill('482913'); pg.locator('.onb__cta').click(); pg.wait_for_timeout(300)
+def go_onb_benvenuto(pg): onb(pg, 'benvenuto', "sessionStorage.setItem('movitae-onboarding', JSON.stringify({name:'Marco', health:true}))")
+def go_onb_benvenuto_senza(pg): onb(pg, 'benvenuto', "sessionStorage.setItem('movitae-onboarding', JSON.stringify({name:'Marco', health:false}))")
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -128,6 +149,20 @@ SCREENS = [
     ('movi-5-mappa', go_movi_5_mappa, [(0, 108, 402, 630)]),   # mappa
     ('movi-6-scheda', go_movi_6_scheda, [(0, 0, 402, 190)]),     # chat sotto il velo
     ('movi-7-riepilogo-scheda', go_movi_7_riepilogo, [(0, 0, 402, 56)]),
+    ('onb-0-splash', go_onb_splash, []),
+    ('onb-1-intro', go_onb_intro(1), []),
+    ('onb-2-intro', go_onb_intro(2), []),
+    ('onb-3-intro', go_onb_intro(3), []),
+    ('onb-4-account', lambda pg: onb(pg, 'account'), []),
+    ('onb-codice-errato', go_onb_codice_errato, [(0, 500, 402, 874)]),   # tastiera di sistema e pulsante sopra
+    ('onb-5-sport', go_onb_sport, []),
+    ('onb-6-salute', lambda pg: onb(pg, 'salute'), []),
+    ('onb-6b-posizione', lambda pg: onb(pg, 'posizione'), []),
+    ('onb-6c-avviso-posizione', go_onb_avviso, []),
+    ('onb-7-obiettivo', lambda pg: onb(pg, 'obiettivo'), []),
+    ('onb-7b-quanto', go_onb_quanto, []),
+    ('onb-8-benvenuto', go_onb_benvenuto, []),
+    ('onb-8b-benvenuto-senza', go_onb_benvenuto_senza, []),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):

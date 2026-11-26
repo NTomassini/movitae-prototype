@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Splash } from './Splash';
 import { TabBar } from '../ui/TabBar';
 import { ScrollEdge } from '../ui/ScrollEdge';
 import { StatusBar, HomeIndicator } from './DeviceChrome';
@@ -26,6 +27,11 @@ function Device() {
   const chrome = useChrome();
   const { pathname } = useLocation();
   const prev = useRef(pathname);
+  const navigate = useNavigate();
+  const [splash, setSplash] = useState(false);
+  const onSplash = useCallback((v: boolean) => setSplash(v), []);
+  // Q36 B: l'onboarding si apre solo con ?onboarding nell'indirizzo (o dal pannello demo)
+  useEffect(() => { if (new URLSearchParams(location.search).has('onboarding')) navigate('/onboarding/intro', { replace: true }); }, [navigate]);
   useLayoutEffect(() => {
     const el = document.getElementById('screen');
     if (!el) return;
@@ -35,7 +41,7 @@ function Device() {
   }, [pathname]);
   return (
     <div className="stage">
-      <div className="device">
+      <div className={`device${splash ? ' is-splash' : ''}`}>
         <StatusBar />
         <main className={`screen${chrome.pageScroll ? '' : ' screen--fixed'}`} id="screen">
           <Outlet />
@@ -44,6 +50,7 @@ function Device() {
         {chrome.bottomEdge && <ScrollEdge position="bottom" height={83} />}
         <TabBar hidden={!chrome.tabBar} />
         <HomeIndicator />
+        <Splash onVisible={onSplash} />
         <DemoPanel />
       </div>
     </div>

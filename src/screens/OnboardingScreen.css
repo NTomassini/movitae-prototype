@@ -1,0 +1,100 @@
+/* Onboarding — DS · Schermate riga y 200 (1461:4857…5022, 6868…6994) e errori/1 (1461:7545) */
+.onb-stack { position: absolute; inset: 0; overflow: clip; }
+.onb { position: absolute; inset: 0; background: var(--bg-default); padding-top: var(--device-top); overflow-y: auto; overflow-x: hidden; box-shadow: -8px 0 24px rgba(0, 0, 0, 0.06); }
+
+/* riga d'intestazione: freccia 44 a (16, 62) e barra di avanzamento 136×4 centrata a y 82 */
+.onb__bar { position: relative; height: 44px; margin-top: 8px; }
+.onb__bar .back-button { top: 0; }
+.onb-steps { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); display: flex; gap: 4px; }
+.onb-steps span { width: 24px; height: 4px; border-radius: 2px; background: var(--fill-tertiary); transition: background-color var(--motion-ease-fade); }
+.onb-steps span.is-on { background: var(--brand-accent); }
+
+/* titolo a y 116 (10 sotto la riga), testo 8 sotto */
+.onb__head { padding: 10px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+
+/* pulsante principale in basso a sinistra (y 786) */
+.onb__cta { position: absolute; left: 16px; bottom: calc(var(--safe-bottom-live) + 4px); z-index: 3; }
+
+/* ---- intro ---- */
+.onb__signin { position: absolute; right: 16px; top: calc(var(--device-top) + 8px); height: 44px; color: var(--brand-accent); z-index: 3; }
+.onb-intro { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-top: var(--device-top); }
+.onb-intro::-webkit-scrollbar { display: none; }
+.onb-intro__page { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 62px 32px 0; }
+.onb-intro__page p { margin-top: 12px; }
+.onb-dots { position: absolute; left: 0; right: 0; bottom: calc(var(--safe-bottom-live) + 78px); display: flex; justify-content: center; gap: 8px; pointer-events: none; }
+.onb-dots span { width: 8px; height: 8px; border-radius: 4px; background: var(--text-disabled); transition: width var(--motion-ease-fade) ease, background-color var(--motion-ease-fade); }
+.onb-dots span.is-on { width: 20px; background: var(--brand-accent); }
+
+/* ---- crea account: pulsanti 370×50 a y 596, termini a y 786 ---- */
+.onb-signup { position: absolute; left: 16px; right: 16px; bottom: calc(var(--safe-bottom-live) + 70px); display: flex; flex-direction: column; gap: 12px; }
+.onb-sso { height: 50px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform var(--motion-ease-press) ease-out; }
+.onb-sso:active { transform: scale(0.97); }
+.onb-sso--apple { background: var(--applepay-bg); color: var(--applepay-label); }
+.onb-sso--google { background: var(--bg-surface); color: var(--text-primary); box-shadow: inset 0 0 0 1px var(--border-separator); }
+.onb-sso--email { background: var(--fill-tertiary); color: var(--text-primary); }
+.onb-terms { position: absolute; left: 32px; right: 32px; bottom: calc(var(--safe-bottom-live) + 22px); text-align: center; color: var(--text-tertiary); }
+.onb-spinner { width: 20px; height: 20px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: onb-spin 0.7s linear infinite; }
+@keyframes onb-spin { to { transform: rotate(360deg); } }
+
+/* ---- campi (email, codice, nome): etichetta a y 232, campo 52 a y 252 ---- */
+.onb-form { display: contents; }
+.onb-field { padding: 24px 16px 0; }
+.onb-field label { display: flex; flex-direction: column; gap: 4px; }
+.onb-input { height: 52px; border-radius: 12px; border: 0; background: var(--bg-surface); color: var(--text-primary); padding: 0 16px; outline: none; font: inherit; box-shadow: inset 0 0 0 1px transparent; width: 100%; }
+.onb-input:focus { box-shadow: inset 0 0 0 1px var(--border-control); }
+.onb-input.is-error { box-shadow: inset 0 0 0 2px var(--feedback-error); }
+.onb-error { display: flex; gap: 6px; align-items: flex-start; margin-top: 8px; color: var(--feedback-error); }
+.onb-error svg { flex: none; margin-top: 2px; }
+.onb-link { display: block; margin: 12px 16px 0; height: 24px; color: var(--brand-accent); text-align: left; }
+
+/* ---- sport: griglia 3×3 di card 114×112, raggio 24 ---- */
+.onb-sports { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 14px; padding: 24px 16px 120px; }
+.onb-sport { position: relative; height: 112px; border-radius: 24px; background: var(--bg-surface); box-shadow: inset 0 0 0 1px var(--border-control); display: flex; flex-direction: column; align-items: center; padding-top: 14px; gap: 8px; color: var(--text-primary); transition: box-shadow var(--motion-ease-fade), transform var(--motion-ease-press) ease-out; }
+.onb-sport.is-on { box-shadow: inset 0 0 0 2px var(--brand-accent); }
+.onb-sport__check { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 12px; background: var(--brand-default); color: var(--brand-on); display: grid; place-items: center; }
+
+/* ---- schermate con oggetto: immagine centrata, titolo e testo centrati in 338 ---- */
+.onb-center { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 26px 32px 0; }
+.onb-center h1 { margin-top: 24px; }
+.onb-center p { margin-top: 12px; }
+.onb-center--top { padding-top: 10px; }
+.onb-center--top h1 { margin-top: 16px; }
+.onb-checks { list-style: none; margin: 32px 24px 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.onb-checks li { display: flex; align-items: center; gap: 12px; }
+.onb-check { width: 24px; height: 24px; border-radius: 12px; background: var(--earn-subtle); color: var(--earn-default); display: grid; place-items: center; flex: none; }
+
+/* ---- obiettivo passi: card a y 348, righe 52 ---- */
+.onb-goals { margin: 24px 16px 120px; padding: 0; overflow: hidden; }
+.onb-goal { width: 100%; height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 16px; color: var(--text-primary); text-align: left; }
+.onb-goal:active { background: var(--fill-tertiary); }
+.onb-goal__pts { margin-left: auto; color: var(--earn-default); }
+.onb-goals__sep { height: 1px; margin-left: 16px; background: var(--border-separator); }
+.onb-tag { padding: 2px 8px; border-radius: 999px; background: var(--fill-tertiary); color: var(--text-secondary); }
+.onb-radio { width: 24px; height: 24px; border-radius: 12px; flex: none; box-shadow: inset 0 0 0 1.5px var(--text-disabled); display: grid; place-items: center; color: var(--brand-on); }
+.onb-radio.is-on { background: var(--brand-default); box-shadow: none; }
+
+/* ---- quanto cammini: card a y 384, gap 8 ---- */
+.onb-walk { display: flex; flex-direction: column; gap: 8px; padding: 24px 16px 120px; }
+.onb-walk__card { display: flex; align-items: center; gap: 12px; padding: 15px 16px 15px 17px; border-radius: 24px; background: var(--bg-surface); box-shadow: inset 0 0 0 1px var(--border-control); text-align: left; color: var(--text-primary); transition: box-shadow var(--motion-ease-fade); }
+.onb-walk__card.is-on { box-shadow: inset 0 0 0 2px var(--brand-accent); }
+.onb-walk__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; }
+
+/* ---- benvenuto: Movi 240 a y 180, titolo grande a y 452 ---- */
+.onb-welcome { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 126px 16px 0; }
+.onb-welcome h1 { margin-top: 32px; }
+.onb-welcome p { margin-top: 12px; padding: 0 16px; }
+
+/* ---- avviso di sistema della posizione (onboarding/6c): 300 di larghezza, raggio 34 ---- */
+.onb-scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.35); pointer-events: auto; z-index: 28; }
+.permission-alert { position: absolute; left: 50%; top: 50%; width: 300px; z-index: 29; pointer-events: auto; padding: 24px 16px 20px; border-radius: 34px; background: var(--bg-elevated); display: flex; flex-direction: column; gap: 12px; text-align: center; color: var(--text-primary); }
+.permission-alert > button { height: 44px; border-radius: 999px; background: var(--fill-tertiary); color: var(--text-primary); }
+.permission-alert > button:active { opacity: 0.7; }
+.permission-alert__map { position: relative; height: 120px; border-radius: 12px; overflow: hidden; background: var(--map-land); }
+.permission-alert__map i { position: absolute; display: block; }
+.permission-alert__map .park { left: 20px; top: 12px; width: 90px; height: 60px; border-radius: 12px; background: var(--map-park); }
+.permission-alert__map .road-h { left: -10px; top: 80px; width: 300px; height: 10px; background: var(--map-road); }
+.permission-alert__map .road-v { left: 170px; top: -20px; width: 10px; height: 160px; background: var(--map-road); }
+.permission-alert__map .dot { position: absolute; left: 116px; top: 42px; width: 36px; height: 36px; border-radius: 50%; background: color-mix(in srgb, var(--system-blue) 25%, transparent); }
+.permission-alert__map .dot::after { content: ''; position: absolute; left: 11px; top: 11px; width: 14px; height: 14px; border-radius: 50%; background: var(--system-blue); box-shadow: 0 0 0 3px #fff; }
+
+@media (prefers-reduced-motion: reduce) { .onb-spinner { animation-duration: 1.6s; } }

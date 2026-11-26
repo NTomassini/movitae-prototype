@@ -1,7 +1,7 @@
 import { balance, upcoming, useBookings } from '../state/bookings';
 import { whenShort } from './BookingsScreen';
 import { fmtPoints } from '../data/data';
-import { activities, activity, euro, nearby, shelfSports, upcomingBooking, user, venueOf } from '../data/data';
+import { activities, activity, euro, homeShelf, nearby, upcomingBooking, user, venueOf } from '../data/data';
 import { Avatar, BookingCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from '../ui/home/HomeParts';
 import { Celebration, HealthExplain, HealthSystemSheet, MissionCard, StreakSheetContent } from '../ui/mission/Mission';
 import { ModalSheet } from '../ui/ModalSheet';
@@ -29,7 +29,8 @@ export function HomeScreen() {
   }, [mission, app.celebrated]);
   const all = useBookings();
   // primo giorno = utente appena iscritto: niente prenotazioni, 0 pt, €0 (home/stato-primo-giorno)
-  const isNew = mission === 'first-day';
+  // utente appena registrato (onboarding, Q37) o stato "primo giorno" del pannello demo
+  const isNew = mission === 'first-day' || (!!app.profile && all.length === 0);
   const bal = isNew ? { points: 0, saved: 0, vouchersUsed: 0 } : balance(all, user.points, user.saved);
   // "Prossima prenotazione" = la prima in arrivo (comprese quelle fatte nel prototipo)
   const made = upcoming(all)[0];
@@ -58,7 +59,7 @@ export function HomeScreen() {
       <section className="home__section">
         <SectionHeader title="Cosa ti va oggi?" link="Altro" to="/scopri" />
         <div className="shelf">
-          {shelfSports.map((s) => <SportShelfItem key={s.sport} label={s.label} image={s.image} to={`/scopri?sport=${s.sport}`} />)}
+          {homeShelf(app.profile ? user.favoriteSports : null).map((s) => <SportShelfItem key={s.sport} label={s.label} image={s.image} to={`/scopri?sport=${s.sport}`} />)}
         </div>
       </section>
 
