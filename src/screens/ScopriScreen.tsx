@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Icon } from '../ui/Icon';
 import { VenueSheet } from '../ui/booking/VenueSheet';
 import { CheckoutSheet } from '../ui/booking/CheckoutSheet';
 import { bookings } from '../state/bookings';
@@ -23,7 +24,7 @@ export function ScopriScreen() {
   const { activityId } = useParams();
   const [checkout, setCheckout] = useState<{ dayId: string; time: string } | null>(null);
   // Tab bar visibile solo con lo sheet piccolo e senza scheda aperta; la pagina non scorre (mappa a tutto schermo).
-  useScreenChrome({ tabBar: detent === 'small' && !activityId, bottomEdge: false, pageScroll: false });
+  useScreenChrome({ tabBar: (detent === 'small' || detent === 'hidden') && !activityId, bottomEdge: false, pageScroll: false });
 
   const list = useMemo(() => {
     // ordine della lista come nella tavola Figma: Boxe, Yoga Flow, Padel Ostiense, poi il resto
@@ -42,7 +43,8 @@ export function ScopriScreen() {
     })
     .filter(Boolean) as MapPinData[], [sport]);
 
-  const onSelect = useCallback((id: string | null) => setSelected(id), []);
+  // toccare un pin mostra la lista di quella struttura (se la lista era nascosta, risale)
+  const onSelect = useCallback((id: string | null) => { setSelected(id); if (id) setDetent((d) => (d === 'hidden' ? 'small' : d)); }, []);
   const title = selected ? venues.find((v) => v.id === selected)!.name : `${list.length} attività vicino a te`;
 
   return (
@@ -53,6 +55,16 @@ export function ScopriScreen() {
         <GlassIconButton icon="UI/Filters" label="Filtri" badge={sport ? 1 : 0} />
       </div>
       {sport && <FilterSummary label={shelfSports.find((x) => x.sport === sport)?.label ?? sport} />}
+      <AnimatePresence>
+        {detent === 'hidden' && !activityId && (
+          <motion.button className="show-list glass-control" onClick={() => setDetent('small')}
+            initial={{ opacity: 0, y: 12, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: 12, x: '-50%' }}
+            transition={{ type: 'spring', visualDuration: 0.35, bounce: 0.15 }}>
+            <Icon name="UI/Chevron-Down" size={18} style={{ transform: 'rotate(180deg)' }} />
+            <span className="t-subheadline-emphasized">Mostra la lista · {list.length}</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
       <ListSheet title={title} detent={detent} onDetent={setDetent}>
         {list.map((a) => {
           const v = venueOf(a);

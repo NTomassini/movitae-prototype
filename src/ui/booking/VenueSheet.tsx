@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { motion } from 'motion/react';
 import { activity, days, euro, fmtPoints, services, venueOf } from '../../data/data';
-import { DetentSheet } from '../DetentSheet';
+import { DetentSheet, type DetentSheetHandle } from '../DetentSheet';
 import { Icon } from '../Icon';
 import { Img } from '../Img';
 import { Button, Chip } from './BookingParts';
@@ -20,14 +21,22 @@ export function VenueSheet({ activityId, onClose, onBook }: { activityId: string
   const [day, setDay] = useState(days[0].id);
   const [time, setTime] = useState<string | null>(null);
   const [fav, setFav] = useState(false);
+  const sheet = useRef<DetentSheetHandle>(null);
+  const [closing, setClosing] = useState(false);
+  // chiusura animata: lo sheet scende, la barra esce, poi si torna a Scopri
+  const close = async (alreadyDown = false) => {
+    setClosing(true);
+    if (!alreadyDown) await sheet.current?.dismiss();
+    onClose();
+  };
   const d = days.find((x) => x.id === day)!;
   const sub = [a.people ? `Campo da ${a.people}` : a.title.split(',')[0], a.duration, v.distance].join(' · ');
 
   return (
     <>
-      <DetentSheet className={`venue-sheet venue-sheet--${detent}`} tops={tops} detent={detent} onDetent={setDetent} label={v.name} onDismiss={onClose}>
-        <div className="venue-sheet__grab" data-drag><button aria-label="Cambia altezza della scheda" onClick={() => setDetent(detent === 'half' ? 'large' : 'half')} style={{ padding: '0 40px', height: 16, display: 'flex', justifyContent: 'center' }}><span /></button></div>
-        <div className="venue-sheet__head" data-drag>
+      <DetentSheet ref={sheet} className={`venue-sheet venue-sheet--${detent}`} tops={tops} detent={detent} onDetent={setDetent} label={v.name} onDismiss={() => close(true)}>
+        <div className="venue-sheet__grab"><button aria-label="Cambia altezza della scheda" onClick={() => setDetent(detent === 'half' ? 'large' : 'half')} style={{ padding: '0 40px', height: 16, display: 'flex', justifyContent: 'center' }}><span /></button></div>
+        <div className="venue-sheet__head">
           <div className="venue-sheet__head-text">
             <h2 className="t-title-2">{v.name}</h2>
             <span className="t-subheadline secondary">{sub}</span>
@@ -36,10 +45,10 @@ export function VenueSheet({ activityId, onClose, onBook }: { activityId: string
             <button className={`circle-button pressable${fav ? ' is-on' : ''}`} aria-label={fav ? 'Togli dai preferiti' : 'Aggiungi ai preferiti'} aria-pressed={fav} onClick={() => setFav(!fav)}>
               <Icon name="UI/Favorite" size={22} />
             </button>
-            <button className="circle-button pressable" aria-label="Chiudi" onClick={onClose}><Icon name="UI/Close" size={22} /></button>
+            <button className="circle-button pressable" aria-label="Chiudi" onClick={() => close()}><Icon name="UI/Close" size={22} /></button>
           </div>
         </div>
-        <div className="venue-sheet__body">
+        <div className="venue-sheet__body" data-scroll>
           <Img name={a.photo} className="venue-sheet__photo" style={{ width: '100%', height: 150, borderRadius: 20 }} />
           <div className="price-line">
             <span className="t-title-3">{euro(a.price)}{a.people ? ' il campo' : ''}</span>
@@ -68,11 +77,11 @@ export function VenueSheet({ activityId, onClose, onBook }: { activityId: string
           <div className="info-block"><span className="info-label t-footnote-emphasized">Disdetta</span><span className="t-body">Gratis fino a 2 ore prima</span></div>
         </div>
       </DetentSheet>
-      <div className="bottom-bar">
+      <motion.div className="bottom-bar" initial={{ y: 120 }} animate={{ y: closing ? 120 : 0 }} transition={{ type: 'spring', visualDuration: 0.4, bounce: 0 }}>
         <Button kind="secondary" icon={<Icon name="Map/Directions" size={20} />}
           onPress={() => window.open(`https://maps.apple.com/?q=${encodeURIComponent(`${v.name}, ${v.street}, ${v.city}`)}`, '_blank')}>Indicazioni</Button>
         <Button fill disabled={!time} onPress={() => time && onBook(day, time)}>{time ? `Prenota alle ${time}` : 'Scegli un orario'}</Button>
-      </div>
+      </motion.div>
     </>
   );
 }

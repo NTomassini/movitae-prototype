@@ -40,12 +40,13 @@
 .activity-row__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
 /* Sheet della lista — bg/elevated, raggio 32 in alto, ombra 0 −4 24 12%, padding 16, gap 16 */
-.list-sheet { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 14; background: var(--bg-elevated); border-radius: 32px 32px 0 0; box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12); display: flex; flex-direction: column; touch-action: none; will-change: transform; }
+.list-sheet { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 14; background: var(--bg-elevated); border-radius: 32px 32px 0 0; box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12); display: flex; flex-direction: column; will-change: transform; }
 .list-sheet__grabber-zone { flex: none; height: 30px; display: flex; justify-content: center; cursor: grab; }
 .list-sheet__grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--text-tertiary); margin-top: 5px; opacity: 0.6; }
 .list-sheet__title { flex: none; padding: 0 16px 20px; margin-top: -4px; } /* Figma: titolo a +26 dal bordo, prima riga a +70 */
 .list-sheet__list { flex: 1 1 auto; overflow-y: hidden; padding: 0 16px 120px; display: flex; flex-direction: column; gap: 16px; overscroll-behavior: contain; }
-.list-sheet--large .list-sheet__list { overflow-y: auto; touch-action: pan-y; }
+.list-sheet--large .list-sheet__list { overflow-y: auto; }
+.list-sheet__list { -webkit-overflow-scrolling: touch; }
 
 /* IconButton style=filled-red + badge (bianco con bordo rosso 1,5, numero 12 Bold) */
 .icon-button-glass { position: relative; }
@@ -53,3 +54,6 @@
 .icon-button__badge { position: absolute; top: -6px; right: -4px; width: 20px; height: 20px; border-radius: 999px; background: var(--bg-surface); box-shadow: inset 0 0 0 1.5px var(--brand-accent); color: var(--brand-accent); font-size: 12px; line-height: 16px; font-weight: 700; display: grid; place-items: center; }
 /* FilterSummary — padding 8/16, gap 4, sotto la ricerca a y 116 */
 .filter-summary { position: absolute; left: 16px; top: calc(var(--device-top) + 62px); z-index: 12; height: 38px; padding: 0 12px 0 16px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; color: var(--text-primary); }
+
+/* Pulsante per riaprire la lista quando è nascosta: capsula di vetro sopra la tab bar (aggiunta del 26 nov) */
+.show-list { position: absolute; left: 50%; z-index: 13; bottom: calc(var(--tabbar-bottom) + var(--size-tabbar) + 16px); height: 44px; padding: 0 18px 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; color: var(--text-primary); white-space: nowrap; }
