@@ -1,0 +1,6 @@
+/* Dettaglio: Header C, biglietto a y 116, azioni a 24, card "Disdici" a 24 con nota 8 sotto (a x 32) */
+.booking-detail { display: flex; flex-direction: column; gap: 24px; padding: 62px var(--size-margin) 0; }
+.checkin { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 16px; }
+.checkin__icon { width: 64px; height: 64px; border-radius: 999px; background: var(--earn-default); color: #fff; display: grid; place-items: center; }
+.cancel-row { width: 100%; min-height: 52px; padding: 14px 16px; color: var(--brand-accent); text-align: center; }
+.cancel-note { margin: 8px 16px 0; }

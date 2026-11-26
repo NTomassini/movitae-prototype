@@ -5,28 +5,52 @@ import { useSyncExternalStore } from 'react';
  * tra un'apertura e l'altra. "Ripristina demo" (Impostazioni o pannello demo) torna allo stato iniziale di Marco.
  * Gli stati difficili da provocare (Q33) stanno in `demo` e si cambiano dal pannello demo.
  */
-export type Booking = { id: string; activityId: string; dayId: string; time: string; voucher: boolean; paid: number; points: number; status?: 'upcoming' | 'checked-in' | 'cancelled' };
+export type Booking = {
+  id: string; activityId: string; dayId: string; time: string; voucher: boolean; paid: number; points: number;
+  status?: 'upcoming' | 'checked-in' | 'cancelled';
+  refunded?: boolean;      // disdetta entro il limite: soldi e buono tornano
+  seed?: boolean;          // prenotazioni già presenti nei dati di Marco (punti già nel saldo)
+  pastLabel?: string;      // per le passate: "Mar 10 nov, 19:00"
+};
 export type Demo = {
   mission: 'active' | 'first-day' | 'no-health' | 'completed' | 'completed-7';
   location: 'granted' | 'denied';
   network: 'online' | 'offline';
   payment: 'ok' | 'fail';
   soldOut: boolean;
+  clock: 'before' | 'after'; // ora del prototipo: prima o dopo il limite di disdetta gratuita (2 ore prima)
 };
 export type AppState = { bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; celebrated: string | null; demo: Demo };
 
 const KEY = 'movitae-prototipo-v1';
-export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false };
-const initial = (): AppState => ({ bookings: [], favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
+export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false, clock: 'before' };
+// Prenotazioni di Marco all'avvio (prenotazioni/1 e /2 in Figma)
+const seedBookings: Booking[] = [
+  { id: 's-yoga', activityId: 'yoga-flow', dayId: 'oggi', time: '18:30', voucher: false, paid: 18, points: 180, status: 'upcoming', seed: true },
+  { id: 's-padel', activityId: 'padel-ostiense', dayId: '14', time: '19:30', voucher: false, paid: 52, points: 520, status: 'upcoming', seed: true },
+  { id: 's-nuoto', activityId: 'nuoto', dayId: '17', time: '07:30', voucher: false, paid: 12, points: 120, status: 'upcoming', seed: true },
+  { id: 's-boxe', activityId: 'boxe', dayId: 'past', time: '19:00', voucher: false, paid: 15, points: 150, status: 'checked-in', seed: true, pastLabel: 'Mar 10 nov, 19:00' },
+  { id: 's-pilates', activityId: 'pilates-base', dayId: 'past', time: '18:00', voucher: false, paid: 18, points: 180, status: 'cancelled', refunded: true, seed: true, pastLabel: 'Ven 6 nov, 18:00' },
+  { id: 's-palestra', activityId: 'palestra', dayId: 'past', time: '08:00', voucher: false, paid: 12, points: 120, status: 'checked-in', seed: true, pastLabel: 'Lun 2 nov, 08:00' },
+];
+const initial = (): AppState => ({ bookings: seedBookings.map((b) => ({ ...b })), favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
 
 const load = (): AppState => {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return { ...initial(), ...JSON.parse(raw) };
+    if (raw) {
+      const saved = JSON.parse(raw);
+      const base = initial();
+      // le prenotazioni di partenza ci sono sempre (anche nei salvataggi di prima)
+      const bookings: Booking[] = saved.bookings ?? [];
+      for (const sb of base.bookings) if (!bookings.some((b) => b.id === sb.id)) bookings.push(sb);
+      return { ...base, ...saved, bookings, demo: { ...base.demo, ...(saved.demo ?? {}) } };
+    }
   } catch { /* storage non disponibile: si resta in memoria */ }
   return initial();
 };
 let state: AppState = load();
+try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignora */ }
 const subs = new Set<() => void>();
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignora */ } };
 const set = (next: Partial<AppState>) => { state = { ...state, ...next }; save(); subs.forEach((f) => f()); };
@@ -63,10 +87,21 @@ export const bookings = {
   all: () => state.bookings,
 };
 
-/** Saldo dopo i buoni usati (i punti delle prenotazioni arrivano solo al check-in). */
+/** Saldo dopo i buoni usati e i check-in fatti nel prototipo (le prenotazioni di partenza sono già nel saldo). */
 export const balance = (all: Booking[], startPoints: number, startSaved: number) => {
-  const live = all.filter((b) => b.status !== 'cancelled' || !b.voucher);
-  const used = live.filter((b) => b.voucher).length;
-  const checkedIn = all.filter((b) => b.status === 'checked-in').reduce((s, b) => s + b.points + 50, 0);
+  const mine = all.filter((b) => !b.seed);
+  const used = mine.filter((b) => b.voucher && !(b.status === 'cancelled' && b.refunded)).length;
+  const checkedIn = mine.filter((b) => b.status === 'checked-in').reduce((s, b) => s + b.points + 50, 0);
   return { points: startPoints - used * 2500 + checkedIn, saved: startSaved + used * 5, vouchersUsed: used };
 };
+
+/** Ordine delle prenotazioni in arrivo: giorno, poi orario. */
+const dayOrder = ['oggi', '14', '15', '16', '17'];
+export const upcoming = (all: Booking[]) => all.filter((b) => b.status === 'upcoming')
+  .sort((a, b) => dayOrder.indexOf(a.dayId) - dayOrder.indexOf(b.dayId) || a.time.localeCompare(b.time));
+export const past = (all: Booking[]) => [
+  ...all.filter((b) => b.status !== 'upcoming' && !b.seed),
+  ...all.filter((b) => b.status !== 'upcoming' && b.seed),
+];
+/** Punti della riga "Check-in fatto · +N pt": 10 per € pagato + 50 del check-in. */
+export const checkInPoints = (b: Booking) => b.points + 50;

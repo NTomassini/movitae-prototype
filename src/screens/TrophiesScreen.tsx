@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { achievements, fmtPoints, type Achievement } from '../data/data';
-import { Icon } from '../ui/Icon';
 import { Img } from '../ui/Img';
 import { ModalSheet } from '../ui/ModalSheet';
-import { ScreenOverlay } from '../app/ScreenOverlay';
-import { ScrollEdge } from '../ui/ScrollEdge';
-import { useScreenScroll } from '../app/useScreenScroll';
+import { PageHeader } from '../ui/PageHeader';
 import './TrophiesScreen.css';
 
 // Tutti i traguardi — premi/2-traguardi-tutti (1461:5459): Header C (freccia + titolo piccolo), gruppi a 32, griglia 3 colonne (gap 14).
@@ -22,21 +19,11 @@ function Stars({ n, size, dim }: { n: number; size: number; dim?: boolean }) {
 export function TrophiesScreen() {
   const [params] = useSearchParams();
   const [open, setOpen] = useState<string | null>(params.get('t'));
-  const navigate = useNavigate();
-  const scrolled = useScreenScroll() > 4;
   const a = achievements.find((x) => x.id === open);
 
   return (
     <div className="trophies-page">
-      <ScreenOverlay>
-        <div className="page-header">
-          <ScrollEdge position="top" height={106} />
-          <button className="back-button pressable" aria-label="Indietro" onClick={() => navigate(-1)} style={{ boxShadow: scrolled ? 'var(--effect-glass-control)' : undefined }}>
-            <Icon name="UI/Chevron-Left" size={24} />
-          </button>
-          <h1 className="t-headline page-header__title">Traguardi</h1>
-        </div>
-      </ScreenOverlay>
+      <PageHeader title="Traguardi" type="C" />
       {groups.map((g) => (
         <section key={g} className="trophy-group">
           <h2 className="t-title-3">{g}</h2>

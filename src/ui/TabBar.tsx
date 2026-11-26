@@ -3,6 +3,10 @@ import { Icon } from './Icon';
 import type { IconName } from './icons';
 import './TabBar.css';
 
+// Le pagine aperte da una sezione restano sotto il suo tab (Prenotazioni e Profilo dalla Home, Traguardi da Premi).
+const sectionOf = (path: string) =>
+  path.startsWith('/scopri') ? '/scopri' : path.startsWith('/movi') ? '/movi' : path.startsWith('/premi') ? '/premi' : '/';
+
 const tabs: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Home', icon: 'Nav/Home' },
   { to: '/scopri', label: 'Scopri', icon: 'Nav/Explore' },
@@ -24,7 +28,7 @@ export function TabBar({ hidden = false }: { hidden?: boolean }) {
   return (
     <nav className={`tabbar${hidden ? ' tabbar--hidden' : ''}`} aria-label="Sezioni" aria-hidden={hidden || undefined}>
       {tabs.map((t) => (
-        <NavLink key={t.to} to={t.to} end={t.to === '/'} className="tabbar-tab" onClick={retap(t.to)}>
+        <NavLink key={t.to} to={t.to} className={() => `tabbar-tab${sectionOf(pathname) === t.to ? ' active' : ''}`} aria-current={sectionOf(pathname) === t.to ? 'page' : undefined} onClick={retap(t.to)}>
           <Icon name={t.icon} />
           <span className="tabbar-label">{t.label}</span>
         </NavLink>

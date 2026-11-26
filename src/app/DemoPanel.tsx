@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { initialDemo, store, useDemo, type Demo } from '../state/bookings';
+import { initialDemo, store, upcoming, useDemo, type Demo } from '../state/bookings';
 import './demo.css';
 
 /**
@@ -15,6 +15,7 @@ const groups: Opt<keyof Demo>[] = [
   { key: 'location', label: 'Posizione', options: [{ v: 'granted', l: 'Concessa' }, { v: 'denied', l: 'Negata' }] },
   { key: 'network', label: 'Connessione', options: [{ v: 'online', l: 'Online' }, { v: 'offline', l: 'Offline' }] },
   { key: 'payment', label: 'Pagamento', options: [{ v: 'ok', l: 'Riuscito' }, { v: 'fail', l: 'Non riuscito' }] },
+  { key: 'clock', label: 'Ora (disdetta gratis fino a 2 ore prima)', options: [{ v: 'before', l: 'Prima del limite' }, { v: 'after', l: 'Dopo il limite' }] },
   { key: 'soldOut', label: 'Orario scelto', options: [{ v: false, l: 'Disponibile' }, { v: true, l: 'Esaurito' }] },
 ] as Opt<keyof Demo>[];
 
@@ -49,6 +50,9 @@ export function DemoPanel() {
                 </div>
               </div>
             ))}
+            <div className="demo-panel__actions">
+              <button className="t-subheadline-emphasized" onClick={() => { const b = upcoming(store.get().bookings)[0]; if (b) store.updateBooking(b.id, { status: 'checked-in' }); }}>Check-in della prossima</button>
+            </div>
             <div className="demo-panel__actions">
               <button className="t-subheadline-emphasized" onClick={() => store.setDemo(initialDemo)}>Stati normali</button>
               <button className="t-subheadline-emphasized danger" onClick={() => { store.reset(); setOpen(false); location.assign('/'); }}>Ripristina demo</button>

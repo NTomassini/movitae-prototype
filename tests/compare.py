@@ -55,6 +55,18 @@ def go_celebrazione7(pg):
     demo(pg, 'active'); pg.evaluate("() => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v1')); s.demo.mission='completed-7'; s.celebrated=null; localStorage.setItem('movitae-prototipo-v1', JSON.stringify(s)) }"); pg.goto(f'{URL}/'); pg.wait_for_timeout(2200)
 def go_spiegazione(pg): demo(pg, 'no-health'); pg.locator('.mission-card__connect').click(); pg.wait_for_timeout(900)
 
+def state(pg, path, patch_js='s=>s'):
+    pg.goto(f'{URL}/'); pg.evaluate('localStorage.clear()'); pg.goto(f'{URL}/'); pg.wait_for_timeout(300)
+    pg.evaluate("p => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v1') || '{}'); const f = eval(p); localStorage.setItem('movitae-prototipo-v1', JSON.stringify(f(s))) }", patch_js)
+    pg.goto(f'{URL}{path}'); pg.wait_for_timeout(1000)
+def go_pren_arrivo(pg): state(pg, '/prenotazioni')
+def go_pren_passate(pg): state(pg, '/prenotazioni?tab=passate')
+def go_pren_dettaglio(pg): state(pg, '/prenotazioni/s-yoga')
+def go_pren_checkin(pg): state(pg, '/prenotazioni/s-yoga', "s => { s.bookings = s.bookings.map(b => b.id === 's-yoga' ? {...b, status:'checked-in'} : b); return s }")
+def go_pren_avviso(pg): state(pg, '/prenotazioni/s-yoga', "s => { s.bookings = s.bookings.map(b => b.id === 's-yoga' ? {...b, voucher:true, paid:13, points:130} : b); return s }"); pg.locator('.cancel-row').click(); pg.wait_for_timeout(700)
+def go_pren_avviso_tardi(pg): state(pg, '/prenotazioni/s-yoga', "s => { s.demo = {...(s.demo||{}), clock:'after'}; s.bookings = s.bookings.map(b => b.id === 's-yoga' ? {...b, voucher:true, paid:13, points:130} : b); return s }"); pg.locator('.cancel-row').click(); pg.wait_for_timeout(700)
+def go_pren_vuote(pg): state(pg, '/prenotazioni', "s => { s.bookings = s.bookings.map(b => b.status === 'upcoming' ? {...b, status:'cancelled'} : b); return s }")
+
 # (nome, come arrivarci, zone da escludere [x0,y0,x1,y1] in pt)
 SCREENS = [
     ('home', go_home, []),
@@ -75,6 +87,13 @@ SCREENS = [
     ('celebrazione', go_celebrazione, []),
     ('celebrazione-7', go_celebrazione7, []),
     ('salute-spiegazione', go_spiegazione, [(0, 0, 402, 345)]),
+    ('pren-arrivo', go_pren_arrivo, []),
+    ('pren-passate', go_pren_passate, []),
+    ('pren-dettaglio', go_pren_dettaglio, []),
+    ('pren-checkin', go_pren_checkin, []),
+    ('pren-avviso', go_pren_avviso, []),
+    ('pren-avviso-tardi', go_pren_avviso_tardi, []),
+    ('pren-vuote', go_pren_vuote, []),
 ]
 
 def diff(fig: Image.Image, code: Image.Image, masks):

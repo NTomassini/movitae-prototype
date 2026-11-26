@@ -1,0 +1,16 @@
+.bookings { display: flex; flex-direction: column; padding: 8px var(--size-margin) 0; }
+.bookings .page-large-title { padding-top: 54px; margin-bottom: 12px; }
+
+/* SegmentedControl — capsula fill/tertiary con padding 4, segmento bianco (fill/segment) che scivola */
+.segmented { position: relative; display: flex; height: 40px; padding: 4px; border-radius: 999px; background: var(--fill-tertiary); }
+.segmented button { position: relative; z-index: 1; flex: 1; border-radius: 999px; color: var(--text-primary); }
+.segmented__thumb { position: absolute; top: 4px; left: 4px; bottom: 4px; border-radius: 999px; background: var(--fill-segment); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* Lista in card: righe 80 (foto 56, padding 12/16, gap 12), separatore che parte dal testo (84) */
+.booking-list { margin-top: 24px; }
+.booking-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; min-height: 80px; color: var(--text-primary); }
+.booking-row + .booking-row { box-shadow: inset 84px 0 0 var(--bg-surface), inset 0 1px 0 var(--border-separator); }
+.booking-row__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+/* EmptyState — icona 48, titolo, testo, pulsante (y 280) */
+.empty-state { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 72px; text-align: center; color: var(--text-primary); padding: 0 16px; }

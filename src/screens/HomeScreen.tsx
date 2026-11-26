@@ -1,5 +1,5 @@
-import { days } from '../data/data';
-import { balance, useBookings } from '../state/bookings';
+import { balance, upcoming, useBookings } from '../state/bookings';
+import { whenShort } from './BookingsScreen';
 import { fmtPoints } from '../data/data';
 import { activities, activity, euro, nearby, shelfSports, upcomingBooking, user, venueOf } from '../data/data';
 import { Avatar, BookingCard, SectionHeader, SportShelfItem, StatTile, VenueCard } from '../ui/home/HomeParts';
@@ -17,7 +17,6 @@ import './HomeScreen.css';
 
 // Home — DS · Schermate › "home — chiaro" (1461:439). Contenuto: padding 16 ai lati, sezioni a 24.
 export function HomeScreen() {
-  // Dopo una prenotazione nel prototipo, "Prossima prenotazione" mostra quella appena fatta.
   const app = useAppState();
   const mission = app.demo.mission;
   const navigate = useNavigate();
@@ -29,12 +28,13 @@ export function HomeScreen() {
     if (mission.startsWith('completed') && app.celebrated !== mission) { setCelebrate(true); store.setCelebrated(mission); }
   }, [mission, app.celebrated]);
   const all = useBookings();
-  const made = all[0];
   // primo giorno = utente appena iscritto: niente prenotazioni, 0 pt, €0 (home/stato-primo-giorno)
   const isNew = mission === 'first-day';
   const bal = isNew ? { points: 0, saved: 0, vouchersUsed: 0 } : balance(all, user.points, user.saved);
-  const booking = activity(made ? made.activityId : upcomingBooking.activityId);
-  const when = made ? `${days.find((d) => d.id === made.dayId)!.id === 'oggi' ? 'Oggi' : days.find((d) => d.id === made.dayId)!.short}, ${made.time}` : `${upcomingBooking.day}, ${upcomingBooking.time}`;
+  // "Prossima prenotazione" = la prima in arrivo (comprese quelle fatte nel prototipo)
+  const made = upcoming(all)[0];
+  const booking = made ? activity(made.activityId) : activity(upcomingBooking.activityId);
+  const when = made ? whenShort(made) : '';
   void activities;
   // Comportamenti §4: il titolo grande scorre via; quando è sparito compaiono il titolo piccolo
   // centrato e il bordo sfocato in alto (alto 106, quanto la riga d'intestazione). L'avatar resta fisso.
@@ -62,9 +62,9 @@ export function HomeScreen() {
         </div>
       </section>
 
-      {!isNew && <section className="home__section">
+      {!isNew && made && <section className="home__section">
         <SectionHeader title="Prossima prenotazione" link="Vedi tutte" to="/prenotazioni" />
-        <BookingCard title={booking.title} subtitle={`${when} · ${venueOf(booking).name}`} photo={made ? booking.photo : 'img/yoga'} to="/prenotazioni/1" />
+        <BookingCard title={booking.title} subtitle={`${when} · ${venueOf(booking).name}`} photo={made.id === 's-yoga' ? 'img/yoga' : booking.photo} to={`/prenotazioni/${made.id}`} />
       </section>}
 
       <div className="stat-tiles">
