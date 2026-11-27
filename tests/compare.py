@@ -47,7 +47,7 @@ def go_scopri_buono(pg): go_sheet_buono(pg); pg.get_by_role('button', name="Trov
 def go_lista_corta(pg):
     # Q57: filtro Padel (3 attività), lista tirata al massimo: si ferma al contenuto
     pg.goto(f'{URL}/'); pg.evaluate('localStorage.clear()'); pg.goto(f'{URL}/scopri?sport=padel&theme=light'); pg.wait_for_timeout(1200)
-    pg.locator('.list-sheet__grabber').click(); pg.wait_for_timeout(900)
+    # Q90: la lista corta a media altezza è alta quanto le sue righe (la grande ora arriva sempre a 124)
 def go_dettaglio(pg): reset(pg); pg.goto(f'{URL}/premi/traguardi?t=serie-30&theme=light'); pg.wait_for_timeout(900)
 
 def demo(pg, mission, path='/'):

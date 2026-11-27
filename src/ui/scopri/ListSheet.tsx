@@ -54,7 +54,8 @@ export function ListSheet({ title, children, detent, onDetent, muted, action, fi
     const small = h - (8 + safe) - CARD;
     let medium = h - pad - (HEADER + 3 * ROW + 2 * GAP);
     let large = 124;
-    if (fit && need) { const fitTop = h - need; medium = Math.max(medium, fitTop); large = Math.max(large, fitTop); }
+    // Q90: la grande resta sempre a 124 (il gesto risponde sempre, anche con poche righe); la media non supera il contenuto
+    if (fit && need) { const fitTop = h - need; medium = Math.max(medium, fitTop); }
     medium = Math.min(medium, small);
     large = Math.min(large, medium);
     return { hidden: h + 8, small, medium, large };
@@ -72,7 +73,9 @@ export function ListSheet({ title, children, detent, onDetent, muted, action, fi
   const bottom = useTransform(y, (v) => Math.max(v, 0) + (8 + geo.current.safe) * floatF(v)); // dal fondo dello sheet al fondo della forma
   const rb = useTransform(y, (v) => 32 * floatF(v));
   const clip = useMotionTemplate`inset(0px ${side}px ${bottom}px ${side}px round 32px 32px ${rb}px ${rb}px)`;
-  const listBottom = useTransform(y, (v) => Math.max(v, 0) + geo.current.pad); // le righe finiscono nette sopra il fondo
+  // Q91: le righe arrivano fino al fondo dello schermo (come gli sheet di iOS), senza fascia vuota sotto; lo spazio
+  // per l'indicatore Home sta solo alla fine della lista (padding del contenitore che scorre)
+  const listBottom = useTransform(y, (v) => Math.max(v, 0)); // Q91
 
   // tab bar legata allo sheet tra "nascosta" e "piccola" (Q76)
   const tabCb = useRef(onTabBar);

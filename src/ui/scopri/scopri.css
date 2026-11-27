@@ -40,7 +40,7 @@
 .list-sheet__grabber-zone { flex: none; height: 30px; display: flex; justify-content: center; cursor: grab; }
 .list-sheet__grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--text-tertiary); margin-top: 5px; opacity: 0.6; }
 .list-sheet__title { flex: none; padding: 0 16px 20px; margin-top: -4px; } /* Figma: titolo a +26 dal bordo, prima riga a +70 */
-.list-sheet__list { flex: 1 1 auto; min-height: 0; overflow-y: hidden; padding: 0 16px; overscroll-behavior: contain; }
+.list-sheet__list { flex: 1 1 auto; min-height: 0; overflow-y: hidden; padding: 0 16px calc(8px + var(--safe-bottom-live, 20px)); /* Q91: in fondo solo l'area sicura */ overscroll-behavior: contain; }
 /* Q57: il contenuto ha la sua altezza naturale, così lo sheet sa dove finisce la lista */
 .list-sheet__content { display: flex; flex-direction: column; gap: 16px; }
 .list-sheet--large .list-sheet__list { overflow-y: auto; }

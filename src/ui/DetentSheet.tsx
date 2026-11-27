@@ -79,77 +79,109 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
     }),
   }));
 
-  // Gesti: tocco con touch events (così si può fermare lo scorrimento nativo), mouse con pointer events.
+  // Gesti (Q90, 27 nov): come gli sheet di iOS, sheet e contenuto sono un solo movimento.
+  // Tirando su lo sheet sale col dito e, arrivato all'altezza massima, lo stesso gesto scorre il contenuto;
+  // scorrendo giù il contenuto torna in cima e poi lo sheet scende, senza staccare il dito.
+  // Lo scorrimento del contenuto è fatto qui (scrollTop + inerzia con la decelerazione di Apple 0,998): su iPhone
+  // Safari decide al primo movimento se lo scorrimento è nativo e poi non lo si può più passare allo sheet.
+  // Il gesto orizzontale (capsule dei giorni) resta nativo. Tocco con touch events, mouse con pointer events.
   useEffect(() => {
     const node = el.current;
     if (!node) return;
-    type G = { x0: number; y0: number; sheetY0: number; last: number; t: number; v: number; live: boolean; scroller: HTMLElement | null; dead: boolean; mine: boolean; decided: boolean };
+    type G = { x0: number; y0: number; lastY: number; t: number; v: number; live: boolean; scroller: HTMLElement | null;
+      dead: boolean; decided: boolean; raw: number; onContent: boolean };
     let g: G | null = null;
     let lastWasDrag = false;
+    let inertia = 0;
+    const stopInertia = () => { if (inertia) cancelAnimationFrame(inertia); inertia = 0; };
 
     const bounds = () => {
       const vals = Object.values(topsRef.current(state.current.h)) as number[];
       return { min: Math.min(...vals), max: Math.max(...vals) };
     };
+    const H = () => state.current.h || 800;
+    const band = (over: number) => (over * H() * 0.55) / (H() + 0.55 * over);
+    const room = (sc: HTMLElement | null) => (sc ? Math.max(0, sc.scrollHeight - sc.clientHeight) : 0);
+    // posizione "grezza" dello sheet → posizione mostrata, con la resistenza di Apple oltre i limiti (Q68)
+    const show = (raw: number) => {
+      const { min, max } = bounds();
+      if (raw < min) return min - band(min - raw);
+      if (raw > max && !state.current.onDismiss) return max + band(raw - max);
+      return raw;
+    };
+
     const start = (clientX: number, clientY: number, target: EventTarget | null) => {
       const t = target as HTMLElement;
       lastWasDrag = false; // prima del controllo: un tocco su un pulsante dopo un trascinamento non va ignorato
+      stopInertia();
       if (t.closest('[data-nodrag]')) return;
-      g = { x0: clientX, y0: clientY, sheetY0: y.get(), last: clientY, t: performance.now(), v: 0, live: false, scroller: t.closest('[data-scroll]'), dead: false, mine: false, decided: false };
+      g = { x0: clientX, y0: clientY, lastY: clientY, t: performance.now(), v: 0, live: false, scroller: t.closest('[data-scroll]'),
+        dead: false, decided: false, raw: y.get(), onContent: false };
     };
-    const scrollable = (sc: HTMLElement | null) => !!sc && sc.scrollHeight > sc.clientHeight + 1 && getComputedStyle(sc).overflowY !== 'hidden';
-    /* Q87 (27 nov): su iPhone, se il primo touchmove non viene fermato, Safari decide che è uno scorrimento del contenuto
-       e i successivi non si possono più fermare: lo sheet a mezza altezza restava fermo e scorreva il contenuto.
-       Quindi la direzione si decide al PRIMO movimento (non dopo 6 px): verticale e di competenza dello sheet
-       (sheet non al massimo, oppure contenuto in cima e dito che scende) → si ferma lo scorrimento nativo da subito.
-       Orizzontale (capsule dei giorni) → il gesto resta al contenuto. */
+    // la direzione si decide al primo movimento: orizzontale → nativo, verticale → di questo componente
     const decide = (clientX: number, clientY: number) => {
       if (!g || g.decided) return;
       const dx = clientX - g.x0, dy = clientY - g.y0;
       if (!dx && !dy) return;
       g.decided = true;
-      if (Math.abs(dx) > Math.abs(dy)) { g.dead = true; return; }
+      if (Math.abs(dx) > Math.abs(dy)) g.dead = true;
+    };
+    // sposta di d px (positivo = dito che scende): prima lo sheet o il contenuto, a seconda della direzione
+    const apply = (d: number) => {
+      if (!g) return;
       const { min } = bounds();
       const sc = g.scroller;
-      if (!scrollable(sc)) { g.mine = true; return; }
-      const atTop = sc!.scrollTop <= 0;
-      const sheetAtMax = y.get() <= min + 1;
-      g.mine = !sheetAtMax || (dy > 0 && atTop);
-      if (!g.mine) g.dead = true;
+      if (d < 0) {
+        // su: lo sheet sale fino all'altezza massima, il resto scorre il contenuto
+        const toMax = Math.max(0, g.raw - min);
+        const sheetPart = Math.max(d, -toMax);
+        g.raw += sheetPart;
+        let rest = d - sheetPart;
+        if (rest < 0 && sc && room(sc) > 0) {
+          const can = room(sc) - sc.scrollTop;
+          const s = Math.min(-rest, can);
+          sc.scrollTop += s; rest += s;
+          g.onContent = s > 0;
+        }
+        if (rest < 0) { g.raw += rest; g.onContent = false; } // niente più da scorrere: resistenza oltre il bordo
+      } else if (d > 0) {
+        // giù: il contenuto torna in cima, poi scende lo sheet
+        let rest = d;
+        if (g.raw <= min + 0.5 && sc && sc.scrollTop > 0) {
+          const s = Math.min(rest, sc.scrollTop);
+          sc.scrollTop -= s; rest -= s;
+          g.onContent = s > 0;
+        }
+        if (rest > 0) { g.raw += rest; g.onContent = false; }
+      }
+      y.set(show(g.raw));
     };
-    // true = il gesto è dello sheet (e va fermato lo scorrimento nativo)
     const move = (clientY: number): boolean => {
       if (!g || g.dead) return false;
-      const dy = clientY - g.y0;
       if (!g.live) {
-        if (Math.abs(dy) < 6) return false;
-        if (g.decided && !g.mine) { g.dead = true; return false; }
-        if (!g.decided) {
-          // mouse: stessa regola di prima, decisa a 6 px
-          const { min } = bounds();
-          const sc = g.scroller;
-          if (scrollable(sc)) {
-            const atTop = sc!.scrollTop <= 0;
-            const sheetAtMax = y.get() <= min + 1;
-            if (dy > 0 && !atTop) { g.dead = true; return false; }
-            if (dy < 0 && sheetAtMax) { g.dead = true; return false; }
-          }
-        }
+        if (Math.abs(clientY - g.y0) < 6) return false;
         g.live = true;
-        g.y0 = clientY; g.sheetY0 = y.get();
+        g.raw = y.get(); g.lastY = g.y0; // i primi 6 px non si perdono: lo sheet resta sotto il dito
       }
       const now = performance.now();
-      g.v = ((clientY - g.last) / Math.max(now - g.t, 1)) * 1000;
-      g.t = now; g.last = clientY;
-      const { min, max } = bounds();
-      let next = g.sheetY0 + (clientY - g.y0);
-      // Q68: resistenza progressiva oltre il bordo (formula di Apple: più tiri, meno segue)
-      const H = state.current.h || 800;
-      const band = (over: number) => (over * H * 0.55) / (H + 0.55 * over);
-      if (next < min) next = min - band(min - next);
-      if (next > max && !state.current.onDismiss) next = max + band(next - max);
-      y.set(next);
+      const d = clientY - g.lastY;
+      g.v = (d / Math.max(now - g.t, 1)) * 1000;
+      g.t = now; g.lastY = clientY;
+      apply(d);
       return true;
+    };
+    const coast = (sc: HTMLElement, v0: number) => {
+      // inerzia del contenuto: v in px/s (positivo = il contenuto torna verso l'alto)
+      let v = v0, last = performance.now();
+      const step = (now: number) => {
+        const dt = now - last; last = now;
+        sc.scrollTop -= (v * dt) / 1000;
+        v *= Math.pow(0.998, dt);
+        const atEdge = sc.scrollTop <= 0 || sc.scrollTop >= room(sc) - 0.5;
+        if (Math.abs(v) < 15 || atEdge) { inertia = 0; return; }
+        inertia = requestAnimationFrame(step);
+      };
+      inertia = requestAnimationFrame(step);
     };
     const end = () => {
       const s = g;
@@ -157,25 +189,29 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
       if (!s || !s.live) return;
       lastWasDrag = true;
       const t = topsRef.current(state.current.h);
+      const keys = (Object.keys(t) as D[]).sort((a, b) => t[a] - t[b]); // dall'alto in basso
+      const top = keys[0];
+      // il dito stava scorrendo il contenuto con lo sheet al massimo: lo sheet resta lì e il contenuto prosegue per inerzia
+      if (s.onContent && s.scroller && Math.abs(y.get() - t[top]) < 0.5) {
+        if (Math.abs(s.v) > 60) coast(s.scroller, s.v);
+        if (state.current.detent !== top) state.current.onDetent(top); else settleRef.current?.(top);
+        return;
+      }
       const projected = y.get() + (s.v / 1000) * 0.998 / (1 - 0.998);
       const { max } = bounds();
-      // Q86 (27 nov): un lancio sposta lo sheet di una sola altezza, come in Mappe (dalla media alla piccola, non
-      // fino a nascosta); si chiude con un lancio solo se è già all'altezza più bassa o trascinato oltre.
+      // Q86: un lancio sposta lo sheet di una sola altezza; si chiude con un lancio solo se è già all'altezza più bassa
       const cur = state.current.detent;
       const atLowest = t[cur] >= max - 1 || y.get() > max + 1;
       if (state.current.onDismiss && projected > max + 100 && atLowest) {
         animate(y, state.current.h, { type: 'spring', visualDuration: 0.35, bounce: 0, velocity: s.v }).then(() => state.current.onDismiss?.());
         return;
       }
-      const keys = (Object.keys(t) as D[]).sort((a, b) => t[a] - t[b]); // dall'alto in basso
       let best = keys.reduce((a, b) => (Math.abs(t[b] - projected) < Math.abs(t[a] - projected) ? b : a));
-      // al massimo un'altezza oltre quella più vicina a dove il dito ha lasciato lo sheet
       const near = keys.reduce((a, b) => (Math.abs(t[b] - y.get()) < Math.abs(t[a] - y.get()) ? b : a));
-      const from = Math.abs(t[near] - y.get()) < 24 ? near : null; // lasciato vicino a un'altezza: si parte da lì
+      const from = Math.abs(t[near] - y.get()) < 24 ? near : null;
       const base = keys.indexOf(from ?? cur);
       const bi = keys.indexOf(best);
       if (Math.abs(bi - base) > 1) best = keys[base + Math.sign(bi - base)];
-      // la molla parte dalla velocità del dito anche quando cambia altezza (prima la riprendeva solo restando ferma)
       lastVelocity.current = s.v;
       if (best === state.current.detent) animate(y, t[best], { ...SPRING, velocity: s.v }).then(() => settleRef.current?.(best));
       else state.current.onDetent(best);
@@ -185,12 +221,13 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
     const tm = (e: TouchEvent) => {
       const p = e.touches[0];
       decide(p.clientX, p.clientY);
-      const own = move(p.clientY) || (!!g && g.mine && !g.dead);
-      if (own && e.cancelable) e.preventDefault();
+      // verticale: fermato da subito (anche sotto i 6 px), così Safari non avvia lo scorrimento nativo
+      if (g && g.decided && !g.dead && e.cancelable) e.preventDefault();
+      move(p.clientY);
     };
     const te = () => end();
     const pd = (e: PointerEvent) => { if (e.pointerType === 'mouse' && e.button === 0) start(e.clientX, e.clientY, e.target); };
-    const pm = (e: PointerEvent) => { if (e.pointerType === 'mouse' && g && move(e.clientY)) e.preventDefault(); };
+    const pm = (e: PointerEvent) => { if (e.pointerType === 'mouse' && g) { decide(e.clientX, e.clientY); if (move(e.clientY)) e.preventDefault(); } };
     const pu = (e: PointerEvent) => { if (e.pointerType === 'mouse') end(); };
     // un trascinamento non deve diventare un tocco sul bottone sotto il dito
     const click = (e: MouseEvent) => { if (lastWasDrag) { e.stopPropagation(); e.preventDefault(); lastWasDrag = false; } };
@@ -204,6 +241,7 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
     window.addEventListener('pointerup', pu);
     node.addEventListener('click', click, true);
     return () => {
+      stopInertia();
       node.removeEventListener('touchstart', ts);
       node.removeEventListener('touchmove', tm);
       node.removeEventListener('touchend', te);

@@ -107,10 +107,17 @@ export function ScopriScreen() {
     })
     .filter(Boolean) as MapPinData[], [filtered]);
 
-    // Q88: toccare un pin porta sempre la lista piccola con il nome della struttura (come la scheda di un luogo in Mappe)
-  const onSelect = useCallback((id: string | null) => { setSelected(id); if (id) setDetent('small'); }, []);
+      const qs = sport ? `?sport=${sport}` : '';
+  // Q89: il pin di una struttura con una sola attività apre subito la sua scheda (come un luogo in Mappe);
+  // con più attività la lista mostra le sue righe, alta quanto serve
+  const onSelect = useCallback((id: string | null) => {
+    setSelected(id);
+    if (!id) return;
+    const acts = filtered.filter((a) => a.venueId === id);
+    if (acts.length === 1) { navigate(`/scopri/${acts[0].id}${qs}`); return; }
+    setDetent('medium');
+  }, [filtered, navigate, qs]);
   const title = selected ? venues.find((v) => v.id === selected)!.name : listTitle(list.length, filters, denied);
-  const qs = sport ? `?sport=${sport}` : '';
   // ricerca: uno sport filtra, una struttura seleziona il suo pin, un'attività apre la scheda
   const onPick = (p: Pick) => {
     setSearch(false);
@@ -171,12 +178,7 @@ export function ScopriScreen() {
         fit={!showOffline && !loading && !noResults}
         onTabBar={driveTabBar}
         onClose={showOffline || loading || noResults ? undefined : () => setDetent('hidden')}
-        onDetent={showOffline || loading || activityId ? () => {} : (d) => {
-          // Q88: pin di una struttura con una sola attività: la lista piccola fa da intestazione della scheda;
-          // trascinandola su si apre la scheda (come toccare la riga), invece di una lista con una riga e spazio vuoto
-          if (selected && list.length === 1 && detent === 'small' && (d === 'medium' || d === 'large')) { navigate(`/scopri/${list[0].id}${qs}`); return; }
-          setDetent(d);
-        }}>
+        onDetent={showOffline || loading || activityId ? () => {} : setDetent}>
         {noResults ? (
           <div className="no-results">
             <p className="t-subheadline secondary">Con questi filtri non c’è niente qui vicino. Prova così:</p>
@@ -209,7 +211,7 @@ export function ScopriScreen() {
         {search && <SearchView key="s" onClose={() => setSearch(false)} onPick={onPick} onAskMovi={(q) => navigate(`/movi?q=${encodeURIComponent(q)}`)} />}
       </AnimatePresence>
       {activityId && (
-        <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${qs}`); }} onClosing={() => setVenueClosing(true)}
+        <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); if (selected && list.length === 1) setSelected(null) /* Q89: aperta dal pin, chiudendo si deseleziona */; navigate(`/scopri${qs}`); }} onClosing={() => setVenueClosing(true)}
           onBook={(dayId, time) => setCheckout({ dayId, time })} />
       )}
       {/* il riepilogo sta nel livello comune degli sheet, così modulo e certificato si aprono sopra */}

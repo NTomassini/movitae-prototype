@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { peekZoom, type ZoomSource } from './zoom';
-import { motion } from 'motion/react';
+import { motion, useMotionValue, useTransform } from 'motion/react';
 import { activity, days, euro, fmtPoints, services, venueOf } from '../../data/data';
 import { DetentSheet, type DetentSheetHandle } from '../DetentSheet';
 import { Icon } from '../Icon';
@@ -31,6 +31,11 @@ export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'sco
   const setFav = () => store.toggleFavorite(activityId);
   const sheet = useRef<DetentSheetHandle>(null);
   const body = useRef<HTMLDivElement>(null);
+  // Q93: lo sheet è alto quanto lo schermo e spostato in giù di y, quindi la sua parte bassa è fuori schermo;
+  // il fondo del contenuto = posizione + barra in basso (con l'area sicura) + 24, così l'ultima riga si legge tutta (prima "Gratis fino a 2 ore prima" restava tagliata)
+  const sheetY = useMotionValue(10000);
+  const [barH, setBarH] = useState(130);
+  const bodyPad = useTransform(sheetY, (v) => Math.max(0, Math.min(v, 2000)) + barH + 24);
   // Q87: tornando a mezza altezza il contenuto torna in cima (lì non scorre)
   useEffect(() => { if (detent === 'half') body.current?.scrollTo({ top: 0, behavior: 'smooth' }); }, [detent]);
   const [closing, setClosing] = useState(false);
@@ -97,7 +102,7 @@ export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'sco
           transition={{ type: 'spring', visualDuration: 0.45, bounce: 0 }}
           onAnimationComplete={() => { const d = fly.done; if (!d) setFly(null); else d(); }} />
       )}
-      <DetentSheet ref={sheet} className={`venue-sheet venue-sheet--${detent}`} tops={from === 'movi' ? topsMovi : tops} detent={detent} onDetent={setDetent} label={title} modal={from === 'movi'} onDismiss={() => close(true)}>
+      <DetentSheet ref={sheet} className={`venue-sheet venue-sheet--${detent}`} tops={from === 'movi' ? topsMovi : tops} detent={detent} onDetent={setDetent} label={title} modal={from === 'movi'} onDismiss={() => close(true)} y={sheetY}>
         <div className="venue-sheet__grab"><button aria-label="Cambia altezza della scheda" onClick={() => setDetent(detent === 'half' ? 'large' : 'half')} style={{ padding: '0 40px', height: 16, display: 'flex', justifyContent: 'center' }}><span /></button></div>
         <div className="venue-sheet__head">
           <div className="venue-sheet__head-text">
@@ -113,7 +118,7 @@ export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'sco
             <button className="circle-button pressable" aria-label="Chiudi" onClick={() => close()}><Icon name="UI/Close" size={22} /></button>
           </div>
         </div>
-        <div className="venue-sheet__body" data-scroll ref={body}>
+        <motion.div className="venue-sheet__body" data-scroll ref={body} style={{ paddingBottom: bodyPad }}>
           <Img name={a.photo} className="venue-sheet__photo" style={{ width: '100%', height: 150, borderRadius: 20, visibility: fly ? 'hidden' : undefined }} />
           <div className="price-line">
             <span className="t-title-3">{euro(a.price)}{a.people ? ' il campo' : ''}</span>
@@ -140,9 +145,9 @@ export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'sco
               <span className="t-body">{v.documents === 'certificate' ? 'Serve il certificato medico' : 'Modulo da firmare al primo ingresso'}</span></div>
           )}
           <div className="info-block"><span className="info-label t-footnote-emphasized">Disdetta</span><span className="t-body">Gratis fino a 2 ore prima</span></div>
-        </div>
+        </motion.div>
       </DetentSheet>
-      <motion.div className="bottom-bar" initial={{ y: 120 }} animate={{ y: closing ? 120 : 0 }} transition={{ type: 'spring', visualDuration: 0.4, bounce: 0 }}>
+      <motion.div className="bottom-bar" ref={(n) => { if (n && Math.abs(n.offsetHeight - barH) > 1) setBarH(n.offsetHeight); }} initial={{ y: 120 }} animate={{ y: closing ? 120 : 0 }} transition={{ type: 'spring', visualDuration: 0.4, bounce: 0 }}>
         <Button kind="secondary" icon={<Icon name="Map/Directions" size={20} />}
           onPress={() => window.open(`https://maps.apple.com/?q=${encodeURIComponent(`${v.name}, ${v.street}, ${v.city}`)}`, '_blank')}>Indicazioni</Button>
         <Button fill disabled={!time} onPress={() => time && onBook(day, time)}>{time ? `Prenota alle ${time}` : 'Scegli un orario'}</Button>
