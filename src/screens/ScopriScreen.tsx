@@ -40,7 +40,7 @@ export function ScopriScreen() {
   const [panel, setPanel] = useState(false);
   const [search, setSearch] = useState(false);
   const nFilters = countFilters(filters);
-  // Q55: dal tab (o da un link senza motivo) Scopri parte con la lista nascosta e "Mostra la lista · N".
+  // Q55: dal tab (o da un link senza motivo) Scopri parte con la lista nascosta e "Mostra la lista · N" (Q86: la capsula apre a media altezza).
   // Con un motivo (sport dalla Home, buono attivo, "Vedi tutte", "Trova un'attività") apre a media altezza.
   // Tornando dalla scheda o dalla conferma la lista resta com'era.
   const { state: navState } = useLocation();
@@ -158,7 +158,7 @@ export function ScopriScreen() {
       </AnimatePresence>
       <AnimatePresence>
         {detent === 'hidden' && !activityId && (
-          <motion.button className="show-list glass-control" onClick={() => setDetent('small')}
+          <motion.button className="show-list glass-control" onClick={() => setDetent('medium') /* Q86: apre a media altezza, con le prime righe */}
             initial={{ opacity: 0, y: 12, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: 12, x: '-50%' }}
             transition={{ type: 'spring', visualDuration: 0.35, bounce: 0.15 }}>
             <Icon name="UI/Chevron-Down" size={18} style={{ transform: 'rotate(180deg)' }} />

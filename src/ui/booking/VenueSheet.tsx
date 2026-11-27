@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { peekZoom, type ZoomSource } from './zoom';
 import { motion } from 'motion/react';
 import { activity, days, euro, fmtPoints, services, venueOf } from '../../data/data';
@@ -30,6 +30,9 @@ export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'sco
   const fav = useAppState().favorites.includes(activityId);
   const setFav = () => store.toggleFavorite(activityId);
   const sheet = useRef<DetentSheetHandle>(null);
+  const body = useRef<HTMLDivElement>(null);
+  // Q87: tornando a mezza altezza il contenuto torna in cima (lì non scorre)
+  useEffect(() => { if (detent === 'half') body.current?.scrollTo({ top: 0, behavior: 'smooth' }); }, [detent]);
   const [closing, setClosing] = useState(false);
   // Q65: foto che vola dalla card alla scheda (e indietro alla chiusura, se la card è ancora sotto)
   type R = { x: number; y: number; w: number; h: number; r: number };
@@ -110,7 +113,7 @@ export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'sco
             <button className="circle-button pressable" aria-label="Chiudi" onClick={() => close()}><Icon name="UI/Close" size={22} /></button>
           </div>
         </div>
-        <div className="venue-sheet__body" data-scroll>
+        <div className="venue-sheet__body" data-scroll ref={body}>
           <Img name={a.photo} className="venue-sheet__photo" style={{ width: '100%', height: 150, borderRadius: 20, visibility: fly ? 'hidden' : undefined }} />
           <div className="price-line">
             <span className="t-title-3">{euro(a.price)}{a.people ? ' il campo' : ''}</span>
