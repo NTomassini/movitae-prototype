@@ -108,7 +108,7 @@ export function ChatInput({ onSend, disabled, className = '' }: { onSend: (t: st
   const send = () => { if (!can) return; onSend(v.trim()); setV(''); };
   return (
     <form className={`movi-input ${className}`} style={kb ? { bottom: kb + 8 } : undefined} onSubmit={(e) => { e.preventDefault(); send(); }}>
-      <input className="t-body" value={v} onChange={(e) => setV(e.target.value)} placeholder="Chiedi a Movi" aria-label="Chiedi a Movi" enterKeyHint="send" autoComplete="off" />
+      <input className="t-body" value={v} onChange={(e) => setV(e.target.value)} maxLength={200} placeholder="Chiedi a Movi" aria-label="Chiedi a Movi" enterKeyHint="send" autoComplete="off" />
       <button type="submit" className={`movi-send${can ? ' is-on' : ''}`} disabled={!can} aria-label="Invia">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 15V3.75M13.875 8.625L9 3.75L4.125 8.625" stroke="currentColor" strokeWidth="1.95" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>

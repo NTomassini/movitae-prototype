@@ -98,7 +98,7 @@ export function ActionsCard({ mapsQuery, event }: { mapsQuery: string; event?: C
         {!done && <Icon name="UI/Chevron-Right" size={18} className="chevron" />}
       </button>
       <div className="sep" />
-      <a className="pressable" href={`https://maps.apple.com/?q=${encodeURIComponent(mapsQuery)}`} target="_blank" rel="noreferrer">
+      <a className="pressable" href={`https://maps.apple.com/?q=${encodeURIComponent(mapsQuery)}`} target="_blank" rel="noopener noreferrer">
         <Icon name="Map/Directions" size={24} />
         <span className="t-body" style={{ flex: 1 }}>Indicazioni</span>
         <Icon name="UI/Chevron-Right" size={18} className="chevron" />

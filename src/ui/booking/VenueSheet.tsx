@@ -149,7 +149,7 @@ export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'sco
       </DetentSheet>
       <motion.div className="bottom-bar" ref={(n) => { if (n && Math.abs(n.offsetHeight - barH) > 1) setBarH(n.offsetHeight); }} initial={{ y: 120 }} animate={{ y: closing ? 120 : 0 }} transition={{ type: 'spring', visualDuration: 0.4, bounce: 0 }}>
         <Button kind="secondary" icon={<Icon name="Map/Directions" size={20} />}
-          onPress={() => window.open(`https://maps.apple.com/?q=${encodeURIComponent(`${v.name}, ${v.street}, ${v.city}`)}`, '_blank')}>Indicazioni</Button>
+          onPress={() => window.open(`https://maps.apple.com/?q=${encodeURIComponent(`${v.name}, ${v.street}, ${v.city}`)}`, '_blank', 'noopener,noreferrer')}>Indicazioni</Button>
         <Button fill disabled={!time} onPress={() => time && onBook(day, time)}>{time ? `Prenota alle ${time}` : 'Scegli un orario'}</Button>
       </motion.div>
     </>

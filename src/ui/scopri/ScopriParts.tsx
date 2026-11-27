@@ -64,6 +64,10 @@ export function pinElement(kind: 'sport' | 'group' | 'selected', opts: { icon?: 
   el.className = `map-pin map-pin--${kind}`;
   if (kind === 'sport') el.innerHTML = svg(opts.icon!, 20);
   if (kind === 'group') el.textContent = String(opts.count);
-  if (kind === 'selected') el.innerHTML = `${svg(opts.icon!, 20)}<span class="t-subheadline-emphasized">${opts.label}</span>`;
+  if (kind === 'selected') {
+    // il nome va come testo, mai come HTML
+    el.innerHTML = svg(opts.icon!, 20);
+    const t = document.createElement('span'); t.className = 't-subheadline-emphasized'; t.textContent = opts.label ?? ''; el.appendChild(t);
+  }
   return el;
 }

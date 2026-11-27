@@ -53,7 +53,7 @@ export function OnboardingScreen() {
   const navigate = useNav();
   useScreenChrome({ tabBar: false, bottomEdge: false, pageScroll: false });
   const [draft, setDraftState] = useState<Draft>(loadDraft);
-  const setDraft = (p: Partial<Draft>) => setDraftState((d) => { const n = { ...d, ...p }; try { sessionStorage.setItem(KEY, JSON.stringify(n)); } catch { /* ignora */ } return n; });
+  const setDraft = (p: Partial<Draft>) => setDraftState((d) => { const n = { ...d, ...p }; try { const { email: _e, ...keep } = n; void _e; sessionStorage.setItem(KEY, JSON.stringify(keep)); } catch { /* ignora */ } /* sicurezza: l'email resta solo in memoria, mai salvata */ return n; });
 
   // ogni volta che si riparte dall'intro, le scelte si azzerano
   useEffect(() => { if (s === 'intro') { try { sessionStorage.removeItem(KEY); } catch { /* ignora */ } setDraftState(fresh()); } }, [s]);
@@ -235,7 +235,7 @@ function EmailStep({ value, onNext }: { value: string; onNext: (v: string) => vo
     <form className="onb-form" onSubmit={(e) => { e.preventDefault(); if (ok) onNext(v.trim()); }}>
       <Head title="Qual è la tua email?" text="Ti mandiamo un codice per entrare: niente password da ricordare." />
       <Field label="Email">
-        <input ref={focusRef} className="onb-input t-body" type="email" inputMode="email" autoComplete="email" value={v} onChange={(e) => setV(e.target.value)} placeholder="nome@esempio.it" />
+        <input ref={focusRef} className="onb-input t-body" type="email" inputMode="email" autoComplete="email" maxLength={80} value={v} onChange={(e) => setV(e.target.value)} placeholder="nome@esempio.it" />
       </Field>
       <Primary onPress={() => ok && onNext(v.trim())} disabled={!ok}>Continua</Primary>
     </form>
@@ -270,7 +270,7 @@ function NameStep({ value, onNext }: { value: string; onNext: (v: string) => voi
     <form className="onb-form" onSubmit={(e) => { e.preventDefault(); if (ok) onNext(v.trim()); }}>
       <Head title="Come ti chiami?" text="Lo usiamo per salutarti e sui biglietti delle prenotazioni." />
       <Field label="Nome">
-        <input className="onb-input t-body" autoComplete="given-name" autoCapitalize="words" ref={focusRef} value={v} onChange={(e) => setV(e.target.value)} />
+        <input className="onb-input t-body" autoComplete="given-name" autoCapitalize="words" maxLength={30} ref={focusRef} value={v} onChange={(e) => setV(e.target.value)} />
       </Field>
       <Primary onPress={() => ok && onNext(v.trim())} disabled={!ok}>Continua</Primary>
     </form>

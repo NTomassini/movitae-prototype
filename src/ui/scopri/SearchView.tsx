@@ -50,7 +50,7 @@ export function SearchView({ onClose, onPick, onAskMovi }: { onClose: () => void
       <form className="search-bar" onSubmit={(e) => { e.preventDefault(); const first = sportHits[0] ? { kind: 'sport' as const, sport: sportHits[0].sport, label: sportHits[0].label } : venueHits[0] ? { kind: 'venue' as const, id: venueHits[0].id, label: venueHits[0].name } : actHits[0] ? { kind: 'activity' as const, id: actHits[0].id, label: actHits[0].title } : null; if (first) pick(first); }}>
         <label className="search-input">
           <Icon name="UI/Search-Field" size={20} />
-          <input ref={input} className="t-body" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cerca sport o struttura" enterKeyHint="search" aria-label="Cerca sport o struttura" />
+          <input ref={input} className="t-body" value={q} onChange={(e) => setQ(e.target.value)} maxLength={200} placeholder="Cerca sport o struttura" enterKeyHint="search" aria-label="Cerca sport o struttura" />
           {q && <button type="button" aria-label="Cancella" onClick={() => setQ('')} className="search-clear"><Icon name="UI/Close" size={16} /></button>}
         </label>
         <button type="button" className="t-body" onClick={onClose}>Annulla</button>

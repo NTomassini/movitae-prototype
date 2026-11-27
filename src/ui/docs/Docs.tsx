@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ScreenOverlay } from '../../app/ScreenOverlay';
 import { venues } from '../../data/data';
@@ -124,9 +124,16 @@ export function UploadMenu({ anchor, onPick, onClose }: { anchor: HTMLElement | 
     const top = Math.min(a.bottom - h.top + 8, h.height - 146 - 120);
     setPos({ left: Math.max(16, a.left - h.left), top });
   }, [anchor]);
+  // Sicurezza (27 nov): il file scelto resta sul telefono. Il prototipo lo mostra solo come anteprima (URL locale
+  // blob:, liberato quando lo sheet si chiude), non lo carica da nessuna parte e non lo salva: dopo "Salva" restano
+  // solo tipo e date. Accettati solo immagini e PDF fino a 15 MB; il campo si svuota dopo ogni scelta.
   const fromInput = (el: HTMLInputElement | null) => {
-    const f = el?.files?.[0]; if (!f) return;
-    onPick({ kind: 'file', url: URL.createObjectURL(f), name: f.name });
+    const f = el?.files?.[0];
+    if (el) el.value = '';
+    if (!f) return;
+    const ok = (f.type.startsWith('image/') || f.type === 'application/pdf') && f.size <= 15 * 1024 * 1024;
+    if (!ok) return;
+    onPick({ kind: 'file', url: URL.createObjectURL(f), name: f.name.slice(0, 80) });
   };
   return (
     <ScreenOverlay>
@@ -181,6 +188,8 @@ export function CertificateSheet({ picked, initial, onCancel, onSaved }: { picke
 export function useUpload() {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [picked, setPicked] = useState<Picked | null>(null);
+  // l'anteprima locale del file si libera appena lo sheet del certificato si chiude
+  useEffect(() => () => { if (picked?.kind === 'file') URL.revokeObjectURL(picked.url); }, [picked]);
   const ui = (
     <>
       {anchor && <UploadMenu anchor={anchor} onClose={() => setAnchor(null)} onPick={(p) => { setAnchor(null); setTimeout(() => setPicked(p), 150); }} />}
