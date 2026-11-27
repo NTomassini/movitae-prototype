@@ -24,7 +24,7 @@
 .chips::after { content: ''; flex: 0 0 8px; }
 .chip { flex: none; min-height: 44px; padding: 12px 16px; border-radius: 999px; background: var(--bg-surface); box-shadow: inset 0 0 0 1px var(--border-control); color: var(--text-primary); display: inline-flex; align-items: center; transition: background-color var(--motion-ease-fade), color var(--motion-ease-fade); }
 .chip:active:not(:disabled) { transform: scale(0.96); }
-.chip { transition: background-color var(--motion-ease-fade), color var(--motion-ease-fade), transform var(--motion-ease-press) ease-out; }
+.chip { transition: background-color var(--motion-ease-fade), color var(--motion-ease-fade), transform var(--press-release); }
 .chip.is-selected { background: var(--brand-default); color: var(--brand-on); box-shadow: none; }
 .chip:disabled { background: var(--fill-tertiary); box-shadow: none; color: var(--text-disabled); text-decoration: line-through; cursor: default; }
 .times { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 0; }
@@ -32,7 +32,7 @@
 
 /* BottomBar kind=venue — padding 12/16/34, gap 12, bg/surface, ombra bottom-bar */
 .bottom-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 18; display: flex; gap: 12px; padding: 12px 16px calc(var(--safe-bottom-live) + 0px); background: var(--bg-surface); box-shadow: var(--effect-shadow-bottom-bar); }
-.button { height: 50px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; transition: transform var(--motion-ease-press) ease-out, background-color var(--motion-ease-fade); }
+.button { height: 50px; padding: 0 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; transition: transform var(--press-release), background-color var(--motion-ease-fade); }
 .button:active:not(:disabled) { transform: scale(0.97); }
 .button--primary { background: var(--brand-default); color: var(--brand-on); }
 .button--secondary { background: var(--fill-tertiary); color: var(--text-primary); }
@@ -57,6 +57,11 @@
 .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1); }
 .toggle[data-checked='true'] { background: var(--earn-default); }
 .toggle[data-checked='true']::after { transform: translateX(20px); }
+/* Q68: mentre il dito è sopra, la manopola si allunga verso il centro (come l'interruttore di iOS) */
+.toggle::after { transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1), width var(--press-release); }
+.toggle:has(.toggle__input:active)::after { width: 33px; transition-duration: 0.3s, 0.12s; }
+.toggle[data-checked='true']:has(.toggle__input:active)::after { transform: translateX(14px); }
+@media (prefers-reduced-motion: reduce) { .toggle:has(.toggle__input:active)::after { width: 27px; } }
 .toggle__input { position: absolute; inset: -7px -2px; width: calc(100% + 4px); height: calc(100% + 14px); margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
 .toggle:has(.toggle__input:focus-visible) { outline: 2px solid var(--brand-accent); outline-offset: 2px; }
 .price-card { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -68,7 +73,7 @@
 .checkout-bar__total { display: flex; flex-direction: column; gap: 2px; }
 .pay-method { height: 36px; padding: 0 12px 0 16px; border-radius: 999px; background: var(--bg-surface); box-shadow: inset 0 0 0 1px var(--border-control); display: inline-flex; align-items: center; gap: 8px; }
 /* Pulsante Apple Pay (in un'app vera: PKPaymentButton di sistema) */
-.apple-pay { height: 56px; border-radius: 999px; background: var(--applepay-bg); color: var(--applepay-label); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 17px; line-height: 24px; font-weight: 600; transition: transform var(--motion-ease-press) ease-out, opacity 0.2s; }
+.apple-pay { height: 56px; border-radius: 999px; background: var(--applepay-bg); color: var(--applepay-label); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 17px; line-height: 24px; font-weight: 600; transition: transform var(--press-release), opacity 0.2s; }
 .apple-pay:active { transform: scale(0.98); }
 .apple-pay[aria-busy='true'] { opacity: 0.7; }
 
@@ -99,3 +104,13 @@
 .soldout__times { display: flex; gap: 8px; padding: 12px 16px 16px; }
 .checkout-bar__pick { height: 56px; align-self: flex-start; }
 .soldout__times .chip { min-height: 44px; padding: 10px 16px; }
+
+/* Q63: interruttore trasparente sopra i pulsanti che vibrano (vedi HapticLayer) */
+.chip, .apple-pay, .filter-sport, .onb-sport, .segmented > button { position: relative; }
+.haptic-layer { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; cursor: pointer; z-index: 2; border-radius: inherit; }
+/* il dito tocca l'interruttore: la pressione si vede comunque sul pulsante */
+.chip:has(> .haptic-layer:active):not(:disabled) { transform: scale(0.96); transition-duration: 0s; }
+.filter-sport:has(> .haptic-layer:active), .onb-sport:has(> .haptic-layer:active), .circle-button:has(> .haptic-layer:active) { transform: scale(0.97); transition-duration: 0s; }
+.apple-pay:has(> .haptic-layer:active) { transform: scale(0.98); transition-duration: 0s; }
+/* Q65: foto che vola tra la card e la scheda, sopra lo sheet */
+.zoom-photo { position: absolute; left: 0; top: 0; z-index: 30; object-fit: cover; pointer-events: none; will-change: transform; }

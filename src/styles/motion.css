@@ -1,0 +1,35 @@
+/*
+ * Movimento comune (Q61, 27 nov). Curve delle molle in CSS con linear(), calcolate dalla formula della molla
+ * (risposta e rimbalzo come in SwiftUI e Motion): niente JavaScript per le pressioni.
+ * - --press-release: rilascio di una pressione, molla 0,3 s con rimbalzo 0,15 (dura circa 0,48 s).
+ * - --spring-smooth: molla 0,35 s senza rimbalzo, per i cambi di stato.
+ * La pressione arriva subito (durata 0 mentre il dito è giù), il rilascio torna con la molla.
+ */
+:root {
+  --ease-spring-release: linear(0, 0.069, 0.218, 0.388, 0.547, 0.681, 0.786, 0.864, 0.919, 0.956, 0.98, 0.994, 1.002, 1.005, 1.006, 1.006, 1.005, 1.004, 1.003, 1.002, 1.001, 1.001, 1.001, 1, 1);
+  --ease-spring-smooth: linear(0, 0.067, 0.205, 0.358, 0.499, 0.619, 0.715, 0.79, 0.848, 0.89, 0.921, 0.944, 0.96, 0.972, 0.981, 0.986, 0.991, 0.993, 0.995, 0.997, 0.998, 0.999, 0.999, 0.999, 1);
+  --press-release: 0.48s var(--ease-spring-release);
+  --spring-smooth: 0.56s var(--ease-spring-smooth);
+}
+
+/* Pressione immediata: mentre il dito è giù nessuna transizione */
+:where(.pressable, .button, .chip, .apple-pay, .tabbar-tab, .map-pin, .onb-sso, .system-alert__actions button,
+  .movi-send, .circle-button, .glass-control, .select-card, .sport-card):active { transition-duration: 0s; }
+
+/* Vetro (Liquid Glass): sotto il dito si gonfia e si illumina, invece di rimpicciolirsi */
+.glass-control { position: relative; transition: scale var(--press-release); }
+.glass-control::before { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(120% 120% at 50% 30%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 70%);
+  opacity: 0; transition: opacity 0.3s ease-out; }
+.glass-control:active { scale: 1.06; }
+.glass-control:active::before { opacity: 1; transition-duration: 0s; }
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.pressable, .button, .chip, .apple-pay, .tabbar-tab, .map-pin, .onb-sso, .movi-send, .circle-button):active { transform: none !important; opacity: 0.7; }
+  .glass-control:active { scale: none; }
+}
+
+/* Q66: numeri che scorrono */
+.rolling-number { display: inline-flex; white-space: pre; }
+.rolling-number__slot { display: inline-flex; position: relative; overflow: clip; } /* clip, non hidden: hidden sposterebbe la linea di base */
+.rolling-number__char { display: inline-block; }

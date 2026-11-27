@@ -50,7 +50,9 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
 
   useEffect(() => {
     if (!h) return;
-    if (y.get() === 10000) y.set(h); // entra dal basso
+    // entra dal basso. jump e non set: set darebbe al valore la velocità del salto 10000 → h e la molla partirebbe
+    // con quella velocità (lo sheet volava fuori dallo schermo per un istante aprendo la scheda dalla lista)
+    if (y.get() === 10000) y.jump(h);
     animate(y, tops(h)[detent], reduce() ? { duration: 0 } : SPRING);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detent, h]);
@@ -102,8 +104,11 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
       g.t = now; g.last = clientY;
       const { min, max } = bounds();
       let next = g.sheetY0 + (clientY - g.y0);
-      if (next < min) next = min - (min - next) * 0.25;
-      if (next > max && !state.current.onDismiss) next = max + (next - max) * 0.25;
+      // Q68: resistenza progressiva oltre il bordo (formula di Apple: più tiri, meno segue)
+      const H = state.current.h || 800;
+      const band = (over: number) => (over * H * 0.55) / (H + 0.55 * over);
+      if (next < min) next = min - band(min - next);
+      if (next > max && !state.current.onDismiss) next = max + band(next - max);
       y.set(next);
       return true;
     };

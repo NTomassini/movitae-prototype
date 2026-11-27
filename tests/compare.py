@@ -29,9 +29,13 @@ def go_riepilogo(pg):
     pg.evaluate("document.querySelector('.venue-sheet__body').scrollTop=400"); pg.wait_for_timeout(200)
     pg.get_by_role('button', name='18:30', exact=True).evaluate('el => el.click()')
     pg.locator('.bottom-bar .button--primary').click(); pg.wait_for_timeout(900)
+def pay(pg):
+    # Q64: Apple Pay apre il foglio simulato; un tocco su "Conferma con il tasto laterale" simula il doppio clic
+    pg.locator('.apple-pay').click(); pg.wait_for_timeout(700)
+    pg.locator('.applepay-confirm').click(); pg.wait_for_timeout(2900)
 def go_conferma(pg):
     go_riepilogo(pg)
-    pg.locator('.apple-pay').click(); pg.wait_for_timeout(1600)
+    pay(pg)
 
 def reset(pg):
     pg.goto(f'{URL}/'); pg.evaluate("localStorage.clear()")
@@ -87,7 +91,7 @@ def go_movi_1_orario(pg):
     movi(pg); ask(pg); pg.add_style_tag(content=FLAT); pg.locator('.movi-card .chip').first.evaluate('el => el.click()'); pg.wait_for_timeout(120); return True
 def go_movi_4_ritorno(pg):
     movi(pg); ask(pg); pg.locator('.movi-card .chip').first.evaluate('el => el.click()'); pg.wait_for_timeout(900)
-    pg.locator('.apple-pay').click(); pg.wait_for_timeout(1500); pg.get_by_role('button', name='Fatto').click(); pg.wait_for_timeout(1200)
+    pay(pg); pg.get_by_role('button', name='Fatto').click(); pg.wait_for_timeout(1200)
 def go_movi_5_mappa(pg): movi(pg); ask(pg); pg.locator('.movi-pill', has_text='Vedi sulla mappa').evaluate('el => el.click()'); pg.wait_for_timeout(1200)
 def go_movi_6_scheda(pg): movi(pg); ask(pg); pg.locator('.movi-card__top').first.evaluate('el => el.click()'); pg.wait_for_timeout(1100)
 def go_movi_7_riepilogo(pg):

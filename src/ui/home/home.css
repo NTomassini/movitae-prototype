@@ -1,7 +1,7 @@
 /* Componenti della Home. Misure da DS · Schermate › "home — chiaro" (1461:439). */
 
 /* Pressione: scala 0,97 con ease/press (comportamenti §15). */
-.pressable { transition: transform var(--motion-ease-press) ease-out; -webkit-user-select: none; user-select: none; }
+.pressable { transition: transform var(--press-release); -webkit-user-select: none; user-select: none; }
 .pressable:active { transform: scale(0.97); }
 
 /* Avatar 44 — fill/tertiary, iniziale 17 Semi Bold */

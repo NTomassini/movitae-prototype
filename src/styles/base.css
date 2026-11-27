@@ -4,6 +4,7 @@
 @import './tokens.light.css';
 @import './tokens.dark.css';
 @import './typography.css';
+@import './motion.css';
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) { color-scheme: dark; }

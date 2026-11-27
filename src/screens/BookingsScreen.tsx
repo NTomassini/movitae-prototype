@@ -1,3 +1,4 @@
+import { HapticLayer } from '../ui/booking/BookingParts';
 import { TLink } from '../app/TLink';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -23,7 +24,7 @@ export function SegmentedControl<T extends string>({ value, options, onChange, l
     <div className="segmented" role="tablist" aria-label={label}>
       <span className="segmented__thumb" style={{ width: `calc((100% - 8px) / ${options.length})`, transform: `translateX(${i * 100}%)` }} />
       {options.map((o) => (
-        <button key={o.v} role="tab" aria-selected={o.v === value} className="t-subheadline-emphasized" onClick={() => onChange(o.v)}>{o.l}</button>
+        <button key={o.v} role="tab" aria-selected={o.v === value} className="t-subheadline-emphasized" onClick={() => onChange(o.v)}>{o.l}<HapticLayer /></button>
       ))}
     </div>
   );

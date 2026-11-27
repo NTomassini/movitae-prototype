@@ -1,4 +1,5 @@
-import { type ReactNode } from 'react';
+import { useEffect, useId, type ReactNode } from 'react';
+import { setPushBack } from './pushback';
 import { animate, motion, useMotionValue } from 'motion/react';
 import { ScreenOverlay } from '../app/ScreenOverlay';
 import './modal-sheet.css';
@@ -13,6 +14,12 @@ export function PageSheet({ title, onCancel, done, onDone, doneDisabled, childre
 }) {
   // come gli altri sheet: si chiude trascinando giù dalla maniglia o dall'intestazione (oltre 120 pt o con un lancio)
   const y = useMotionValue(1000); // in pt: 1000 = fuori dallo schermo (numeri, così trascinamento e uscita non mescolano unità)
+  // Q67: la pagina sotto arretra seguendo lo sheet
+  const pid = useId();
+  useEffect(() => {
+    const unsub = y.on('change', (v) => setPushBack(pid, 1 - Math.max(0, v) / 800));
+    return () => { unsub(); setPushBack(pid, 0); };
+  }, [y, pid]);
   const onDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('button')) return;
     const el = e.currentTarget as HTMLElement; el.setPointerCapture(e.pointerId);

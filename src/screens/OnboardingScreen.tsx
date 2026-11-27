@@ -1,3 +1,4 @@
+import { HapticLayer } from '../ui/booking/BookingParts';
 import { useEffect, useRef, useState } from 'react';
 
 /** Focus dopo l'entrata della schermata e senza far scorrere la cornice (autoFocus durante il push la spostava). */
@@ -290,6 +291,7 @@ function SportStep({ value, onChange, onNext }: { value: string[]; onChange: (v:
               <Img name={s.image} style={{ width: 56, height: 56 }} />
               <span className={on ? 't-subheadline-emphasized' : 't-subheadline-emphasized'}>{s.label}</span>
               {on && <span className="onb-sport__check"><Icon name="UI/Check" size={14} /></span>}
+              <HapticLayer />
             </button>
           );
         })}

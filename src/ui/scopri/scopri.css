@@ -26,7 +26,7 @@
 .scopri-map .maplibregl-ctrl-bottom-right { bottom: auto; top: calc(var(--device-top) + 64px); }
 
 /* MapPin */
-.map-pin { display: inline-flex; align-items: center; justify-content: center; gap: 4px; border-radius: 999px; background: var(--bg-surface); color: var(--brand-accent); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16); cursor: pointer; border: 0; transition: transform var(--motion-ease-press) ease-out; }
+.map-pin { display: inline-flex; align-items: center; justify-content: center; gap: 4px; border-radius: 999px; background: var(--bg-surface); color: var(--brand-accent); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16); cursor: pointer; border: 0; transition: transform var(--press-release); }
 .map-pin:active { transform: scale(0.94); }
 .map-pin--sport { width: 36px; height: 36px; }
 .map-pin--group { width: 40px; height: 40px; border: 2px solid var(--brand-accent); color: var(--text-primary); font-weight: 700; font-size: 15px; line-height: 20px; }
@@ -79,3 +79,14 @@
 .skeleton-row span i:nth-child(2) { width: 120px; } .skeleton-row span i:nth-child(3) { width: 80px; }
 @keyframes movi-pulse { 50% { opacity: 0.55; } }
 @media (prefers-reduced-motion: reduce) { .skeleton-row { animation: none; } }
+/* Q68–Q69: pin che si trasforma, compare e svanisce (sul pin; la posizione è del marker che lo contiene) */
+.map-pin.is-morph { animation: pin-morph 0.45s var(--ease-spring-release) both; }
+.map-pin.is-entering { animation: pin-enter 0.35s var(--ease-spring-release) both; }
+.map-pin.is-leaving { animation: pin-leave 0.2s ease-in both; pointer-events: none; }
+@keyframes pin-morph { from { transform: scale(0.7); opacity: 0.4; } }
+@keyframes pin-enter { from { transform: scale(0.4); opacity: 0; } }
+@keyframes pin-leave { to { transform: scale(0.5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .map-pin.is-morph, .map-pin.is-entering { animation: pin-fade 0.2s ease both; }
+  @keyframes pin-fade { from { opacity: 0; } }
+}

@@ -1,3 +1,4 @@
+import { RollingNumber } from '../RollingNumber';
 import { TLink } from '../../app/TLink';
 import { Icon } from '../Icon';
 import { Img } from '../Img';
@@ -62,11 +63,11 @@ export function StatTile(p: StatTileProps) {
       <span className="t-footnote-emphasized stat-tile__label">{p.kind === 'points' ? 'I tuoi punti' : 'Hai risparmiato'}</span>
       {p.kind === 'points' ? (
         <>
-          <span style={{ lineHeight: '34px', height: 34 }}><span className="t-number-large" style={{ lineHeight: 'inherit' }}>{fmtPoints(p.points)}</span><span className="t-headline" style={{ lineHeight: 'inherit', letterSpacing: '-0.02em' }}> pt</span></span>
+          <span style={{ lineHeight: '34px', height: 34 }}><span className="t-number-large" style={{ lineHeight: 'inherit' }}><RollingNumber id="points" value={p.points} format={fmtPoints} /></span><span className="t-headline" style={{ lineHeight: 'inherit', letterSpacing: '-0.02em' }}> pt</span></span>
           <span className="stat-tile__progress"><span style={{ width: `${Math.min(p.points / p.nextVoucher, 1) * 100}%` }} /></span>
         </>
       ) : (
-        <span className="t-number-large" style={{ color: 'var(--earn-default)' }}>€{p.amount}</span>
+        <span className="t-number-large" style={{ color: 'var(--earn-default)' }}><RollingNumber id="saved" value={p.amount} format={(n) => `€${n}`} /></span>
       )}
       <span className="t-footnote stat-tile__label" style={{ fontWeight: 400 }}>{p.note}</span>
     </TLink>

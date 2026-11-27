@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { RollingNumber } from '../RollingNumber';
+import { useEffect, useId, useState } from 'react';
+import { setPushBack } from '../pushback';
 import { AnimatePresence, motion } from 'motion/react';
 import { DocCard, FormSheet, useUpload } from '../docs/Docs';
 import { VOUCHER, activity, days, endTime, euro, euroCents, fmtPoints, user, venueOf } from '../../data/data';
 import { Icon } from '../Icon';
 import { balance, store, useBookings, useDemo } from '../../state/bookings';
 import { Img } from '../Img';
-import { ActivityBlock, AppleLogo, Chip, Toggle } from './BookingParts';
+import { ApplePaySheet } from './ApplePaySheet';
+import { ActivityBlock, AppleLogo, Chip, HapticLayer, Toggle } from './BookingParts';
 import '../modal-sheet.css';
 import '../page-header.css';
 
@@ -37,6 +40,9 @@ export function CheckoutSheet({ activityId, dayId, time: chosen, onCancel, onPai
   const [failed, setFailed] = useState(false);
   const total = a.price - (voucher ? VOUCHER.value : 0);
   const points = total * 10;
+  // Q67: la pagina sotto (scheda, chat) arretra mentre il riepilogo è aperto
+  const pid = useId();
+  useEffect(() => () => setPushBack(pid, 0), [pid]);
   const label = a.people ? `Campo da ${a.people}` : a.duration === 'ingresso singolo' || a.sport === 'nuoto' ? 'Ingresso' : 'Lezione';
 
   // documenti richiesti dalla struttura (handoff › Documenti): modulo da firmare o certificato
@@ -45,13 +51,8 @@ export function CheckoutSheet({ activityId, dayId, time: chosen, onCancel, onPai
   const needsForm = v.documents === 'form' && !store.get().docs.forms[v.id];
   const pay = () => {
     if (needsForm) { setFormOpen(true); return; } // Apple Pay resta attivo: senza firma apre prima il modulo
-    setPaying(true);
     setFailed(false);
-    setTimeout(() => {
-      setPaying(false);
-      if (demo.payment === 'fail') setFailed(true); // errori/3: il messaggio prende il posto del totale
-      else onPaid({ voucher, paid: total, points, time });
-    }, 900);
+    setPaying(true); // Q64: sale il foglio di Apple Pay
   };
 
   return (
@@ -59,7 +60,8 @@ export function CheckoutSheet({ activityId, dayId, time: chosen, onCancel, onPai
       <motion.div className="scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onCancel} />
       <motion.div className="checkout" role="dialog" aria-modal="true" aria-label="Riepilogo"
         style={{ top: 'calc(var(--device-top) + 2px)' }}
-        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', visualDuration: 0.5, bounce: 0 }}>
+        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', visualDuration: 0.5, bounce: 0 }}
+        onUpdate={(l) => setPushBack(pid, 1 - (typeof l.y === 'string' ? parseFloat(l.y) / 100 : Number(l.y) / 800))}>
         {back ? (
           <div className="checkout__head checkout__head--back">
             <span />
@@ -104,8 +106,8 @@ export function CheckoutSheet({ activityId, dayId, time: chosen, onCancel, onPai
             <div className="price-card__row"><span className="t-body secondary">{label}</span><span className="t-headline">{euro(a.price)}</span></div>
             {voucher && <div className="price-card__row"><span className="t-body secondary">Buono</span><span className="t-headline" style={{ color: 'var(--earn-default)' }}>−{euro(VOUCHER.value)}</span></div>}
             <div className="price-card__rule" />
-            <div className="price-card__row"><span className="t-title-3">Totale</span><span className="t-title-2">{euro(total)}</span></div>
-            <span className="points-pill t-footnote-emphasized">+{fmtPoints(points)} pt in arrivo dopo il check-in</span>
+            <div className="price-card__row"><span className="t-title-3">Totale</span><span className="t-title-2"><RollingNumber id="checkout-total" remember={false} value={total} format={euro} /></span></div>
+            <span className="points-pill t-footnote-emphasized">+<RollingNumber id="checkout-points" remember={false} value={points} format={fmtPoints} /> pt in arrivo dopo il check-in</span>
           </div>
           <p className="t-footnote secondary">Puoi disdire gratis fino a 2 ore prima: ti rimborsiamo sul metodo di pagamento.</p>
         </div>
@@ -134,9 +136,17 @@ export function CheckoutSheet({ activityId, dayId, time: chosen, onCancel, onPai
           {soldOut ? <button className="button t-headline checkout-bar__pick" disabled>Scegli un orario</button> :
           <button className="apple-pay" onClick={pay} aria-busy={paying} aria-label={`Paga ${euroCents(total)} con Apple Pay`} disabled={paying}>
             <AppleLogo /><span>Pay</span>
+            <HapticLayer off={paying} />
           </button>}
         </div>
       </motion.div>
+      <AnimatePresence>
+        {paying && (
+          <ApplePaySheet key="ap" total={total} fail={demo.payment === 'fail'} onCancel={() => setPaying(false)}
+            onFail={() => { setPaying(false); setFailed(true); }} // errori/3: il messaggio prende il posto del totale
+            onSuccess={() => onPaid({ voucher, paid: total, points, time })} />
+        )}
+      </AnimatePresence>
       <AnimatePresence>{formOpen && <FormSheet key="form" venueId={v.id} onClose={() => setFormOpen(false)} />}</AnimatePresence>
       {upload.ui}
     </>

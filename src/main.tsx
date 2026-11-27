@@ -5,8 +5,10 @@ import './styles/base.css';
 import './app/shell.css';
 import { App } from './app/App';
 import { installViewportFix } from './app/viewport';
+import { installZoomSources } from './ui/booking/zoom';
 
 installViewportFix();
+installZoomSources();
 
 // Tema: segue iOS (Aspetto chiaro/scuro). ?theme=dark|light lo forza, utile per i confronti con Figma.
 const forced = new URLSearchParams(location.search).get('theme');

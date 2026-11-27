@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { peekZoom, type ZoomSource } from './zoom';
 import { motion } from 'motion/react';
 import { activity, days, euro, fmtPoints, services, venueOf } from '../../data/data';
 import { DetentSheet, type DetentSheetHandle } from '../DetentSheet';
 import { Icon } from '../Icon';
 import { Img } from '../Img';
-import { Button, Chip } from './BookingParts';
+import { Button, Chip, HapticLayer } from './BookingParts';
 import { store, useAppState } from '../../state/bookings';
 
 type D = 'half' | 'large';
@@ -27,10 +28,41 @@ export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { a
   const setFav = () => store.toggleFavorite(activityId);
   const sheet = useRef<DetentSheetHandle>(null);
   const [closing, setClosing] = useState(false);
+  // Q65: foto che vola dalla card alla scheda (e indietro alla chiusura, se la card è ancora sotto)
+  type R = { x: number; y: number; w: number; h: number; r: number };
+  const [fly, setFly] = useState<{ from: R; to: R; src: string; done?: () => void } | null>(null);
+  const zoom = useRef<ZoomSource | null>(null);
+  const measure = () => {
+    const el = document.querySelector<HTMLElement>('.venue-sheet');
+    const photo = el?.querySelector<HTMLElement>('.venue-sheet__photo');
+    const parent = el?.parentElement;
+    if (!el || !photo || !parent) return null;
+    const P = parent.getBoundingClientRect(), S = el.getBoundingClientRect(), Ph = photo.getBoundingClientRect();
+    return { P, S, Ph };
+  };
+  useLayoutEffect(() => {
+    const z = peekZoom();
+    const m = measure();
+    if (!z || !m) return;
+    zoom.current = z;
+    const finalTop = (from === 'movi' ? topsMovi : tops)(m.P.height).half + (m.Ph.top - m.S.top);
+    setFly({ src: z.src,
+      from: { x: z.rect.left - m.P.left, y: z.rect.top - m.P.top, w: z.rect.width, h: z.rect.height, r: z.radius },
+      to: { x: m.Ph.left - m.P.left, y: finalTop, w: m.Ph.width, h: m.Ph.height, r: 20 } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // chiusura animata: lo sheet scende, la barra esce, poi si torna a Scopri
   const close = async (alreadyDown = false) => {
     setClosing(true);
+    const z = zoom.current;
+    const m = measure();
+    // la foto torna nella card solo se la card è ancora sotto (riga di Scopri, card di Movi) e la scheda è ancora su
+    const back = !alreadyDown && z && m && z.path === (from === 'movi' ? '/movi' : '/scopri');
+    const flown = back ? new Promise<void>((done) => setFly({ src: z!.src, done,
+      from: { x: m!.Ph.left - m!.P.left, y: m!.Ph.top - m!.P.top, w: m!.Ph.width, h: m!.Ph.height, r: 20 },
+      to: { x: z!.rect.left - m!.P.left, y: z!.rect.top - m!.P.top, w: z!.rect.width, h: z!.rect.height, r: z!.radius } })) : null;
     if (!alreadyDown) await sheet.current?.dismiss();
+    if (flown) await flown;
     onClose();
   };
   const d = days.find((x) => x.id === day)!;
@@ -40,6 +72,13 @@ export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { a
 
   return (
     <>
+      {fly && (
+        <motion.img key={fly.done ? 'back' : 'in'} src={fly.src} alt="" aria-hidden="true" className="zoom-photo"
+          initial={{ x: fly.from.x, y: fly.from.y, width: fly.from.w, height: fly.from.h, borderRadius: fly.from.r }}
+          animate={{ x: fly.to.x, y: fly.to.y, width: fly.to.w, height: fly.to.h, borderRadius: fly.to.r }}
+          transition={{ type: 'spring', visualDuration: 0.45, bounce: 0 }}
+          onAnimationComplete={() => { const d = fly.done; if (!d) setFly(null); else d(); }} />
+      )}
       <DetentSheet ref={sheet} className={`venue-sheet venue-sheet--${detent}`} tops={from === 'movi' ? topsMovi : tops} detent={detent} onDetent={setDetent} label={title} modal={from === 'movi'} onDismiss={() => close(true)}>
         <div className="venue-sheet__grab"><button aria-label="Cambia altezza della scheda" onClick={() => setDetent(detent === 'half' ? 'large' : 'half')} style={{ padding: '0 40px', height: 16, display: 'flex', justifyContent: 'center' }}><span /></button></div>
         <div className="venue-sheet__head">
@@ -49,13 +88,15 @@ export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { a
           </div>
           <div className="venue-sheet__actions">
             <button className={`circle-button pressable${fav ? ' is-on' : ''}`} aria-label={fav ? 'Togli dai preferiti' : 'Aggiungi ai preferiti'} aria-pressed={fav} onClick={setFav}>
-              <Icon name="UI/Favorite" size={22} />
+              <motion.span key={String(fav)} style={{ display: 'grid' }} initial={fav ? { scale: 0.6 } : false} animate={{ scale: 1 }}
+                transition={{ type: 'spring', visualDuration: 0.35, bounce: 0.5 }}><Icon name="UI/Favorite" size={22} /></motion.span>
+              <HapticLayer />
             </button>
             <button className="circle-button pressable" aria-label="Chiudi" onClick={() => close()}><Icon name="UI/Close" size={22} /></button>
           </div>
         </div>
         <div className="venue-sheet__body" data-scroll>
-          <Img name={a.photo} className="venue-sheet__photo" style={{ width: '100%', height: 150, borderRadius: 20 }} />
+          <Img name={a.photo} className="venue-sheet__photo" style={{ width: '100%', height: 150, borderRadius: 20, visibility: fly ? 'hidden' : undefined }} />
           <div className="price-line">
             <span className="t-title-3">{euro(a.price)}{a.people ? ' il campo' : ''}</span>
             <span className="points-pill t-footnote-emphasized">+{fmtPoints(a.points)} pt</span>

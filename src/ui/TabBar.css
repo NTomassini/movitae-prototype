@@ -14,6 +14,8 @@
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease;
+  touch-action: none; /* il dito può scorrere sulla barra (Q62) */
+  -webkit-user-select: none; user-select: none;
 }
 
 /* Coperta dallo sheet a media o grande altezza: scende sotto il bordo. */
@@ -31,15 +33,22 @@
   border-radius: var(--radius-full);
   color: var(--text-primary);
   text-decoration: none;
-  transition: background-color var(--motion-ease-fade), transform var(--motion-ease-press);
+  transition: background-color var(--motion-ease-fade), transform var(--press-release);
 }
 
-.tabbar-tab:active { transform: scale(0.94); }
+.tabbar-tab { position: relative; z-index: 1; -webkit-user-drag: none; }
+.tabbar-tab.active { color: var(--brand-accent); }
 
-.tabbar-tab.active {
-  background: var(--tab-selected);
-  color: var(--brand-accent);
+/* Q62: riquadro del tab attivo, un solo livello che scivola (molla 0,35 s senza rimbalzo) e si gonfia sotto il dito */
+.tabbar-indicator {
+  position: absolute; top: 6px; left: 6px; height: 48px; width: calc((100% - 12px) / 4);
+  border-radius: var(--radius-full); background: var(--tab-selected);
+  transition: transform var(--spring-smooth), scale 0.18s ease-out;
+  will-change: transform;
 }
+.tabbar-indicator.is-pressed { scale: 1.08; }
+.tabbar.is-dragging .tabbar-indicator { transition: scale 0.18s ease-out; }
+@media (prefers-reduced-motion: reduce) { .tabbar-indicator { transition: none; } .tabbar-indicator.is-pressed { scale: none; } }
 
 .tabbar-label {
   font-size: 12px;

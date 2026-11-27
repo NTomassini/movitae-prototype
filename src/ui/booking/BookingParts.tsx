@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Icon } from '../Icon';
@@ -11,6 +12,7 @@ export function Chip({ label, selected, disabled, onPress, big }: { label: strin
       aria-pressed={selected} onClick={onPress}>
       {label}
       {disabled && <span className="sr-only"> (esaurito)</span>}
+      <HapticLayer off={disabled} />
     </button>
   );
 }
@@ -89,7 +91,9 @@ export function ActionsCard({ mapsQuery, event }: { mapsQuery: string; event?: C
       <button className="pressable" onClick={add} aria-disabled={done}>
         <Icon name="UI/Calendar" size={24} />
         {done
-          ? <span className="t-body" style={{ flex: 1, color: 'var(--earn-default)', display: 'flex', alignItems: 'center', gap: 4 }}>Aggiunto al calendario<Icon name="UI/Check" size={18} /></span>
+          ? <motion.span className="t-body" initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2 }}
+              style={{ flex: 1, color: 'var(--earn-default)', display: 'flex', alignItems: 'center', gap: 4 }}>Aggiunto al calendario
+              <motion.span style={{ display: 'grid' }} initial={{ scale: 0.4, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', visualDuration: 0.35, bounce: 0.45 }}><Icon name="UI/Check" size={18} /></motion.span></motion.span>
           : <span className="t-body" style={{ flex: 1 }}>Aggiungi al calendario</span>}
         {!done && <Icon name="UI/Chevron-Right" size={18} className="chevron" />}
       </button>
@@ -109,3 +113,15 @@ export const AppleLogo = () => (
     <path d="M14.2 10.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9C3.7 4.8 2 5.8 1.1 7.4c-1.9 3.3-.5 8.1 1.3 10.8.9 1.3 2 2.7 3.3 2.7 1.3-.1 1.8-.9 3.4-.9s2 .9 3.4.8c1.4 0 2.3-1.3 3.2-2.6 1-1.5 1.4-2.9 1.4-3-.1 0-2.9-1.1-2.9-4.6ZM11.6 3c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.1.1 2.3-.6 3-1.5Z" />
   </svg>
 );
+
+/**
+ * Q63 (27 nov): vibrazione sulle scelte e sulle conferme. Safari su iPhone non ha la Vibration API; l'unica
+ * vibrazione possibile è quella di un interruttore nativo (<input type="checkbox" switch>) toccato davvero dal dito
+ * (da iOS 26.5 i clic da codice non vibrano più). Questo interruttore trasparente copre il pulsante che lo contiene:
+ * il dito tocca l'interruttore (vibrazione), il clic risale al pulsante, che fa la sua azione. Nascosto a VoiceOver
+ * e alla tastiera; non c'è sui pulsanti spenti. Senza vibrazione (computer, Android) non cambia niente.
+ */
+export function HapticLayer({ off }: { off?: boolean }) {
+  if (off) return null;
+  return <input type="checkbox" {...{ switch: '' }} className="haptic-layer" tabIndex={-1} aria-hidden="true" readOnly={false} onChange={() => { /* solo vibrazione */ }} />;
+}

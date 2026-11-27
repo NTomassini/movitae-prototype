@@ -1,3 +1,4 @@
+import { HapticLayer } from '../booking/BookingParts';
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { activities, days, euro, shelfSports, type Sport } from '../../data/data';
@@ -37,6 +38,7 @@ export function FilterPanel({ value, onChange, onClose }: { value: Filters; onCh
                   onClick={() => set({ sports: on ? value.sports.filter((x) => x !== s.sport) : [...value.sports, s.sport as Sport] })}>
                   <Img name={s.image} style={{ width: 40, height: 40 }} />
                   <span className="t-caption" style={{ fontWeight: on ? 600 : undefined }}>{s.label}</span>
+                  <HapticLayer />
                 </button>
               );
             })}

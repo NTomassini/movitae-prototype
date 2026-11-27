@@ -1,3 +1,4 @@
+import { RollingNumber } from '../ui/RollingNumber';
 import { TLink } from '../app/TLink';
 import { useState } from 'react';
 import { AnimatePresence } from 'motion/react';
@@ -25,7 +26,7 @@ export function PremiScreen() {
 
       <section className="balance-card" aria-label={`Il tuo saldo: ${fmtPoints(bal.points)} punti`}>
         <span className="t-headline balance-card__muted">Il tuo saldo</span>
-        <span className="balance-card__amount"><span className="balance-card__number">{fmtPoints(bal.points)}</span><span className="balance-card__unit"> pt</span></span>
+        <span className="balance-card__amount"><span className="balance-card__number"><RollingNumber id="points-premi" value={bal.points} format={fmtPoints} /></span><span className="balance-card__unit"> pt</span></span>
         <span className="balance-card__bar"><span style={{ width: `${progress * 100}%` }} /></span>
         <span className="t-body balance-card__muted">Ancora {fmtPoints(next.points - bal.points)} pt per il buono da €{next.value}</span>
       </section>
@@ -61,7 +62,7 @@ export function PremiScreen() {
       </section>
 
       <div className="stat-tiles">
-        <div className="stat-tile small-tile"><span className="t-footnote-emphasized stat-tile__label">Hai risparmiato</span><span className="number-28" style={{ color: 'var(--earn-default)' }}>€{bal.saved}</span></div>
+        <div className="stat-tile small-tile"><span className="t-footnote-emphasized stat-tile__label">Hai risparmiato</span><span className="number-28" style={{ color: 'var(--earn-default)' }}><RollingNumber id="saved-premi" value={bal.saved} format={(n) => `€${n}`} /></span></div>
         <div className="stat-tile small-tile"><span className="t-footnote-emphasized stat-tile__label">Punti in totale</span><span className="number-28">{fmtPoints(user.totalPoints)}</span></div>
       </div>
 

@@ -1,3 +1,4 @@
+import { HapticLayer } from '../ui/booking/BookingParts';
 import { useState } from 'react';
 import { useNav } from '../app/nav';
 import { AnimatePresence } from 'motion/react';
@@ -76,6 +77,7 @@ function SportsSheet({ value, onClose }: { value: string[]; onClose: () => void 
               <Img name={s.image} style={{ width: 56, height: 56 }} />
               <span className="t-subheadline-emphasized">{s.label}</span>
               {on && <span className="onb-sport__check"><Icon name="UI/Check" size={14} /></span>}
+              <HapticLayer />
             </button>
           );
         })}
