@@ -21,7 +21,7 @@ const topsMovi = (h: number) => ({ half: Math.max(h - 684, 54), large: 54 });
  * Scheda della struttura (flusso-sport/3). Toccare un orario lo sceglie; "Prenota alle …" è spento
  * finché non scegli. In fondo restano sempre Indicazioni e Prenota (BottomBar kind=venue).
  */
-export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { activityId: string; onClose: () => void; onBook: (dayId: string, time: string) => void; from?: 'scopri' | 'movi' }) {
+export function VenueSheet({ activityId, onClose, onClosing, onBook, from = 'scopri' }: { activityId: string; onClose: () => void; onClosing?: () => void; onBook: (dayId: string, time: string) => void; from?: 'scopri' | 'movi' }) {
   const a = activity(activityId);
   const v = venueOf(a);
   const [detent, setDetent] = useState<D>('half');
@@ -67,10 +67,12 @@ export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { a
   // chiusura animata: lo sheet scende, la barra esce, poi si torna a Scopri
   const close = async (alreadyDown = false) => {
     setClosing(true);
+    onClosing?.(); // Q82: in Scopri la lista comincia a risalire mentre la scheda scende
     const z = zoom.current;
     const m = measure();
-    // la foto torna nella card solo se la card è ancora sotto (riga di Scopri, card di Movi) e la scheda è ancora su
-    const back = !alreadyDown && z && m && z.path === (from === 'movi' ? '/movi' : '/scopri');
+    // la foto torna nella card solo se la card è ancora sotto (card di Movi) e la scheda è ancora su.
+    // Q82: in Scopri la riga non è più sotto (la lista era scesa e sta risalendo), quindi la foto scende con la scheda.
+    const back = !alreadyDown && z && m && from === 'movi' && z.path === '/movi';
     const flown = back ? new Promise<void>((done) => setFly({ src: z!.src, done,
       from: { x: m!.Ph.left - m!.P.left, y: m!.Ph.top - m!.P.top, w: m!.Ph.width, h: m!.Ph.height, r: 20 },
       to: { x: z!.rect.left - m!.P.left, y: z!.rect.top - m!.P.top, w: z!.rect.width, h: z!.rect.height, r: z!.radius } })) : null;

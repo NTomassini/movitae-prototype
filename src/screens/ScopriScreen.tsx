@@ -67,6 +67,8 @@ export function ScopriScreen() {
   const navigate = useNav();
   const { activityId } = useParams();
   const [checkout, setCheckout] = useState<{ dayId: string; time: string } | null>(null);
+  const [venueClosing, setVenueClosing] = useState(false);
+  useEffect(() => setVenueClosing(false), [activityId]);
   // Tab bar visibile solo con lo sheet piccolo e senza scheda aperta; la pagina non scorre (mappa a tutto schermo).
 
   // ordine della lista come nella tavola Figma: Boxe, Yoga Flow, Padel Ostiense, poi il resto
@@ -164,7 +166,7 @@ export function ScopriScreen() {
           </motion.button>
         )}
       </AnimatePresence>
-      <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={activityId ? 'hidden' : detent}
+      <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={activityId && !venueClosing ? 'hidden' : detent}
         action={nFilters > 0 && !panel && !showOffline && !loading ? <button className="list-sheet__clear t-subheadline-emphasized" onClick={() => { setFilters(NO_FILTERS); setDetent('small'); }}>Cancella tutto</button> : undefined}
         fit={!showOffline && !loading && !noResults}
         onTabBar={driveTabBar}
@@ -202,7 +204,7 @@ export function ScopriScreen() {
         {search && <SearchView key="s" onClose={() => setSearch(false)} onPick={onPick} onAskMovi={(q) => navigate(`/movi?q=${encodeURIComponent(q)}`)} />}
       </AnimatePresence>
       {activityId && (
-        <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${qs}`); }}
+        <VenueSheet key={activityId} activityId={activityId} onClose={() => { setCheckout(null); navigate(`/scopri${qs}`); }} onClosing={() => setVenueClosing(true)}
           onBook={(dayId, time) => setCheckout({ dayId, time })} />
       )}
       {/* il riepilogo sta nel livello comune degli sheet, così modulo e certificato si aprono sopra */}
