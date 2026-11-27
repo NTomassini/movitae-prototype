@@ -14,7 +14,7 @@ export function Avatar({ initial, label, onPress, onLongPress }: { initial: stri
   const down = () => { long = false; timer = window.setTimeout(() => { long = true; onLongPress?.(); }, 600); };
   const up = () => window.clearTimeout(timer);
   return (
-    <button className="avatar pressable t-headline" aria-label={label}
+    <button className="avatar glass-control glass-system t-headline" aria-label={label}
       onPointerDown={down} onPointerUp={up} onPointerLeave={up} onContextMenu={(e) => e.preventDefault()}
       onClick={() => { if (!long) onPress?.(); }}>{initial}</button>
   );

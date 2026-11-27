@@ -19,7 +19,7 @@ export function SectionBar({ small, right }: { small: string; right?: ReactNode 
   return (
     <ScreenOverlay>
       <div className="page-header section-bar">
-        <span className="scroll-edge-wrap" style={{ opacity: edge }}><ScrollEdge position="top" height={106} /></span>
+        <span className="scroll-edge-wrap" style={{ ['--edge' as string]: edge }}><ScrollEdge position="top" /></span>
         <span className="t-headline page-header__title section-bar__title" aria-hidden={title < 0.5}
           style={{ opacity: title, transform: `translateY(${(1 - title) * 4}px)` }}>{small}</span>
         {right && <span className="section-bar__right">{right}</span>}

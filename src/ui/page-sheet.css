@@ -1,9 +1,13 @@
 .page-sheet { position: absolute; left: 0; right: 0; bottom: 0; top: calc(var(--device-top) + 8px); z-index: 27; pointer-events: auto; background: var(--bg-elevated); border-radius: 32px 32px 0 0; display: flex; flex-direction: column; }
-.page-sheet__head { flex: none; height: 72px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; padding: 26px 16px 0; color: var(--text-primary); }
+.page-sheet__head { position: relative; z-index: 2; flex: none; height: 72px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; padding: 26px 16px 0; color: var(--text-primary); }
 .page-sheet__head > :first-child { justify-self: start; min-height: 44px; margin-top: -10px; color: var(--text-primary); }
 .page-sheet__head > :last-child { justify-self: end; min-height: 44px; margin-top: -10px; color: var(--text-primary); }
 .page-sheet__head > button:disabled { color: var(--text-disabled); }
-.page-sheet__body { flex: 1 1 auto; overflow-y: auto; padding: 0 16px 140px; }
+.page-sheet__body { flex: 1 1 auto; overflow-y: auto; margin-top: -72px; padding: 72px 16px 140px; }
+/* Q79: bordo di scorrimento sotto l'intestazione (84 = intestazione + 12), velo del colore dello sheet */
+.page-sheet__edge { --edge: 0; position: absolute; left: 0; right: 0; top: 0; height: 84px; z-index: 1; pointer-events: none; border-radius: 32px 32px 0 0; overflow: hidden; }
+.page-sheet__edge .scroll-edge { --edge-bg: var(--bg-elevated); height: 100%; }
 .page-sheet__footer { position: absolute; left: 16px; bottom: calc(var(--safe-bottom-live) + 4px); }
 /* card dentro uno sheet bianco = fondo grigio */
 .page-sheet .list-group__card, .page-sheet .list-row { background: var(--bg-default); }
+.page-sheet .modal-sheet__grabber { z-index: 2; }

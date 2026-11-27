@@ -16,6 +16,24 @@
 :where(.pressable, .button, .chip, .apple-pay, .tabbar-tab, .map-pin, .onb-sso, .system-alert__actions button,
   .movi-send, .circle-button, .glass-control, .select-card, .sport-card):active { transition-duration: 0s; }
 
+/* Vetro dei controlli flottanti: glass/regular, bordo glass/edge, ombra 0 4 16 8%, sfocatura 10 */
+.glass-control {
+  background: var(--glass-regular);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--effect-glass-control);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+}
+@media (prefers-reduced-transparency: reduce) { .glass-control { background: var(--bg-glass); backdrop-filter: none; -webkit-backdrop-filter: none; } }
+
+/* Q80: cerchi di vetro delle intestazioni (avatar, indietro, chiudi) come i pulsanti di WhatsApp su iOS 26.
+   Dove Safari espone il materiale di sistema lo usa; altrove resta la versione CSS qui sopra. */
+.glass-system { width: 44px; height: 44px; border-radius: 22px; }
+@supports (-apple-visual-effect: -apple-system-glass-material) {
+  .glass-system { -apple-visual-effect: -apple-system-glass-material; background: transparent; border-color: transparent;
+    backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
 /* Vetro (Liquid Glass): sotto il dito si gonfia e si illumina, invece di rimpicciolirsi */
 .glass-control { position: relative; transition: scale var(--press-release); }
 .glass-control::before { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;

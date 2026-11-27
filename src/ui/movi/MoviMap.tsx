@@ -45,7 +45,7 @@ export function MoviMap({ cards, booked, selected, onClose, onOpen, onTime, onSe
       initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
       transition={{ type: 'spring', visualDuration: 0.35, bounce: 0 }}>
       <MapView center={user.location} pins={pins} selected={cards[current]?.activityId ?? null} onSelect={pick} />
-      <button className="movi-map__close glass-control pressable" aria-label="Chiudi la mappa" onClick={onClose}><Icon name="UI/Close" size={18} /></button>
+      <button className="movi-map__close glass-control glass-system" aria-label="Chiudi la mappa" onClick={onClose}><Icon name="UI/Close" size={18} /></button>
       <button className="movi-map__all glass-control pressable t-subheadline-emphasized" onClick={() => navigate('/scopri', { state: { list: true } })}>Vedi tutte in Scopri</button>
       <div className="movi-carousel" ref={strip}>
         {cards.map((c) => (

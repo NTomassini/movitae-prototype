@@ -82,7 +82,7 @@ function ViewportLine() {
   const ok = !r.standalone || r.device >= r.screen;
   return (
     <p className="t-footnote demo-viewport" style={{ color: ok ? 'var(--earn-default)' : 'var(--feedback-error)' }}>
-      {r.standalone ? 'App installata' : 'Browser'} · schermo {r.screen} · cornice {r.device} · finestra {r.inner} · dvh {r.dvh} · area sicura {r.top}/{r.bottom}
+      {r.standalone ? 'App installata' : 'Browser'} · schermo {r.screen} · cornice {r.device} · finestra {r.inner} · dvh {r.dvh} · area sicura {r.top}/{r.bottom} · vetro {CSS.supports('-apple-visual-effect', '-apple-system-glass-material') ? 'di sistema' : 'CSS'}
     </p>
   );
 }

@@ -145,8 +145,8 @@ export function MoviScreen() {
   return (
     <div className="movi">
       <ScreenOverlay>
-        <div className={`page-header${y > 4 ? ' is-scrolled' : ''}`}>
-          <ScrollEdge position="top" height={106} />
+        <div className="page-header">
+          <span className="scroll-edge-wrap" style={{ ['--edge' as string]: Math.min(Math.max(y / 24, 0), 1) }}><ScrollEdge position="top" /></span>
           <span className={`t-headline page-header__title${!empty || y > 44 ? ' is-on' : ''}`} aria-hidden={empty}>Movi</span>
         </div>
         {!map && <ChatInput onSend={send} disabled={!!pending} />}

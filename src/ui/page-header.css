@@ -1,13 +1,14 @@
 .page-header { position: absolute; left: 0; right: 0; top: 0; z-index: 15; height: calc(var(--device-top) + 52px); pointer-events: none; }
-.page-header .scroll-edge { height: 100% !important; opacity: 0; transition: opacity var(--motion-ease-fade) ease; }
-.page-header.is-scrolled .scroll-edge { opacity: 1; }
+.page-header .scroll-edge { height: calc(var(--device-top) + 64px) !important; } /* Q79: finisce 12 sotto la riga (y 126) */
 .back-button { position: absolute; left: 16px; top: calc(var(--device-top) + 8px); width: 44px; height: 44px; border-radius: 22px; background: var(--bg-surface); color: var(--text-primary); display: grid; place-items: center; pointer-events: auto; }
+/* Q80: nelle intestazioni la freccia è un cerchio di vetro (sopra il contenuto che scorre) */
+.page-header .back-button.glass-control { position: absolute; background: var(--glass-regular); }
 .page-header__title { position: absolute; left: 70px; right: 70px; top: calc(var(--device-top) + 8px); height: 44px; display: grid; place-items: center; opacity: 0; transform: translateY(4px); transition: opacity var(--motion-ease-fade) ease, transform var(--motion-ease-fade) ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .page-header__title.is-on { opacity: 1; transform: none; }
 /* titolo grande sotto la riga: a y 116 (62 sotto la barra di stato) */
 .page-large-title { padding: 54px 0 0; }
 /* Q70–Q72: riga delle sezioni principali; bordo e titolo piccolo seguono lo scorrimento (opacità inline) */
-.scroll-edge-wrap { position: absolute; inset: 0; pointer-events: none; }
-.scroll-edge-wrap .scroll-edge { height: 100% !important; opacity: 1 !important; transition: none; }
+.scroll-edge-wrap { position: absolute; inset: 0; z-index: 0; pointer-events: none; } /* contesto proprio: il bordo resta sotto titolo e pulsanti */
+/* l'intensità arriva da --edge (inline), mai da opacity: spegnerebbe la sfocatura */
 .section-bar__title { transition: none; }
 .section-bar__right { position: absolute; right: var(--size-margin); top: calc(var(--device-top) + 8px); pointer-events: auto; }

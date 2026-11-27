@@ -5,7 +5,7 @@
 .pressable:active { transform: scale(0.97); }
 
 /* Avatar 44 — fill/tertiary, iniziale 17 Semi Bold */
-.avatar { width: 44px; height: 44px; border-radius: 22px; display: grid; place-items: center; background: var(--fill-tertiary); color: var(--text-primary); }
+.avatar { width: 44px; height: 44px; border-radius: 22px; display: grid; place-items: center; color: var(--text-primary); }
 
 /* SectionHeader — titolo 22/28 Bold + link 15/20 Semi Bold rosso */
 .section-header { display: flex; justify-content: space-between; align-items: center; min-height: 28px; }

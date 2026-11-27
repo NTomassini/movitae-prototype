@@ -22,8 +22,8 @@ export function PageHeader({ title, type, onBack }: { title: string; type: 'B' |
     <>
       <ScreenOverlay>
         <div className="page-header">
-          <span className="scroll-edge-wrap" style={{ opacity: edge }}><ScrollEdge position="top" height={106} /></span>
-          <button className="back-button pressable" aria-label="Indietro" onClick={onBack ?? (() => navigate(-1))}>
+          <span className="scroll-edge-wrap" style={{ ['--edge' as string]: edge }}><ScrollEdge position="top" /></span>
+          <button className="back-button glass-control glass-system" aria-label="Indietro" onClick={onBack ?? (() => navigate(-1))}>
             <Icon name="UI/Chevron-Left" size={24} />
           </button>
           <span className={`t-headline page-header__title${showSmall ? ' is-on' : ''}`} aria-hidden={type === 'B'}

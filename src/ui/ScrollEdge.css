@@ -1,33 +1,60 @@
+/* Q79: bordo di scorrimento progressivo (vedi ScrollEdge.tsx). */
+@property --edge { syntax: '<number>'; inherits: true; initial-value: 1; }
+
 .scroll-edge {
+  --edge-bg: var(--bg-default);
   position: absolute;
   left: 0;
   right: 0;
   z-index: 10;
   pointer-events: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
+.scroll-edge--top { top: 0; --dir: to bottom; }
+.scroll-edge--bottom { bottom: 0; --dir: to top; }
 
-.scroll-edge--bottom {
-  bottom: 0;
-  background: linear-gradient(to top,
-    color-mix(in srgb, var(--bg-default) 95%, transparent) 0%,
-    color-mix(in srgb, var(--bg-default) 85%, transparent) 78%,
-    transparent 100%);
-  mask-image: linear-gradient(to top, #000 0%, #000 78%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 78%, transparent 100%);
+/* livelli di sfocatura (raggio scritto per esteso: con var() il minificatore toglie la versione senza prefisso): ciascuno copre dal bordo fino a --s, poi sfuma fino a --e */
+.scroll-edge > i {
+  position: absolute;
+  inset: 0;
+  opacity: var(--edge);
+  mask-image: linear-gradient(var(--dir), #000 0%, #000 var(--s), transparent var(--e));
+  -webkit-mask-image: linear-gradient(var(--dir), #000 0%, #000 var(--s), transparent var(--e));
 }
+.scroll-edge--top > i:nth-child(1) { --s: 90%; --e: 100%; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.scroll-edge--top > i:nth-child(2) { --s: 78%; --e: 96%; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.scroll-edge--top > i:nth-child(3) { --s: 64%; --e: 88%; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.scroll-edge--top > i:nth-child(4) { --s: 46%; --e: 76%; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.scroll-edge--top > i:nth-child(5) { --s: 30%; --e: 62%; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
 
-.scroll-edge--top {
-  top: 0;
+.scroll-edge--bottom > i:nth-child(1) { --s: 80%; --e: 100%; backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px); }
+.scroll-edge--bottom > i:nth-child(2) { --s: 62%; --e: 92%; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.scroll-edge--bottom > i:nth-child(3) { --s: 46%; --e: 80%; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.scroll-edge--bottom > i:nth-child(4) { --s: 30%; --e: 66%; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.scroll-edge--bottom > i:nth-child(5) { --s: 14%; --e: 50%; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+/* velo del colore di sfondo, sopra la sfocatura */
+.scroll-edge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: var(--edge);
+}
+.scroll-edge--top::after {
   background: linear-gradient(to bottom,
-    color-mix(in srgb, var(--bg-default) 95%, transparent) 0%,
-    color-mix(in srgb, var(--bg-default) 85%, transparent) 78%,
+    color-mix(in srgb, var(--edge-bg) 97%, transparent) 0%,
+    color-mix(in srgb, var(--edge-bg) 93%, transparent) 49%,
+    color-mix(in srgb, var(--edge-bg) 65%, transparent) 73%,
+    color-mix(in srgb, var(--edge-bg) 25%, transparent) 90%,
     transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
+}
+.scroll-edge--bottom::after {
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--edge-bg) 80%, transparent) 0%,
+    color-mix(in srgb, var(--edge-bg) 55%, transparent) 50%,
+    transparent 100%);
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .scroll-edge { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .scroll-edge > i { display: none; }
+  .scroll-edge--top::after { background: linear-gradient(to bottom, var(--edge-bg) 0%, var(--edge-bg) 90%, transparent 100%); }
 }

@@ -1,7 +1,8 @@
-import { useEffect, useId, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { setPushBack } from './pushback';
 import { animate, motion, useMotionValue } from 'motion/react';
 import { ScreenOverlay } from '../app/ScreenOverlay';
+import { ScrollEdge } from './ScrollEdge';
 import './modal-sheet.css';
 import './page-sheet.css';
 
@@ -16,6 +17,7 @@ export function PageSheet({ title, onCancel, done, onDone, doneDisabled, childre
   const y = useMotionValue(1000); // in pt: 1000 = fuori dallo schermo (numeri, così trascinamento e uscita non mescolano unità)
   // Q67: la pagina sotto arretra seguendo lo sheet
   const pid = useId();
+  const edgeRef = useRef<HTMLSpanElement>(null); // Q79: il contenuto passa sotto l'intestazione sfocandosi
   useEffect(() => {
     const unsub = y.on('change', (v) => setPushBack(pid, 1 - Math.max(0, v) / 800));
     return () => { unsub(); setPushBack(pid, 0); };
@@ -37,13 +39,15 @@ export function PageSheet({ title, onCancel, done, onDone, doneDisabled, childre
       <motion.div className="modal-scrim" style={{ pointerEvents: 'auto' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} onClick={onCancel} />
       <motion.div className="page-sheet" role="dialog" aria-modal="true" aria-label={title}
         style={{ y }} animate={{ y: 0 }} exit={{ y: 1000 }} transition={{ type: 'spring', visualDuration: 0.5, bounce: 0 }}>
+        <span className="page-sheet__edge" ref={edgeRef}><ScrollEdge position="top" /></span>
         <span className="modal-sheet__grabber" aria-hidden="true" />
         <div className="page-sheet__head" onPointerDown={onDown} style={{ touchAction: 'none' }}>
           <button className="t-body" onClick={onCancel}>Annulla</button>
           <h2 className="t-headline">{title}</h2>
           {done ? <button className="t-headline" onClick={onDone} disabled={doneDisabled}>{done}</button> : <span />}
         </div>
-        <div className="page-sheet__body">{children}</div>
+        <div className="page-sheet__body"
+          onScroll={(e) => edgeRef.current?.style.setProperty('--edge', String(Math.min(e.currentTarget.scrollTop / 24, 1)))}>{children}</div>
         {footer && <div className="page-sheet__footer">{footer}</div>}
       </motion.div>
     </ScreenOverlay>
