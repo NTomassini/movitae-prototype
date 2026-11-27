@@ -29,13 +29,15 @@ type Props<D extends string> = {
   y?: MotionValue<number>;
   /** chiamata quando lo sheet si è fermato a un'altezza (es. la lista diventa scorrevole solo da ferma) */
   onSettle?: (d: D) => void;
+  /** cambia quando cambiano le altezze (es. la lista ha meno righe): lo sheet si riallinea all'altezza nuova */
+  retarget?: number;
 };
 
 // Q76 (27 nov): come gli sheet di iOS, si ferma senza rimbalzo (molla smorzata, 0,5 s) partendo dalla velocità del dito
 const SPRING = { type: 'spring' as const, visualDuration: 0.5, bounce: 0 };
 const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function DetentSheetInner<D extends string>({ tops, detent, onDetent, className, children, label, onDismiss, modal, y: yExt, onSettle }: Props<D>, ref: React.Ref<DetentSheetHandle>) {
+function DetentSheetInner<D extends string>({ tops, detent, onDetent, className, children, label, onDismiss, modal, y: yExt, onSettle, retarget }: Props<D>, ref: React.Ref<DetentSheetHandle>) {
   const el = useRef<HTMLDivElement>(null);
   const [h, setH] = useState(0);
   const yOwn = useMotionValue(10000);
@@ -69,7 +71,7 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
     a.then(() => settleRef.current?.(detent));
     return () => a.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [detent, h]);
+  }, [detent, h, retarget]);
 
   useImperativeHandle(ref, () => ({
     dismiss: () => new Promise<void>((res) => {

@@ -107,8 +107,8 @@ export function ScopriScreen() {
     })
     .filter(Boolean) as MapPinData[], [filtered]);
 
-  // toccare un pin mostra la lista di quella struttura (se la lista era nascosta, risale)
-  const onSelect = useCallback((id: string | null) => { setSelected(id); if (id) setDetent((d) => (d === 'hidden' ? 'small' : d)); }, []);
+    // Q88: toccare un pin porta sempre la lista piccola con il nome della struttura (come la scheda di un luogo in Mappe)
+  const onSelect = useCallback((id: string | null) => { setSelected(id); if (id) setDetent('small'); }, []);
   const title = selected ? venues.find((v) => v.id === selected)!.name : listTitle(list.length, filters, denied);
   const qs = sport ? `?sport=${sport}` : '';
   // ricerca: uno sport filtra, una struttura seleziona il suo pin, un'attività apre la scheda
@@ -171,7 +171,12 @@ export function ScopriScreen() {
         fit={!showOffline && !loading && !noResults}
         onTabBar={driveTabBar}
         onClose={showOffline || loading || noResults ? undefined : () => setDetent('hidden')}
-        onDetent={showOffline || loading || activityId ? () => {} : setDetent}>
+        onDetent={showOffline || loading || activityId ? () => {} : (d) => {
+          // Q88: pin di una struttura con una sola attività: la lista piccola fa da intestazione della scheda;
+          // trascinandola su si apre la scheda (come toccare la riga), invece di una lista con una riga e spazio vuoto
+          if (selected && list.length === 1 && detent === 'small' && (d === 'medium' || d === 'large')) { navigate(`/scopri/${list[0].id}${qs}`); return; }
+          setDetent(d);
+        }}>
         {noResults ? (
           <div className="no-results">
             <p className="t-subheadline secondary">Con questi filtri non c’è niente qui vicino. Prova così:</p>

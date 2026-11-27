@@ -84,7 +84,7 @@ export function ListSheet({ title, children, detent, onDetent, muted, action, fi
 
   return (
     <DetentSheet className={`list-sheet list-sheet--${settled === 'large' && detent === 'large' ? 'large' : detent === 'large' ? 'medium' : detent}`} tops={tops} detent={detent} onDetent={onDetent}
-      label={title ?? 'Lista'} y={y} onSettle={(d) => setSettled(d)}>
+      label={title ?? 'Lista'} y={y} onSettle={(d) => setSettled(d)} retarget={fit ? need : 0}>
       <motion.div className="list-sheet__bg" style={{ left: side, right: side, bottom, borderBottomLeftRadius: rb, borderBottomRightRadius: rb }} aria-hidden="true" />
       <motion.div className="list-sheet__clip" style={{ clipPath: clip, WebkitClipPath: clip, paddingLeft: side, paddingRight: side }}>
         <div className="list-sheet__grabber-zone">
