@@ -199,8 +199,8 @@ export function HealthSystemSheet({ onAllow, onDeny }: { onAllow: () => void; on
         <button className="t-body" style={{ color: 'var(--system-blue)', marginTop: 16 }} onClick={() => setOn({ steps: true, distance: true })}>Attiva tutto</button>
         <p className="t-footnote secondary" style={{ alignSelf: 'flex-start', marginTop: 16, marginLeft: 16 }}>CONSENTI A "MOVITAE" DI LEGGERE</p>
         <div className="health-system__list">
-          <label><span className="t-body">Passi</span><input type="checkbox" role="switch" checked={on.steps} onChange={(e) => setOn({ ...on, steps: e.target.checked })} /></label>
-          <label><span className="t-body">Distanza camminata e corsa</span><input type="checkbox" role="switch" checked={on.distance} onChange={(e) => setOn({ ...on, distance: e.target.checked })} /></label>
+          <label><span className="t-body">Passi</span><input type="checkbox" role="switch" {...{ switch: '' }} checked={on.steps} onChange={(e) => setOn({ ...on, steps: e.target.checked })} /></label>
+          <label><span className="t-body">Distanza camminata e corsa</span><input type="checkbox" role="switch" {...{ switch: '' }} checked={on.distance} onChange={(e) => setOn({ ...on, distance: e.target.checked })} /></label>
         </div>
         <p className="t-footnote secondary" style={{ marginTop: 12, padding: '0 16px' }}>Spiegazione dell'app: Contiamo i tuoi passi per la missione del giorno.</p>
       </div>

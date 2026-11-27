@@ -66,6 +66,7 @@ export function listTitle(n: number, f: Filters, denied: boolean) {
   if (c === 0) return `${base} ${denied ? 'a Roma' : 'vicino a te'}`;
   if (c === 1 && f.maxPrice != null) return `${base} fino a ${euro(f.maxPrice)}`;
   if (c === 1 && f.maxDist != null) return `${base} entro ${kmLabel(f.maxDist)}`;
+  if (c === 1 && (f.day || f.moment)) { const w = whenLabel(f); return /^(stasera|stamattina|oggi)/.test(w) ? `${base} ${w}` : `${base} · ${w}`; }
   return base;
 }
 export { kmLabel };

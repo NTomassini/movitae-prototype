@@ -343,7 +343,12 @@ Correzione in Figma: nella lista In arrivo la riga del padel ora segue la regola
     - Confronto: ricerca vuota 4,3%, filtri sport 4,6%, prezzo 3,9%, distanza 4,4%, nessun risultato 4,4%, filtro attivo 1,8%; onboarding con il pulsante nuovo tra 1,1% e 4,5% (intro 1 6,6% per l'immagine). Ricontrollate tutte le 78 schermate contro la versione precedente: nessun peggioramento. Le differenze dei filtri vengono dai dati (in Figma 24 attività, nel codice 11).
     - Figma: tutti i pulsanti principali dell'onboarding portati a 370 di larghezza, centrati.
     - Non fatto: lo stile a capsula con il prezzo sui pin delle tavole dei filtri.
-28. Prossimo: decidere se disegnare in Figma il pannello "Quando" e se usare il pulsante a tutta larghezza anche fuori dall'onboarding; poi i video dei flussi.
+28. Q51–Q53 (27 nov, decisi): Q51 tavola "Quando" disegnata in Figma. Q52 il pulsante a tutta larghezza resta solo nell'onboarding e nelle barre in basso; negli stati vuoti il pulsante segue il testo. Q53 interruttori nativi che fanno vibrare l'iPhone, con l'aspetto di Figma.
+29. (fatto 27 nov) Q51 e Q53:
+    - Figma: nuova variante `tab=quando` del componente FilterPanel (1541:6371, con istanze di Chip: Giorno con 5 capsule che scorrono, Momento con Mattina / Pomeriggio / Sera, entrambe a scelta singola) e nuova tavola flusso-filtri/3a-pannello-quando (1541:6442) tra prezzo e distanza, con didascalia; distanza, filtro attivo e nessun risultato spostati di 522 a destra.
+    - Codice allineato alla tavola: con solo "Quando" il titolo della lista dice "11 attività stasera" (altri giorni: "11 attività · Sab 14, sera"); "Cancella tutto" sparisce mentre il pannello è aperto, come in tutte le tavole dei filtri. Confronto: Quando 3,5%.
+    - Interruttori (`Toggle` in BookingParts.tsx: buono, modulo, Notifiche; e il foglio di Salute): sopra il disegno c'è un `<input type="checkbox" switch>` trasparente, così su iPhone il tocco vibra come un interruttore di sistema. Aspetto invariato (Notifiche 3,0%, modulo 2,8%, riepilogo 3,0%). Da provare sull'iPhone: secondo le fonti la vibrazione c'è da iOS 18, ma non è documentata da Apple e potrebbe cambiare.
+30. Prossimo: i video dei flussi (prima lo storyboard dei 5 video).
 
 Messaggio da incollare in una nuova conversazione:
 "Riprendo il redesign di Movitae. Leggi claude/movitae-handoff.md e claude/movitae-flussi.md nel Project. Siamo nella fase 6, prototipo in codice (sezione PROSSIMO PASSO dell'handoff, dati in claude/movitae-dati-prototipo.md). Fammi le domande con grilling prima di decisioni nuove e controlla gli screenshot. File Figma: https://www.figma.com/design/6UqomibKpRWEhGOp1Y9oj0/Movitae-Design-System?node-id=1119-1375"

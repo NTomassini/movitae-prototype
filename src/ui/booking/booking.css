@@ -55,8 +55,10 @@
 .voucher-card__text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; }
 .toggle { width: 51px; height: 31px; border-radius: 16px; background: var(--fill-tertiary); position: relative; flex: none; transition: background-color 0.2s ease; }
 .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1); }
-.toggle[aria-checked='true'] { background: var(--earn-default); }
-.toggle[aria-checked='true']::after { transform: translateX(20px); }
+.toggle[data-checked='true'] { background: var(--earn-default); }
+.toggle[data-checked='true']::after { transform: translateX(20px); }
+.toggle__input { position: absolute; inset: -7px -2px; width: calc(100% + 4px); height: calc(100% + 14px); margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.toggle:has(.toggle__input:focus-visible) { outline: 2px solid var(--brand-accent); outline-offset: 2px; }
 .price-card { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 .price-card__row { display: flex; justify-content: space-between; align-items: center; }
 .price-card__rule { height: 1px; background: var(--border-separator); }

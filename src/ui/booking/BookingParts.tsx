@@ -38,7 +38,14 @@ export function ActivityBlock({ photo, title, when, where }: { photo: string; ti
 }
 
 export function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
-  return <button role="switch" aria-checked={checked} aria-label={label} className="toggle" onClick={() => onChange(!checked)} />;
+  // Q53: sopra il disegno c'è un interruttore nativo trasparente (<input type="checkbox" switch>):
+  // su iPhone (Safari 18+) toccarlo fa vibrare il telefono come un interruttore di sistema.
+  return (
+    <span className="toggle" data-checked={checked}>
+      <input type="checkbox" role="switch" {...{ switch: '' }} className="toggle__input" checked={checked} aria-label={label}
+        onChange={(e) => onChange(e.target.checked)} />
+    </span>
+  );
 }
 
 /** QR vero (codice della prenotazione), disegnato come SVG. */

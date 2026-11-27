@@ -153,6 +153,8 @@ def panel(pg, tab=None):
 def go_filtri_sport(pg):
     panel(pg); pg.locator('.filter-sport').first.click(); pg.locator('.filter-sport').nth(3).click(); pg.wait_for_timeout(300)
 def go_filtri_prezzo(pg): panel(pg, 'Prezzo'); pg.locator('.filter-slider').fill('15'); pg.wait_for_timeout(300)
+def go_filtri_quando(pg):
+    panel(pg, 'Quando'); pg.locator('.filter-chips button').first.click(); pg.locator('.filter-moments button').nth(2).click(); pg.wait_for_timeout(300)
 def go_filtri_distanza(pg): panel(pg, 'Distanza'); pg.locator('.filter-slider').fill('2'); pg.wait_for_timeout(300)
 def go_filtri_attivo(pg): go_filtri_prezzo(pg); pg.locator('.filter-show').click(); pg.wait_for_timeout(600)
 def go_filtri_nessuno(pg):
@@ -238,6 +240,7 @@ SCREENS = [
     ('ricerca-vuota', go_ricerca_vuota, [(0, 400, 402, 874)]),
     ('filtri-sport', go_filtri_sport, [(0, 430, 402, 874)]), # mappa e lista (24 attività in Figma, 11 nei dati)
     ('filtri-prezzo', go_filtri_prezzo, [(0, 430, 402, 874)]),
+    ('filtri-quando', go_filtri_quando, [(0, 430, 402, 874)]),
     ('filtri-distanza', go_filtri_distanza, [(0, 430, 402, 874)]),
     ('filtri-attivo', go_filtri_attivo, [(0, 160, 402, 874)]),
     ('filtri-nessuno', go_filtri_nessuno, [(0, 160, 402, 560)]),

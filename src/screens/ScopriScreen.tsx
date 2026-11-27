@@ -133,7 +133,7 @@ export function ScopriScreen() {
         )}
       </AnimatePresence>
       <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={detent}
-        action={nFilters > 0 && !showOffline && !loading ? <button className="list-sheet__clear t-subheadline-emphasized" onClick={() => { setFilters(NO_FILTERS); setDetent('small'); }}>Cancella tutto</button> : undefined}
+        action={nFilters > 0 && !panel && !showOffline && !loading ? <button className="list-sheet__clear t-subheadline-emphasized" onClick={() => { setFilters(NO_FILTERS); setDetent('small'); }}>Cancella tutto</button> : undefined}
         onDetent={showOffline || loading ? () => {} : setDetent}>
         {noResults ? (
           <div className="no-results">
