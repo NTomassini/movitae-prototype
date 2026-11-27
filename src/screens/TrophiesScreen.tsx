@@ -36,7 +36,7 @@ export function TrophiesScreen() {
                 <span className="t-footnote-emphasized" style={{ color: x.unlocked ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{x.label}</span>
                 {x.unlocked ? <span className="t-footnote" style={{ color: 'var(--text-tertiary)' }}>{x.unlocked}</span>
                   : <>
-                      <span className="mini-bar"><span style={{ width: `${Math.max(Math.min(x.progress / x.target, 1) * 100, 10)}%` }} /></span>
+                      <span className="mini-bar"><span style={{ width: x.progress > 0 ? `${Math.max(Math.min(x.progress / x.target, 1) * 100, 10)}%` : 0 /* Q94: a zero la barra è vuota */ }} /></span>
                       <span className="t-footnote" style={{ color: 'var(--text-tertiary)' }}>Ancora {fmt(x, x.target - Math.min(x.progress, x.target))}</span>
                     </>}
               </button>
@@ -57,7 +57,7 @@ export function TrophiesScreen() {
                   <p className="t-subheadline-emphasized" style={{ color: 'var(--earn-default)', marginTop: 12 }}>Ottenuto il {a.unlocked}</p>
                 ) : (
                   <div style={{ alignSelf: 'stretch', marginTop: 12 }}>
-                    <span className="path-sheet__bar" style={{ display: 'block' }}><span style={{ width: `${Math.max(Math.min(a.progress / a.target, 1) * 100, 6)}%` }} /></span>
+                    <span className="path-sheet__bar" style={{ display: 'block' }}><span style={{ width: a.progress > 0 ? `${Math.max(Math.min(a.progress / a.target, 1) * 100, 6)}%` : 0 }} /></span>
                     <div className="path-sheet__ends t-footnote-emphasized"><span className="secondary">{fmt(a, a.progress)}</span><span style={{ color: 'var(--text-tertiary)' }}>{fmt(a, a.target)}</span></div>
                   </div>
                 )}

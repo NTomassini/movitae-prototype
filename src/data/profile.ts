@@ -1,4 +1,4 @@
-import { user, type Sport } from './data';
+import { achievements, user, type Sport } from './data';
 import type { Profile } from '../state/bookings';
 
 // Punti della missione per scaglione (handoff › Punti e premi)
@@ -9,11 +9,15 @@ export const GOALS: { steps: number; points: number }[] = [
 
 // Dati di Marco come nel file dei dati, per tornare indietro con "Ripristina demo" o "Accedi"
 const marco = JSON.parse(JSON.stringify(user)) as typeof user;
+const marcoAchievements = JSON.parse(JSON.stringify(achievements)) as typeof achievements;
 
 /** Applica (o toglie) l'utente nuovo dell'onboarding all'oggetto `user` usato da tutte le schermate. */
 export function applyProfile(p: Profile | null) {
   Object.assign(user, JSON.parse(JSON.stringify(marco)));
+  achievements.forEach((a, i) => Object.assign(a, marcoAchievements[i]));
   if (!p) return;
+  // Q94 (27 nov): chi ha appena fatto l'onboarding non ha traguardi sbloccati né progressi
+  achievements.forEach((a) => { a.unlocked = undefined; a.progress = 0; });
   user.name = p.name;
   user.fullName = p.name;
   user.initial = p.name.charAt(0).toUpperCase();

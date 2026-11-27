@@ -17,6 +17,7 @@ import './PremiScreen.css';
 export function PremiScreen() {
   const bal = balance(useBookings(), user.points, user.saved);
   const navigate = useNav();
+  const shown = ['risparmio-10', 'punti-5k', 'serie-7', 'lezioni-1'].map((id) => achievements.find((a) => a.id === id)!).filter((a) => a.unlocked);
   const [sheet, setSheet] = useState<null | { kind: 'use' } | { kind: 'path'; id: string }>(null);
   const next = vouchers.find((v) => v.points > bal.points) ?? vouchers[vouchers.length - 1];
   const progress = Math.min(bal.points / next.points, 1);
@@ -71,15 +72,25 @@ export function PremiScreen() {
 
       <section className="premi__section">
         <SectionHeader title="Traguardi" link="Vedi tutti" to="/premi/traguardi" />
-        <div className="trophies">
-          {['risparmio-10', 'punti-5k', 'serie-7', 'lezioni-1'].map((id) => achievements.find((a) => a.id === id)!).filter((a) => a.unlocked).map((a) => (
-            <TLink key={a.id} to={`/premi/traguardi?t=${a.id}`} className="trophy pressable">
-              <Img name={a.image} style={{ width: 64, height: 64 }} />
-              <Img name="img/stella" style={{ width: 18, height: 18 }} />
-              <span className="t-footnote-emphasized secondary">{a.label}</span>
-            </TLink>
-          ))}
-        </div>
+        {shown.length ? (
+          <div className="trophies">
+            {shown.map((a) => (
+              <TLink key={a.id} to={`/premi/traguardi?t=${a.id}`} className="trophy pressable">
+                <Img name={a.image} style={{ width: 64, height: 64 }} />
+                <Img name="img/stella" style={{ width: 18, height: 18 }} />
+                <span className="t-footnote-emphasized secondary">{a.label}</span>
+              </TLink>
+            ))}
+          </div>
+        ) : (
+          // Q94: utente nuovo, nessun traguardo ancora: invito a muoversi o a vedere tutti i traguardi
+          <div className="trophies-empty">
+            <Img name="img/trLezioni" style={{ width: 56, height: 56, opacity: 0.5, filter: 'grayscale(1)' }} />
+            <p className="t-headline">Nessun traguardo per ora</p>
+            <p className="t-subheadline secondary">Prenota la prima lezione o completa la missione di oggi: i traguardi si sbloccano da soli.</p>
+            <Button onPress={() => navigate('/scopri', { state: { list: true } })}>Trova un'attività</Button>
+          </div>
+        )}
       </section>
 
       <AnimatePresence>

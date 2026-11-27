@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { animate, motion, useMotionValue, useTransform } from 'motion/react';
 import { fmtPoints, user } from '../../data/data';
-import type { Demo } from '../../state/bookings';
+import { useAppState, type Demo } from '../../state/bookings';
 import { Icon } from '../Icon';
 import { Img } from '../Img';
 import { Button } from '../booking/BookingParts';
@@ -62,7 +62,7 @@ export function MissionCard({ state, onPress, onConnect }: { state: Demo['missio
   const left = goal - steps;
   return (
     <button className="mission-card pressable" onClick={onPress}
-      aria-label={done ? `Missione completata, +${points} punti. ${streak} giorni di fila.` : `Missione di oggi: ${fmtPoints(goal)} passi, ne mancano ${fmtPoints(left)}. ${state === 'first-day' ? 'Inizia oggi.' : `${streak} giorni di fila.`}`}>
+      aria-label={done ? `Missione completata, +${points} punti. ${days(streak)} di fila.` : `Missione di oggi: ${fmtPoints(goal)} passi, ne mancano ${fmtPoints(left)}. ${state === 'first-day' || streak === 0 ? 'Inizia oggi.' : `${days(streak)} di fila.`}`}>
       <span className="mission-card__text">
         <span className="mission-card__lines">
           <span className="t-footnote-emphasized mission-card__muted">{done ? 'Missione completata' : 'Missione di oggi'}</span>
@@ -71,7 +71,7 @@ export function MissionCard({ state, onPress, onConnect }: { state: Demo['missio
         </span>
         <span className="mission-card__streak">
           <span className="mission-card__flame"><Img name="img/fiamma" style={{ width: 20, height: 20 }} /></span>
-          <span className="t-subheadline-emphasized">{state === 'first-day' ? 'Inizia oggi' : `${streak} giorni di fila`}</span>
+          <span className="t-subheadline-emphasized">{state === 'first-day' || (!done && streak === 0) ? 'Inizia oggi' : `${days(streak)} di fila`}</span>
         </span>
       </span>
       {ring}
@@ -80,6 +80,7 @@ export function MissionCard({ state, onPress, onConnect }: { state: Demo['missio
 }
 
 type DayState = 'done' | 'pause' | 'today' | 'future';
+const days = (n: number) => `${n} ${n === 1 ? 'giorno' : 'giorni'}`;
 /** StreakDay — 36 + lettera; fatto = cerchio rosso con spunta; pausa = azzurro con fiamma ghiacciata; oggi = anello; futuro = vuoto. */
 export function StreakDay({ letter, state, progress = 0.69 }: { letter: string; state: DayState; progress?: number }) {
   const names: Record<DayState, string> = { done: 'fatto', pause: 'pausa usata', today: 'oggi', future: 'da fare' };
@@ -96,18 +97,22 @@ export function StreakDay({ letter, state, progress = 0.69 }: { letter: string; 
 
 /** Contenuto dello sheet "La tua serie" (missione/1, 1461:5088). Oggi è venerdì 13: la serie di 5 include sabato e domenica scorsi. */
 export function StreakSheetContent({ state }: { state: Demo['mission'] }) {
+  // Q94: chi ha appena fatto l'onboarding parte da zero: nessun giorno fatto né pausa nella settimana
+  const fresh = !!useAppState().profile || state === 'first-day';
   const done = state.startsWith('completed');
-  const streak = state === 'completed-7' ? 7 : done ? user.streak + 1 : state === 'first-day' ? 0 : user.streak;
-  const week: [string, DayState][] = [['L', 'done'], ['M', 'done'], ['M', 'pause'], ['G', 'done'], ['V', done ? 'done' : 'today'], ['S', 'future'], ['D', 'future']];
+  const streak = state === 'completed-7' ? 7 : done ? user.streak + 1 : fresh ? 0 : user.streak;
+  const week: [string, DayState][] = fresh
+    ? [['L', 'future'], ['M', 'future'], ['M', 'future'], ['G', 'future'], ['V', done ? 'done' : 'today'], ['S', 'future'], ['D', 'future']]
+    : [['L', 'done'], ['M', 'done'], ['M', 'pause'], ['G', 'done'], ['V', done ? 'done' : 'today'], ['S', 'future'], ['D', 'future']];
   return (
     <div className="streak-sheet">
       <Img name="img/fiamma" style={{ width: 72, height: 72 }} />
-      <h2 className="t-title-1" style={{ marginTop: 12 }}>{streak} giorni di fila</h2>
+      <h2 className="t-title-1" style={{ marginTop: 12 }}>{days(streak)} di fila</h2>
       <p className="t-subheadline secondary" style={{ marginTop: 4 }}>
-        {done ? 'Missione di oggi completata. Domani si riparte.' : `Oggi ti mancano ${fmtPoints(user.mission.goal - (state === 'first-day' ? 0 : user.mission.steps))} passi.`}
+        {done ? 'Missione di oggi completata. Domani si riparte.' : fresh ? `Completa la missione di oggi per iniziare la serie: ${fmtPoints(user.mission.goal - user.mission.steps)} passi.` : `Oggi ti mancano ${fmtPoints(user.mission.goal - user.mission.steps)} passi.`}
       </p>
       <div className="streak-week" role="list" aria-label="Questa settimana">
-        {week.map(([l, s], i) => <StreakDay key={i} letter={l} state={s} />)}
+        {week.map(([l, s], i) => <StreakDay key={i} letter={l} state={s} progress={fresh ? Math.min(user.mission.steps / user.mission.goal, 1) : undefined} />)}
       </div>
       <div className="streak-facts">
         <div className="streak-facts__row">
@@ -115,7 +120,7 @@ export function StreakSheetContent({ state }: { state: Demo['mission'] }) {
           <span className="streak-facts__text"><span className="t-headline">Pause</span><span className="t-subheadline secondary">{user.pauses} di 2 disponibili</span></span>
         </div>
         <div className="streak-facts__sep" />
-        <div className="streak-facts__row streak-facts__row--between"><span className="t-body">Serie più lunga</span><span className="t-headline">{user.bestStreak} giorni</span></div>
+        <div className="streak-facts__row streak-facts__row--between"><span className="t-body">Serie più lunga</span><span className="t-headline">{days(Math.max(user.bestStreak, done ? streak : 0))}</span></div>
       </div>
       <p className="t-footnote secondary" style={{ marginTop: 12, alignSelf: 'stretch' }}>Guadagni una pausa quando cammini il 50% in più o vai a una lezione. Se salti un giorno, la pausa salva la tua serie.</p>
     </div>
@@ -149,7 +154,7 @@ export function Celebration({ seven, onClose, onProposal }: { seven: boolean; on
       </div>
       <motion.div className="celebration__streak" {...fade(1.05)}>
         <Img name="img/fiamma" style={{ width: seven ? 40 : 28, height: seven ? 40 : 28 }} />
-        <span className="t-headline">{seven ? 7 : user.streak + 1} giorni di fila</span>
+        <span className="t-headline">{days(seven ? 7 : user.streak + 1)} di fila</span>
       </motion.div>
       <motion.h2 className="t-title-3 celebration__more" style={{ marginTop: seven ? 48 : 60 }} {...fade(1.2)}>Ti va di continuare?</motion.h2>
       <motion.button className="proposal pressable" onClick={onProposal} {...fade(1.3)}>
