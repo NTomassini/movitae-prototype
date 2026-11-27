@@ -51,3 +51,8 @@
 .rolling-number { display: inline-flex; white-space: pre; }
 .rolling-number__slot { display: inline-flex; position: relative; overflow: clip; } /* clip, non hidden: hidden sposterebbe la linea di base */
 .rolling-number__char { display: inline-block; }
+
+/* Q92 (27 nov): un pulsante per andare avanti non sta mai a sinistra (fa pensare a "indietro"). In fondo allo schermo
+   o a uno sheet è a tutta larghezza, 16 dai bordi, come "Continua" nell'onboarding. */
+:where(.confirm__done, .page-sheet__footer, .celebration__done, .offline-cta, div.onb__cta) { right: 16px; display: flex; }
+:where(.confirm__done, .page-sheet__footer, .celebration__done, .offline-cta, div.onb__cta) > .button { flex: 1 1 auto; }

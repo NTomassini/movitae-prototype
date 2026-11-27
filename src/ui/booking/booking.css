@@ -104,7 +104,7 @@
 .soldout__error { display: flex; gap: 6px; align-items: flex-start; padding: 0 16px; color: var(--feedback-error); }
 .soldout__error svg { flex: none; margin-top: 2px; }
 .soldout__times { display: flex; gap: 8px; padding: 12px 16px 16px; }
-.checkout-bar__pick { height: 56px; align-self: flex-start; }
+.checkout-bar__pick { height: 56px; align-self: stretch; } /* Q92: a tutta larghezza come Apple Pay, mai a sinistra */
 .soldout__times .chip { min-height: 44px; padding: 10px 16px; }
 
 /* Q63: interruttore trasparente sopra i pulsanti che vibrano (vedi HapticLayer) */
