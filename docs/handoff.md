@@ -21,7 +21,7 @@ Questo file basta per riprendere il progetto in una nuova conversazione. Leggerl
 
 ### Mappa delle bozze (pagina "Fase 4 — bozza Home", riordinata il 23 nov: onboarding → Home → Scopri → Movi → Premi → Profilo)
 Ogni flusso sta nella sezione da cui parte; stati, conferme ed errori stanno nella riga della schermata a cui appartengono. Frame a x 100 + 522 per posizione; titolo di riga 70 sopra; didascalia 16 sotto ogni frame. Il frame "home/01-home" a x −363 è la vecchia Home v2: non toccare.
-- y 200 · Onboarding dal primo avvio alla Home: splash, intro 1–3, crea account, codice email sbagliato, sport preferiti, Salute, posizione, avviso posizione, obiettivo passi, benvenuto.
+- y 200 · Onboarding dal primo avvio alla Home (in DS · Schermate preceduto da installa/iphone e installa/computer): splash, intro 1–3, crea account, codice email sbagliato, sport preferiti, Salute, posizione, avviso posizione, obiettivo passi, benvenuto.
 - y 1320 · Onboarding se rifiuti Salute: "Quanto cammini?", benvenuto senza Salute.
 - y 2420 · Home: chiaro, primo giorno, Salute non collegata, missione completata, scuro (provvisorio).
 - y 3514 · Missione del giorno: sheet "La tua serie", celebrazione, celebrazione 7 giorni.
@@ -407,8 +407,17 @@ Correzione in Figma: nella lista In arrivo la riga del padel ora segue la regola
     - Scoperta: il minificatore CSS di Vite 8 (Lightning CSS) toglieva `backdrop-filter` senza prefisso, quindi in Chrome desktop nessuna sfocatura (tab bar compresa); su iPhone andava per via di `-webkit-`. Ora `build.cssMinify: 'esbuild'` in vite.config.ts (esbuild tra le devDependencies): sfocature visibili anche su Chrome, utile per chi guarda il portfolio dal computer.
     - Figma: DS · Componenti › ScrollEdge (top 126, sfocatura progressiva fino a 24 e velo 97/93/65/25/0; bottom 83, fino a 12 e velo 80/55/0; 7 istanze ridimensionate), Avatar 44 in vetro, Header A/B/C con IconButton glass (D e sheet plain). La tavola pilota della Home che scorre (1461:8135) segue i componenti.
     - Confronto con Figma invariato (nessuna schermata cambia oltre l'1%: a riposo il bordo è spento).
-40. PROSSIMO: Nicolò prova sull'iPhone (punti 35, 37 e 39: scorrimento in Home, Premi, Prenotazioni, Movi e nello sheet "Sport preferiti"; riga "vetro" nel pannello demo) e dice cosa correggere; poi i video.
-41. Dopo: i video dei flussi (prima lo storyboard dei 5 video).
+40. Q82–Q85 (27 nov, decisi con grilling dopo uno screenshot di Nicolò: aprendo un'attività dalla lista la scheda si sovrapponeva alla lista alta):
+    - Q82 la scheda prende il posto della lista, come in Mappe: toccata una riga la lista scende fuori dallo schermo mentre la scheda sale (la foto vola dalla riga alla scheda, Q65); con la x o trascinando giù la scheda, la lista risale mentre la scheda scende, all'altezza e allo scorrimento di prima. In Scopri la foto non torna più nella riga (la riga non è sotto); da Movi sì.
+    - Q83 schermata "Aggiungi alla Home" prima dello splash: iPhone in un browser → i passi; aperta dall'icona sulla Home → mai; computer → QR da inquadrare con l'iPhone; Android → "Installa" col foglio di Chrome se c'è, altrimenti i passi del menu ⋮. "Continua nel browser" (sul computer "Continua qui") la nasconde finché la scheda resta aperta (sessionStorage). Nei test automatici non compare (`?install` la forza).
+    - Q84 contenuto: icona dell'app 96, "Prova Movitae come un'app", "Aggiungilo alla schermata Home: si apre a tutto schermo, come un'app vera.", card con 3 passi numerati e simboli SF (ellipsis, square.and.arrow.up, plus.square): Tocca ··· nella barra di Safari · Tocca Condividi · Scegli Aggiungi alla schermata Home, lascia acceso "Apri come app web" e tocca Aggiungi; nota "Se Condividi è già nella barra, parti dal passo 2." (iOS 26 con barra compatta nasconde Condividi nel menu ···). Niente freccia verso la barra (la sua posizione dipende dalle impostazioni di Safari). Passi che entrano con la molla.
+    - Q85 Figma e dati: l'app installata ha una memoria separata da Safari, quindi dalla Home riparte dall'onboarding.
+41. (fatto 27 nov, commit 37344ff e 6777274) Q82–Q85:
+    - Codice: `src/screens/ScopriScreen.tsx` (lista `hidden` con la scheda aperta, `venueClosing` per farla risalire mentre la scheda scende), `src/ui/booking/VenueSheet.tsx` (prop `onClosing`; la foto torna nella card solo da Movi), `src/app/InstallScreen.tsx` + `install.css`, `src/app/AppShell.tsx` (schermata prima dello splash), `QR` con etichetta.
+    - Figma (DS · Schermate, riga onboarding): nuove tavole installa/iphone (1552:6070) e installa/computer (1552:6114, indirizzo di esempio movitae-prototype.vercel.app) con didascalie; il resto della riga spostato di 1044 a destra.
+    - Confronto invariato su tutte le schermate.
+42. PROSSIMO: Nicolò prova sull'iPhone (punti 35, 37, 39 e 41: scorrimento, riga "vetro" nel pannello demo, scheda al posto della lista, schermata Aggiungi alla Home in Safari e poi l'app dalla Home) e dice cosa correggere; poi i video.
+43. Dopo: i video dei flussi (prima lo storyboard dei 5 video).
 
 Messaggio da incollare in una nuova conversazione:
 "Riprendo il redesign di Movitae. Leggi claude/movitae-handoff.md e claude/movitae-flussi.md nel Project. Siamo nella fase 6, prototipo in codice (sezione PROSSIMO PASSO dell'handoff, dati in claude/movitae-dati-prototipo.md). Fammi le domande con grilling prima di decisioni nuove e controlla gli screenshot. File Figma: https://www.figma.com/design/6UqomibKpRWEhGOp1Y9oj0/Movitae-Design-System?node-id=1119-1375"
