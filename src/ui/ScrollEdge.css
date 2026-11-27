@@ -4,28 +4,28 @@
   right: 0;
   z-index: 10;
   pointer-events: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .scroll-edge--bottom {
   bottom: 0;
   background: linear-gradient(to top,
-    color-mix(in srgb, var(--bg-default) 72%, transparent) 0%,
-    color-mix(in srgb, var(--bg-default) 30%, transparent) 50%,
+    color-mix(in srgb, var(--bg-default) 95%, transparent) 0%,
+    color-mix(in srgb, var(--bg-default) 85%, transparent) 78%,
     transparent 100%);
-  mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 78%, transparent 100%);
 }
 
 .scroll-edge--top {
   top: 0;
   background: linear-gradient(to bottom,
-    color-mix(in srgb, var(--bg-default) 72%, transparent) 0%,
-    color-mix(in srgb, var(--bg-default) 30%, transparent) 50%,
+    color-mix(in srgb, var(--bg-default) 95%, transparent) 0%,
+    color-mix(in srgb, var(--bg-default) 85%, transparent) 78%,
     transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
 }
 
 @media (prefers-reduced-transparency: reduce) {

@@ -63,7 +63,7 @@ export function ScopriScreen() {
   const retry = () => { setLoading(true); setTimeout(() => setLoading(false), 1100); };
   useEffect(() => { if (wasOffline.current && !offline) retry(); wasOffline.current = offline; }, [offline]);
   const showOffline = offline && !loading;
-  useEffect(() => { if (showOffline) setDetent('medium'); else if (loading) setDetent('small'); }, [showOffline, loading]);
+  useEffect(() => { if (showOffline) setDetent('medium'); else if (loading) setDetent('medium') /* Q74: righe segnaposto visibili a media altezza */; }, [showOffline, loading]);
   const navigate = useNav();
   const { activityId } = useParams();
   const [checkout, setCheckout] = useState<{ dayId: string; time: string } | null>(null);
@@ -77,7 +77,22 @@ export function ScopriScreen() {
   useEffect(() => { if (noResults) setDetent('medium'); }, [noResults]);
   // Tab bar visibile solo con lo sheet piccolo, senza scheda, ricerca o "nessun risultato"; la pagina non scorre.
   // Q55: la tab bar c'è solo con la lista nascosta; appena lo sheet è visibile (anche piccolo) sparisce.
-  useScreenChrome({ tabBar: detent === 'hidden' && !activityId && !showOffline && !search && !noResults, bottomEdge: false, pageScroll: false });
+  // Q76: tra "nascosta" e "piccola" la tab bar scende seguendo lo sheet (anche col dito), invece di una transizione fissa.
+  const tabBarOn = !activityId && !showOffline && !search && !noResults;
+  useScreenChrome({ tabBar: tabBarOn, bottomEdge: false, pageScroll: false });
+  const tabBarOnRef = useRef(tabBarOn);
+  tabBarOnRef.current = tabBarOn;
+  const driveTabBar = useCallback((v: number) => {
+    const tb = document.querySelector<HTMLElement>('.tabbar');
+    if (!tb) return;
+    if (!tabBarOnRef.current) { tb.style.removeProperty('transform'); tb.style.removeProperty('opacity'); tb.style.removeProperty('pointer-events'); tb.style.removeProperty('transition'); return; }
+    tb.style.transition = 'none';
+    tb.style.transform = v >= 0.999 ? '' : `translateY(calc(${(1 - v).toFixed(4)} * (100% + 40px)))`;
+    tb.style.opacity = String(Math.min(1, v * 1.4).toFixed(3));
+    tb.style.pointerEvents = v < 0.5 ? 'none' : '';
+  }, []);
+  useEffect(() => { if (!tabBarOn) driveTabBar(1); }, [tabBarOn, driveTabBar]);
+  useEffect(() => () => { const tb = document.querySelector<HTMLElement>('.tabbar'); if (tb) { tb.style.removeProperty('transform'); tb.style.removeProperty('opacity'); tb.style.removeProperty('pointer-events'); tb.style.removeProperty('transition'); } }, []);
 
   const pins: MapPinData[] = useMemo(() => venues
     .map((v) => {
@@ -150,6 +165,7 @@ export function ScopriScreen() {
       <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={detent}
         action={nFilters > 0 && !panel && !showOffline && !loading ? <button className="list-sheet__clear t-subheadline-emphasized" onClick={() => { setFilters(NO_FILTERS); setDetent('small'); }}>Cancella tutto</button> : undefined}
         fit={!showOffline && !loading && !noResults}
+        onTabBar={driveTabBar}
         onClose={showOffline || loading || noResults ? undefined : () => setDetent('hidden')}
         onDetent={showOffline || loading ? () => {} : setDetent}>
         {noResults ? (

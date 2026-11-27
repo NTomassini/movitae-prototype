@@ -1,3 +1,4 @@
+import { SectionBar, useLargeTitleFade } from '../ui/SectionBar';
 import { RollingNumber } from '../ui/RollingNumber';
 import { TLink } from '../app/TLink';
 import { useState } from 'react';
@@ -19,10 +20,12 @@ export function PremiScreen() {
   const [sheet, setSheet] = useState<null | { kind: 'use' } | { kind: 'path'; id: string }>(null);
   const next = vouchers.find((v) => v.points > bal.points) ?? vouchers[vouchers.length - 1];
   const progress = Math.min(bal.points / next.points, 1);
+  const fade = useLargeTitleFade();
 
   return (
     <div className="premi">
-      <h1 className="t-large-title premi__title">Premi</h1>
+      <SectionBar small="Premi" />
+      <h1 className="t-large-title premi__title" data-large-title style={{ opacity: fade }}>Premi</h1>
 
       <section className="balance-card" aria-label={`Il tuo saldo: ${fmtPoints(bal.points)} punti`}>
         <span className="t-headline balance-card__muted">Il tuo saldo</span>

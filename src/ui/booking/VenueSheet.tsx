@@ -10,7 +10,10 @@ import { store, useAppState } from '../../state/bookings';
 
 type D = 'half' | 'large';
 // Figma: mezza altezza con il bordo a y 392, grande a y 54 (su 874).
-const tops = (h: number) => ({ half: Math.max(h - 482, 54), large: 54 });
+// Q75 (27 nov): la mezza altezza finisce 24 sopra la barra in basso subito dopo il blocco del prezzo (nome, foto,
+// prezzo e punti), senza capsule tagliate; misurata sullo sheet (vedi halfOffset). Prima: bordo a y 392 (h − 482).
+let halfOffset: number | null = null; // dal bordo dello sheet alla fine del blocco del prezzo + 24 + barra in basso
+const tops = (h: number) => ({ half: halfOffset != null ? Math.min(Math.max(h - halfOffset, 54), h - 300) : Math.max(h - 482, 54), large: 54 });
 // Da Movi (flusso-movi/6) la scheda parte più alta, con il bordo a y 190, sopra un velo.
 const topsMovi = (h: number) => ({ half: Math.max(h - 684, 54), large: 54 });
 
@@ -40,6 +43,16 @@ export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { a
     const P = parent.getBoundingClientRect(), S = el.getBoundingClientRect(), Ph = photo.getBoundingClientRect();
     return { P, S, Ph };
   };
+  // Q75: misura della mezza altezza prima che lo sheet entri (gli effetti di layout vengono prima della sua molla)
+  useLayoutEffect(() => {
+    if (from === 'movi') return;
+    const el = document.querySelector<HTMLElement>('.venue-sheet');
+    const when = el?.querySelector<HTMLElement>('.venue-sheet__when');
+    const bar = document.querySelector<HTMLElement>('.bottom-bar');
+    if (!el || !when) return;
+    const priceEnd = when.getBoundingClientRect().top - el.getBoundingClientRect().top - 24;
+    halfOffset = priceEnd + 24 + (bar?.offsetHeight ?? 96);
+  }, [from, activityId]);
   useLayoutEffect(() => {
     const z = peekZoom();
     const m = measure();
@@ -103,7 +116,7 @@ export function VenueSheet({ activityId, onClose, onBook, from = 'scopri' }: { a
           </div>
           {a.pricePerPerson && <p className="t-subheadline secondary" style={{ marginTop: 4 }}>{euro(a.pricePerPerson)} a persona se giocate in {a.people}. Paghi il campo intero.</p>}
 
-          <h3 className="t-headline" style={{ marginTop: 24, marginBottom: 12 }}>Quando vuoi andare?</h3>
+          <h3 className="t-headline venue-sheet__when" style={{ marginTop: 24, marginBottom: 12 }}>Quando vuoi andare?</h3>
           <div className="chips" role="group" aria-label="Giorno">
             {days.map((x) => <Chip key={x.id} label={x.short} selected={x.id === day} onPress={() => { setDay(x.id); setTime(null); }} />)}
           </div>

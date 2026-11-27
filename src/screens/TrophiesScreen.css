@@ -1,7 +1,7 @@
 /* Pagina aperta da un'altra pagina, titolo piccolo (Header C): riga a y 62, contenuto da y 116 */
-.trophies-page { display: flex; flex-direction: column; gap: 32px; padding: 62px var(--size-margin) 0; }
+.trophies-page { display: flex; flex-direction: column; gap: 24px; /* Q73: 24 tra le sezioni */ padding: 62px var(--size-margin) 0; }
 .trophy-group { display: flex; flex-direction: column; gap: 12px; }
-.trophy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }
+.trophy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: stretch; } /* Q73: stessa altezza in riga */
 .trophy-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border-radius: var(--radius-24); background: var(--bg-surface); text-align: center; }
 .stars { display: inline-flex; }
 .mini-bar { width: 80px; height: 8px; border-radius: 4px; background: var(--fill-tertiary); overflow: hidden; margin-top: 4px; }

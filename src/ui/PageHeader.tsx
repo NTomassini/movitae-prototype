@@ -14,19 +14,23 @@ import './page-header.css';
 export function PageHeader({ title, type, onBack }: { title: string; type: 'B' | 'C'; onBack?: () => void }) {
   const navigate = useNav();
   const y = useScreenScroll();
-  const showSmall = type === 'C' || y > 44;
+  // Q71–Q72: bordo sfocato e titolo piccolo seguono lo scorrimento (niente soglie che scattano)
+  const edge = Math.min(Math.max(y / 24, 0), 1);
+  const small = type === 'C' ? 1 : Math.min(Math.max((y - 30) / 20, 0), 1);
+  const showSmall = small > 0.5;
   return (
     <>
       <ScreenOverlay>
-        <div className={`page-header${y > 4 ? ' is-scrolled' : ''}`}>
-          <ScrollEdge position="top" height={106} />
+        <div className="page-header">
+          <span className="scroll-edge-wrap" style={{ opacity: edge }}><ScrollEdge position="top" height={106} /></span>
           <button className="back-button pressable" aria-label="Indietro" onClick={onBack ?? (() => navigate(-1))}>
             <Icon name="UI/Chevron-Left" size={24} />
           </button>
-          <span className={`t-headline page-header__title${showSmall ? ' is-on' : ''}`} aria-hidden={type === 'B'}>{title}</span>
+          <span className={`t-headline page-header__title${showSmall ? ' is-on' : ''}`} aria-hidden={type === 'B'}
+            style={type === 'B' ? { opacity: small, transform: `translateY(${(1 - small) * 4}px)`, transition: 'none' } : undefined}>{title}</span>
         </div>
       </ScreenOverlay>
-      {type === 'B' && <h1 className="t-large-title page-large-title">{title}</h1>}
+      {type === 'B' && <h1 className="t-large-title page-large-title" data-large-title>{title}</h1>}
     </>
   );
 }

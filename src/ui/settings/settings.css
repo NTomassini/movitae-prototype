@@ -15,7 +15,7 @@
 .list-row__icon { width: 44px; height: 44px; border-radius: 12px; background: var(--fill-tertiary); display: grid; place-items: center; flex: none; color: var(--text-primary); }
 
 /* pagine aperte da un'altra pagina: titolo grande a y 116, primo contenuto a y 168 */
-.settings-page { display: flex; flex-direction: column; padding: 8px 16px 24px; }
+.settings-page { display: flex; flex-direction: column; padding: 8px 16px 0; } /* Q73: il margine sopra la tab bar (24) lo dà già #screen */
 .settings-page .page-large-title { margin-bottom: 12px; }
 /* righe con interruttore: 52 alte, l'interruttore 31 resta centrato */
 .list-row:has(.toggle) { padding-block: 0; min-height: 52px; }

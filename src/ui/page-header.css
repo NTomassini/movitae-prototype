@@ -6,3 +6,8 @@
 .page-header__title.is-on { opacity: 1; transform: none; }
 /* titolo grande sotto la riga: a y 116 (62 sotto la barra di stato) */
 .page-large-title { padding: 54px 0 0; }
+/* Q70–Q72: riga delle sezioni principali; bordo e titolo piccolo seguono lo scorrimento (opacità inline) */
+.scroll-edge-wrap { position: absolute; inset: 0; pointer-events: none; }
+.scroll-edge-wrap .scroll-edge { height: 100% !important; opacity: 1 !important; transition: none; }
+.section-bar__title { transition: none; }
+.section-bar__right { position: absolute; right: var(--size-margin); top: calc(var(--device-top) + 8px); pointer-events: auto; }

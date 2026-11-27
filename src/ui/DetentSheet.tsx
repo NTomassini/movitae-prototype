@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type ReactNode } from 'react';
-import { animate, motion, useMotionValue } from 'motion/react';
+import { animate, motion, useMotionValue, type MotionValue } from 'motion/react';
 
 /**
  * Sheet con altezze fisse (detent), come gli sheet di iOS.
@@ -25,15 +25,24 @@ type Props<D extends string> = {
   label: string;
   onDismiss?: () => void;
   modal?: boolean;
+  /** posizione dello sheet dall'esterno (per legare altri elementi al suo movimento, Q76) */
+  y?: MotionValue<number>;
+  /** chiamata quando lo sheet si è fermato a un'altezza (es. la lista diventa scorrevole solo da ferma) */
+  onSettle?: (d: D) => void;
 };
 
-const SPRING = { type: 'spring' as const, visualDuration: 0.4, bounce: 0.15 };
+// Q76 (27 nov): come gli sheet di iOS, si ferma senza rimbalzo (molla smorzata, 0,5 s) partendo dalla velocità del dito
+const SPRING = { type: 'spring' as const, visualDuration: 0.5, bounce: 0 };
 const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function DetentSheetInner<D extends string>({ tops, detent, onDetent, className, children, label, onDismiss, modal }: Props<D>, ref: React.Ref<DetentSheetHandle>) {
+function DetentSheetInner<D extends string>({ tops, detent, onDetent, className, children, label, onDismiss, modal, y: yExt, onSettle }: Props<D>, ref: React.Ref<DetentSheetHandle>) {
   const el = useRef<HTMLDivElement>(null);
   const [h, setH] = useState(0);
-  const y = useMotionValue(10000);
+  const yOwn = useMotionValue(10000);
+  const y = yExt ?? yOwn;
+  const settleRef = useRef(onSettle);
+  const lastVelocity = useRef(0);
+  settleRef.current = onSettle;
   const topsRef = useRef(tops);
   topsRef.current = tops;
   const state = useRef({ detent, onDetent, onDismiss, h });
@@ -53,7 +62,12 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
     // entra dal basso. jump e non set: set darebbe al valore la velocità del salto 10000 → h e la molla partirebbe
     // con quella velocità (lo sheet volava fuori dallo schermo per un istante aprendo la scheda dalla lista)
     if (y.get() === 10000) y.jump(h);
-    animate(y, tops(h)[detent], reduce() ? { duration: 0 } : SPRING);
+    const target = tops(h)[detent];
+    if (Math.abs(y.get() - target) < 0.5) { settleRef.current?.(detent); return; }
+    const v = lastVelocity.current; lastVelocity.current = 0;
+    const a = animate(y, target, reduce() ? { duration: 0 } : { ...SPRING, velocity: v });
+    a.then(() => settleRef.current?.(detent));
+    return () => a.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detent, h]);
 
@@ -126,7 +140,9 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
       }
       const keys = Object.keys(t) as D[];
       const best = keys.reduce((a, b) => (Math.abs(t[b] - projected) < Math.abs(t[a] - projected) ? b : a));
-      if (best === state.current.detent) animate(y, t[best], { ...SPRING, velocity: s.v });
+      // la molla parte dalla velocità del dito anche quando cambia altezza (prima la riprendeva solo restando ferma)
+      lastVelocity.current = s.v;
+      if (best === state.current.detent) animate(y, t[best], { ...SPRING, velocity: s.v }).then(() => settleRef.current?.(best));
       else state.current.onDetent(best);
     };
 

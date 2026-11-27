@@ -1,3 +1,4 @@
+import { SectionBar, useLargeTitleFade } from '../ui/SectionBar';
 import { balance, upcoming, useBookings } from '../state/bookings';
 import { whenShort } from './BookingsScreen';
 import { fmtPoints } from '../data/data';
@@ -9,8 +10,6 @@ import { AnimatePresence } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useNav } from '../app/nav';
 import { store, useAppState } from '../state/bookings';
-import { ScrollEdge } from '../ui/ScrollEdge';
-import { useScreenScroll } from '../app/useScreenScroll';
 import { ScreenOverlay } from '../app/ScreenOverlay';
 import { openDemo } from '../app/DemoPanel';
 import './HomeScreen.css';
@@ -39,19 +38,13 @@ export function HomeScreen() {
   void activities;
   // Comportamenti §4: il titolo grande scorre via; quando è sparito compaiono il titolo piccolo
   // centrato e il bordo sfocato in alto (alto 106, quanto la riga d'intestazione). L'avatar resta fisso.
-  const y = useScreenScroll();
-  const scrolled = y > 40;
+  // Q70: in cima "Ciao, Marco" grande; scorrendo si dissolve e compare "Home" piccolo al centro (il nome del posto).
+  const fade = useLargeTitleFade();
   return (
     <div className="home">
-      <ScreenOverlay>
-        <div className={`home__bar${scrolled ? ' is-scrolled' : ''}`}>
-          <ScrollEdge position="top" height={106} />
-          <span className="home__bar-title t-headline" aria-hidden={!scrolled}>Ciao, {user.name}</span>
-          <span className="home__bar-avatar"><Avatar initial={user.initial} label="Profilo" onLongPress={openDemo} onPress={() => navigate('/profilo')} /></span>
-        </div>
-      </ScreenOverlay>
+      <SectionBar small="Home" right={<Avatar initial={user.initial} label="Profilo" onLongPress={openDemo} onPress={() => navigate('/profilo')} />} />
       <header className="home__header">
-        <h1 className="t-large-title">Ciao, {user.name}</h1>
+        <h1 className="t-large-title" data-large-title style={{ opacity: fade }}>Ciao, {user.name}</h1>
       </header>
 
       <MissionCard state={mission} onPress={() => setSheet('streak')} onConnect={() => setSheet('health')} />

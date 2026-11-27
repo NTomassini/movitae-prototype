@@ -1,5 +1,5 @@
 import { useRef, useState, type ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { motion, useMotionValue, useTransform } from 'motion/react';
 import { DetentSheet, type DetentSheetHandle } from './DetentSheet';
 import { ScreenOverlay } from '../app/ScreenOverlay';
 import { Icon } from './Icon';
@@ -18,11 +18,17 @@ export function ModalSheet({ visible, label, onClose, children, closeButton = tr
     if (!down) await sheet.current?.dismiss();
     onClose();
   };
+  // Q76: il velo segue la posizione dello sheet (entrata, trascinamento, uscita), invece di una dissolvenza a tempo
+  const y = useMotionValue(10000);
+  const scrim = useTransform(y, (v) => {
+    const h = document.querySelector<HTMLElement>('.device')?.clientHeight ?? 874;
+    return Math.min(Math.max(1 - (v - (h - visible)) / visible, 0), 1);
+  });
   // reso fuori dalla pagina che scorre, dentro la cornice: così l'altezza è quella dello schermo
   return (
     <ScreenOverlay>
-      <motion.div className="modal-scrim" initial={{ opacity: 0 }} animate={{ opacity: closing ? 0 : 1 }} transition={{ duration: 0.25 }} onClick={() => close()} />
-      <DetentSheet ref={sheet} className="modal-sheet" tops={(h) => ({ open: h - visible })} detent="open" onDetent={() => {}} label={label} onDismiss={() => close(true)} modal>
+      <motion.div className="modal-scrim" style={{ opacity: scrim }} onClick={() => close()} />
+      <DetentSheet ref={sheet} y={y} className="modal-sheet" tops={(h) => ({ open: h - visible })} detent="open" onDetent={() => {}} label={label} onDismiss={() => close(true)} modal>
         <span className="modal-sheet__grabber" aria-hidden="true" />
         {closeButton && <button className="circle-button modal-sheet__close pressable" aria-label="Chiudi" onClick={() => close()}><Icon name="UI/Close" size={22} /></button>}
         {children(() => close())}

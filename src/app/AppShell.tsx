@@ -54,6 +54,7 @@ function Device() {
     lastPath = pathname;
     settle(); // la pagina nuova è sullo schermo: la transizione può partire
   }, [pathname]);
+  useTitleSnap();
   const { search } = useLocation();
   const device = useRef<HTMLDivElement>(null);
   useEdgeBack(device, pathname + search, navigate);
@@ -136,4 +137,42 @@ function useEdgeBack(ref: React.RefObject<HTMLDivElement | null>, here: string, 
       el.removeEventListener('mousedown', md); window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu);
     };
   }, [ref]);
+}
+
+/**
+ * Q71 (27 nov): come iOS, il titolo grande non resta a metà. Quando lo scorrimento si ferma (dito alzato e inerzia
+ * finita) dentro la fascia in cui il titolo grande si riduce (0–52 pt), la pagina finisce il movimento: torna in cima
+ * se era più vicina all'inizio, altrimenti arriva al titolo piccolo. Solo nelle pagine con un titolo grande.
+ */
+const SNAP = 52;
+function useTitleSnap() {
+  useEffect(() => {
+    const el = document.getElementById('screen');
+    if (!el) return;
+    let touching = false;
+    let t = 0;
+    const check = () => {
+      if (touching || !el.querySelector('[data-large-title]')) return;
+      const y = el.scrollTop;
+      if (el.scrollHeight - el.clientHeight < SNAP) return; // pagina troppo corta per ridurre il titolo
+      if (y > 0.5 && y < SNAP - 0.5) {
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el.scrollTo({ top: y < SNAP / 2 ? 0 : SNAP, behavior: reduce ? 'auto' : 'smooth' });
+      }
+    };
+    const schedule = () => { clearTimeout(t); t = window.setTimeout(check, 140); };
+    const ts = () => { touching = true; clearTimeout(t); };
+    const te = () => { touching = false; schedule(); };
+    el.addEventListener('scroll', schedule, { passive: true });
+    el.addEventListener('touchstart', ts, { passive: true });
+    el.addEventListener('touchend', te);
+    el.addEventListener('touchcancel', te);
+    return () => {
+      clearTimeout(t);
+      el.removeEventListener('scroll', schedule);
+      el.removeEventListener('touchstart', ts);
+      el.removeEventListener('touchend', te);
+      el.removeEventListener('touchcancel', te);
+    };
+  }, []);
 }
