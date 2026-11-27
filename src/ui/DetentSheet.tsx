@@ -75,8 +75,8 @@ function DetentSheetInner<D extends string>({ tops, detent, onDetent, className,
     };
     const start = (clientY: number, target: EventTarget | null) => {
       const t = target as HTMLElement;
+      lastWasDrag = false; // prima del controllo: un tocco su un pulsante dopo un trascinamento non va ignorato
       if (t.closest('[data-nodrag]')) return;
-      lastWasDrag = false;
       g = { y0: clientY, sheetY0: y.get(), last: clientY, t: performance.now(), v: 0, live: false, scroller: t.closest('[data-scroll]'), dead: false };
     };
     // true = il gesto è dello sheet (e va fermato lo scorrimento nativo)

@@ -100,11 +100,11 @@ export function FavoritesScreen() {
           })}
         </ListGroup>
       ) : (
-        <div className="empty-state">
+        <div className="empty-state empty-state--fav">
           <Icon name="UI/Favorite" size={48} />
           <h2 className="t-title-3">Nessun preferito</h2>
           <p className="t-body secondary">Tocca il cuore su un’attività per ritrovarla qui.</p>
-          <Button onPress={() => navigate('/scopri')}>Trova un’attività</Button>
+          <Button onPress={() => navigate('/scopri', { state: { list: true } })}>Trova un’attività</Button>
         </div>
       )}
     </div>
@@ -122,6 +122,7 @@ export function SettingsScreen() {
   const leave = (wipe: boolean) => {
     // Q43: fuori dall'app → intro dell'onboarding; "Accedi" riporta dentro come Marco
     if (wipe) { store.reset(); chat.reset(); }
+    store.setOnboarded(false); // Q58: alla prossima apertura riparte dall'onboarding
     navigate('/onboarding/intro', { replace: true });
   };
   return (

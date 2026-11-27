@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
+import { useAppState } from '../state/bookings';
 import { Splash } from './Splash';
 import { settle, startEdgeBack } from './nav';
 import { TabBar } from '../ui/TabBar';
@@ -21,12 +22,17 @@ export function AppShell() {
   );
 }
 
+// Indirizzo precedente: durante il render della pagina nuova vale ancora quello da cui arrivi (Scopri lo usa, Q55).
+let lastPath = '/';
+export const previousPath = () => lastPath;
+
 // Ogni sezione ricorda dove l'avevi lasciata (come le tab di iOS); una pagina nuova parte dall'alto.
 const scrollMemory = new Map<string, number>();
 
 function Device() {
   const chrome = useChrome();
   const { pathname } = useLocation();
+  const onboarded = useAppState().onboarded;
   const prev = useRef(pathname);
   const navigate = useNavigate();
   const navType = useNavigationType();
@@ -45,6 +51,7 @@ function Device() {
     const restore = navType === 'POP' || isTab || (history.state?.usr as { restore?: boolean } | null)?.restore;
     el.scrollTop = restore ? scrollMemory.get(pathname) ?? 0 : 0;
     prev.current = pathname;
+    lastPath = pathname;
     settle(); // la pagina nuova è sullo schermo: la transizione può partire
   }, [pathname]);
   const { search } = useLocation();
@@ -56,7 +63,8 @@ function Device() {
         {/* pagina + livelli fissi in un solo strato: nel passaggio tra le pagine si muovono insieme (Q48) */}
         <div className="page-layer">
           <main className={`screen${chrome.pageScroll ? '' : ' screen--fixed'}`} id="screen">
-            <Outlet />
+            {/* Q58: finché non hai fatto accesso (o finito l'onboarding) l'app parte dall'intro */}
+            {!onboarded && !pathname.startsWith('/onboarding') ? <Navigate to="/onboarding/intro" replace /> : <Outlet />}
           </main>
           <div id="overlay" />
         </div>

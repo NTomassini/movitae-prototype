@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { previousPath } from '../app/AppShell';
 import { useNav } from '../app/nav';
 import { AnimatePresence, motion } from 'motion/react';
 import { Icon } from '../ui/Icon';
@@ -21,11 +22,14 @@ import type { Sport } from '../data/data';
 
 // I filtri restano mentre apri e chiudi la scheda di una struttura (la schermata si rimonta).
 let kept: Filters = NO_FILTERS;
+let keptDetent: Detent = 'hidden';
 
 // Scopri — DS · Schermate › "scopri — chiaro" (1461:1083) e sheet piccolo / medio / grande.
 // Posizione negata: mappa su Roma centro, senza punto blu (scopri/posizione-negata).
 const ROMA_CENTRO = { lat: 41.8955, lng: 12.4823 };
 const priceLabel = (a: Activity) => (a.pricePerPerson ? `${euro(a.price)} · ${euro(a.pricePerPerson)} a persona` : euro(a.price));
+
+const activityIdAtMount = () => /^\/scopri\/[^/]+/.test(location.pathname);
 
 export function ScopriScreen() {
   const [params] = useSearchParams();
@@ -36,7 +40,17 @@ export function ScopriScreen() {
   const [panel, setPanel] = useState(false);
   const [search, setSearch] = useState(false);
   const nFilters = countFilters(filters);
-  const [detent, setDetent] = useState<Detent>('small');
+  // Q55: dal tab (o da un link senza motivo) Scopri parte con la lista nascosta e "Mostra la lista · N".
+  // Con un motivo (sport dalla Home, buono attivo, "Vedi tutte", "Trova un'attività") apre a media altezza.
+  // Tornando dalla scheda o dalla conferma la lista resta com'era.
+  const { state: navState } = useLocation();
+  const voucherAtStart = useAppState().voucherActive;
+  const [detent, setDetentState] = useState<Detent>(() => {
+    const from = previousPath();
+    if (activityIdAtMount() || from.startsWith('/scopri/') || from.startsWith('/prenotato')) return keptDetent;
+    return (keptDetent = sport || voucherAtStart || (navState as { list?: boolean } | null)?.list ? 'medium' : 'hidden');
+  });
+  const setDetent = useCallback((d: Detent | ((p: Detent) => Detent)) => setDetentState((p) => (keptDetent = typeof d === 'function' ? d(p) : d)), []);
   const [selected, setSelected] = useState<string | null>(() => kept.venue);
   const demo = useDemo();
   const voucherActive = useAppState().voucherActive;
@@ -62,7 +76,8 @@ export function ScopriScreen() {
   const noResults = !filtered.length && !showOffline && !loading;
   useEffect(() => { if (noResults) setDetent('medium'); }, [noResults]);
   // Tab bar visibile solo con lo sheet piccolo, senza scheda, ricerca o "nessun risultato"; la pagina non scorre.
-  useScreenChrome({ tabBar: (detent === 'small' || detent === 'hidden') && !activityId && !showOffline && !search && !noResults, bottomEdge: false, pageScroll: false });
+  // Q55: la tab bar c'è solo con la lista nascosta; appena lo sheet è visibile (anche piccolo) sparisce.
+  useScreenChrome({ tabBar: detent === 'hidden' && !activityId && !showOffline && !search && !noResults, bottomEdge: false, pageScroll: false });
 
   const pins: MapPinData[] = useMemo(() => venues
     .map((v) => {
@@ -134,6 +149,8 @@ export function ScopriScreen() {
       </AnimatePresence>
       <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={detent}
         action={nFilters > 0 && !panel && !showOffline && !loading ? <button className="list-sheet__clear t-subheadline-emphasized" onClick={() => { setFilters(NO_FILTERS); setDetent('small'); }}>Cancella tutto</button> : undefined}
+        fit={!showOffline && !loading && !noResults}
+        onClose={showOffline || loading || noResults ? undefined : () => setDetent('hidden')}
         onDetent={showOffline || loading ? () => {} : setDetent}>
         {noResults ? (
           <div className="no-results">

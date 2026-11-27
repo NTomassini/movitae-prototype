@@ -19,6 +19,8 @@ img { -webkit-user-drag: none; }
    dei livelli fissi dopo la tastiera nell'app installata (WebKit 237961, iOS 26 visualViewport). */
 @media not ((min-width: 600px) and (pointer: fine)) {
   html, body { position: fixed; inset: 0; overflow: hidden; }
+  /* app installata: altezza vera dello schermo (vedi src/app/viewport.ts) */
+  html[data-standalone], html[data-standalone] body { bottom: auto; height: var(--app-h, 100dvh); }
 }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }

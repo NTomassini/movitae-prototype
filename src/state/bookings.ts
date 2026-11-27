@@ -32,7 +32,10 @@ export type Settings = { notifs: Record<string, boolean>; missionTime: string; n
 export type Profile = { name: string; sports: string[]; goal: number; health: boolean };
 export type AppState = { favSports: string[] | null; profile: Profile | null; docs: Docs; settings: Settings; bookings: Booking[]; favorites: string[]; onboarded: boolean; voucherActive: boolean; celebrated: string | null; demo: Demo };
 
-const KEY = 'movitae-prototipo-v1';
+// v2 (Q58, 27 nov): l'app parte dall'onboarding finché non hai fatto accesso; la chiave nuova fa ripartire tutti da lì.
+const KEY = 'movitae-prototipo-v2';
+// nei test automatici (webdriver) si entra già dentro come Marco, a meno di ?fresh nell'indirizzo
+const signedInByDefault = typeof navigator !== 'undefined' && navigator.webdriver && !new URLSearchParams(location.search).has('fresh');
 export const initialDemo: Demo = { mission: 'active', location: 'granted', network: 'online', payment: 'ok', soldOut: false, clock: 'before', emailCode: 'ok', iosNotifications: 'on' };
 const initialSettings = (): Settings => ({ notifs: Object.fromEntries(NOTIFS.map((n) => [n, n !== 'Pausa usata'])), missionTime: '08:00', nextGoal: null, exportRequested: false });
 // Prenotazioni di Marco all'avvio (prenotazioni/1 e /2 in Figma)
@@ -44,7 +47,7 @@ const seedBookings: Booking[] = [
   { id: 's-pilates', activityId: 'pilates-base', dayId: 'past', time: '18:00', voucher: false, paid: 18, points: 180, status: 'cancelled', refunded: true, seed: true, pastLabel: 'Ven 6 nov, 18:00' },
   { id: 's-palestra', activityId: 'palestra', dayId: 'past', time: '08:00', voucher: false, paid: 12, points: 120, status: 'checked-in', seed: true, pastLabel: 'Lun 2 nov, 08:00' },
 ];
-const initial = (): AppState => ({ favSports: null, profile: null, docs: { certificate: null, forms: {} }, settings: initialSettings(), bookings: seedBookings.map((b) => ({ ...b })), favorites: [], onboarded: true, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
+const initial = (): AppState => ({ favSports: null, profile: null, docs: { certificate: null, forms: {} }, settings: initialSettings(), bookings: seedBookings.map((b) => ({ ...b })), favorites: [], onboarded: signedInByDefault, voucherActive: false, celebrated: null, demo: { ...initialDemo } });
 
 const load = (): AppState => {
   try {

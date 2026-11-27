@@ -2,6 +2,7 @@ import { chat } from '../state/movi';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { initialDemo, store, upcoming, useDemo, type Demo } from '../state/bookings';
+import { viewportReport } from './viewport';
 import './demo.css';
 
 /**
@@ -42,6 +43,7 @@ export function DemoPanel() {
               <button className="t-headline" onClick={() => setOpen(false)}>Fine</button>
             </div>
             <p className="t-footnote secondary">Strumento per prove e video, non fa parte dell'app.</p>
+            <ViewportLine />
             {groups.map((g) => (
               <div key={g.key} className="demo-panel__group">
                 <span className="t-footnote-emphasized secondary">{g.label}</span>
@@ -71,5 +73,16 @@ export function DemoPanel() {
         </>
       )}
     </AnimatePresence>
+  );
+}
+
+/** Riga di controllo dello schermo (Q54): in app installata "cornice" deve essere uguale a "schermo". */
+function ViewportLine() {
+  const r = viewportReport();
+  const ok = !r.standalone || r.device >= r.screen;
+  return (
+    <p className="t-footnote demo-viewport" style={{ color: ok ? 'var(--earn-default)' : 'var(--feedback-error)' }}>
+      {r.standalone ? 'App installata' : 'Browser'} · schermo {r.screen} · cornice {r.device} · finestra {r.inner} · dvh {r.dvh} · area sicura {r.top}/{r.bottom}
+    </p>
   );
 }

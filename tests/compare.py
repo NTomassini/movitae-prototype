@@ -40,24 +40,28 @@ def go_premi_scuro(pg): reset(pg); pg.goto(f'{URL}/premi?theme=dark')
 def go_arrivarci(pg): go_premi(pg); pg.wait_for_timeout(500); pg.locator('.voucher-row').nth(1).click(); pg.wait_for_timeout(900)
 def go_sheet_buono(pg): go_premi(pg); pg.wait_for_timeout(500); pg.locator('.use-button').click(); pg.wait_for_timeout(900)
 def go_scopri_buono(pg): go_sheet_buono(pg); pg.get_by_role('button', name="Trova un'attività").click(); pg.wait_for_timeout(1500)
+def go_lista_corta(pg):
+    # Q57: filtro Padel (3 attività), lista tirata al massimo: si ferma al contenuto
+    pg.goto(f'{URL}/'); pg.evaluate('localStorage.clear()'); pg.goto(f'{URL}/scopri?sport=padel&theme=light'); pg.wait_for_timeout(1200)
+    pg.locator('.list-sheet__grabber').click(); pg.wait_for_timeout(900)
 def go_dettaglio(pg): reset(pg); pg.goto(f'{URL}/premi/traguardi?t=serie-30&theme=light'); pg.wait_for_timeout(900)
 
 def demo(pg, mission, path='/'):
-    pg.goto(f'{URL}/'); pg.evaluate("m => { localStorage.clear(); localStorage.setItem('movitae-prototipo-v1', JSON.stringify({demo:{mission:m,location:'granted',network:'online',payment:'ok',soldOut:false}, celebrated: m.startsWith('completed') ? m : null})) }", mission)
+    pg.goto(f'{URL}/'); pg.evaluate("m => { localStorage.clear(); localStorage.setItem('movitae-prototipo-v2', JSON.stringify({demo:{mission:m,location:'granted',network:'online',payment:'ok',soldOut:false}, celebrated: m.startsWith('completed') ? m : null})) }", mission)
     pg.goto(f'{URL}{path}'); pg.wait_for_timeout(1200)
 def go_primo(pg): demo(pg, 'first-day')
 def go_senza_salute(pg): demo(pg, 'no-health')
 def go_completata(pg): demo(pg, 'completed')
 def go_sheet_serie(pg): demo(pg, 'active'); pg.locator('.mission-card').click(); pg.wait_for_timeout(900)
 def go_celebrazione(pg):
-    demo(pg, 'active'); pg.evaluate("() => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v1')); s.demo.mission='completed'; s.celebrated=null; localStorage.setItem('movitae-prototipo-v1', JSON.stringify(s)) }"); pg.goto(f'{URL}/'); pg.wait_for_timeout(2200)
+    demo(pg, 'active'); pg.evaluate("() => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v2')); s.demo.mission='completed'; s.celebrated=null; localStorage.setItem('movitae-prototipo-v2', JSON.stringify(s)) }"); pg.goto(f'{URL}/'); pg.wait_for_timeout(2200)
 def go_celebrazione7(pg):
-    demo(pg, 'active'); pg.evaluate("() => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v1')); s.demo.mission='completed-7'; s.celebrated=null; localStorage.setItem('movitae-prototipo-v1', JSON.stringify(s)) }"); pg.goto(f'{URL}/'); pg.wait_for_timeout(2200)
+    demo(pg, 'active'); pg.evaluate("() => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v2')); s.demo.mission='completed-7'; s.celebrated=null; localStorage.setItem('movitae-prototipo-v2', JSON.stringify(s)) }"); pg.goto(f'{URL}/'); pg.wait_for_timeout(2200)
 def go_spiegazione(pg): demo(pg, 'no-health'); pg.locator('.mission-card__connect').click(); pg.wait_for_timeout(900)
 
 def state(pg, path, patch_js='s=>s'):
     pg.goto(f'{URL}/'); pg.evaluate('localStorage.clear()'); pg.goto(f'{URL}/'); pg.wait_for_timeout(300)
-    pg.evaluate("p => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v1') || '{}'); const f = eval(p); localStorage.setItem('movitae-prototipo-v1', JSON.stringify(f(s))) }", patch_js)
+    pg.evaluate("p => { const s = JSON.parse(localStorage.getItem('movitae-prototipo-v2') || '{}'); const f = eval(p); localStorage.setItem('movitae-prototipo-v2', JSON.stringify(f(s))) }", patch_js)
     pg.goto(f'{URL}{path}'); pg.wait_for_timeout(1000)
 def go_pren_arrivo(pg): state(pg, '/prenotazioni')
 def go_pren_passate(pg): state(pg, '/prenotazioni?tab=passate')
@@ -106,7 +110,7 @@ def go_onb_sport(pg):
 def go_onb_avviso(pg): onb(pg, 'posizione'); pg.locator('.onb__cta').click(); pg.wait_for_timeout(700)
 def go_onb_quanto(pg): onb(pg, 'quanto'); pg.get_by_role('radio', name='Abbastanza').evaluate('el => el.click()'); pg.evaluate("document.querySelector('.onb').scrollTop = 0")
 def go_onb_codice_errato(pg):
-    onb(pg, 'codice', "localStorage.setItem('movitae-prototipo-v1', JSON.stringify({demo:{emailCode:'wrong'}})); sessionStorage.setItem('movitae-onboarding', JSON.stringify({email:'marco.rossi@icloud.com'}))")
+    onb(pg, 'codice', "localStorage.setItem('movitae-prototipo-v2', JSON.stringify({demo:{emailCode:'wrong'}})); sessionStorage.setItem('movitae-onboarding', JSON.stringify({email:'marco.rossi@icloud.com'}))")
     pg.get_by_label('Codice').fill('482913'); pg.locator('.onb__cta').click(); pg.wait_for_timeout(300)
 def go_onb_benvenuto(pg): onb(pg, 'benvenuto', "sessionStorage.setItem('movitae-onboarding', JSON.stringify({name:'Marco', health:true}))")
 def go_onb_benvenuto_senza(pg): onb(pg, 'benvenuto', "sessionStorage.setItem('movitae-onboarding', JSON.stringify({name:'Marco', health:false}))")
@@ -175,6 +179,7 @@ SCREENS = [
     ('come-arrivarci', go_arrivarci, [(0, 0, 402, 246)]),
     ('sheet-buono', go_sheet_buono, [(0, 0, 402, 470)]),
     ('scopri-buono', go_scopri_buono, [(0, 160, 402, 650)]),
+    ('scopri-lista-corta', go_lista_corta, [(0, 160, 402, 500)]),  # mappa (in Figma 6 pin)
     ('dettaglio-traguardo', go_dettaglio, [(0, 0, 402, 523)]),
     ('home-primo-giorno', go_primo, []),
     ('home-senza-salute', go_senza_salute, []),

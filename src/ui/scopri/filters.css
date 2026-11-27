@@ -44,8 +44,10 @@
 
 /* ---- nessun risultato (errori/5) ---- */
 .no-results { display: flex; flex-direction: column; gap: 16px; }
-.list-sheet__title-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0 16px 20px; margin-top: -4px; }
-.list-sheet__title-row .list-sheet__title { padding: 0; margin: 0; }
+.list-sheet__title-row { flex: none; display: flex; align-items: center; gap: 12px; padding: 0 16px 20px; margin-top: -4px; }
+.list-sheet__title-row .list-sheet__title { padding: 0; margin: 0; flex: 1; min-width: 0; }
+/* Q56: x per nascondere la lista (36, grigia); margini negativi così la riga resta alta come il titolo (28) */
+.list-sheet__close { flex: none; margin: -4px 0; }
 .list-sheet__clear { color: var(--text-primary); }
 .search-bar > button { flex: none; color: var(--text-primary); }
 .search-clear { flex: none; width: 20px; height: 20px; border-radius: 10px; background: var(--text-tertiary); color: var(--bg-surface); display: grid; place-items: center; }

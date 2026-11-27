@@ -48,7 +48,7 @@ export function BookingsScreen() {
           <Icon name="UI/Calendar" size={48} />
           <h2 className="t-title-2" style={{ marginTop: 16 }}>{tab === 'arrivo' ? 'Nessuna prenotazione in arrivo' : 'Nessuna prenotazione passata'}</h2>
           <p className="t-body secondary">{tab === 'arrivo' ? "Quando prenoti un'attività la trovi qui, con il QR per l'ingresso." : 'Qui trovi le attività a cui sei andato e quelle disdette.'}</p>
-          {tab === 'arrivo' && <div style={{ marginTop: 16 }}><Button onPress={() => navigate('/scopri')}>Trova un'attività</Button></div>}
+          {tab === 'arrivo' && <div style={{ marginTop: 16 }}><Button onPress={() => navigate('/scopri', { state: { list: true } })}>Trova un'attività</Button></div>}
         </div>
       ) : (
         <div className="card booking-list">

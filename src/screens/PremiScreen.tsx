@@ -87,7 +87,7 @@ export function PremiScreen() {
                 <h2 className="t-title-1">Buono da €5</h2>
                 <p className="t-body secondary">Vale su qualsiasi prenotazione. I 2.500 pt si scalano quando paghi.</p>
                 <div style={{ height: 8 }} />
-                <Button onPress={() => { store.setVoucherActive(true); close(); setTimeout(() => navigate('/scopri'), 250); }}>Trova un'attività</Button>
+                <Button onPress={() => { store.setVoucherActive(true); close(); setTimeout(() => navigate('/scopri', { state: { list: true } }), 250); }}>Trova un'attività</Button>
                 <button className="t-headline voucher-sheet__later" onClick={close}>Non ora</button>
               </div>
             )}
@@ -112,7 +112,7 @@ export function PremiScreen() {
                     <div className="way"><span className="t-body">Tieni viva la serie</span><span className="t-subheadline-emphasized earn">+10 / +25 / +100 pt</span></div>
                   </div>
                   <div style={{ alignSelf: 'center', marginTop: 24 }}>
-                    <Button onPress={() => { close(); setTimeout(() => navigate('/scopri'), 250); }}>Trova un'attività</Button>
+                    <Button onPress={() => { close(); setTimeout(() => navigate('/scopri', { state: { list: true } }), 250); }}>Trova un'attività</Button>
                   </div>
                 </div>
               )}

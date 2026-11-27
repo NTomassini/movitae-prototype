@@ -8,7 +8,7 @@
 
 .device {
   position: relative;
-  height: 100dvh;
+  height: var(--app-h, 100dvh);
   overflow: clip; /* clip: nessuno scorrimento nascosto (il focus non può spostare la cornice) */
   background: var(--bg-default);
 }
@@ -67,6 +67,9 @@
 /* Splash (onboarding/0): sopra tutto tranne la barra di stato, che diventa bianca */
 .splash { position: absolute; inset: 0; z-index: 29; background: var(--brand-default); display: grid; place-items: center; }
 .device.is-splash .device-status { color: #fff; }
+/* barra di caricamento: 120×4 a 32 sotto il logo (alto 119, centrato), traccia bianca al 30% */
+.splash__bar { position: absolute; left: 50%; top: calc(50% + 59.5px + 32px); width: 120px; height: 4px; margin-left: -60px; border-radius: 2px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
+.splash__bar i { position: absolute; inset: 0; border-radius: 2px; background: #fff; transform-origin: left center; }
 
 /* ---- Passaggio tra le pagine (Q48): View Transitions. Si muovono pagina e intestazione; tab bar e barra di stato restano ferme. ---- */
 .page-layer { position: absolute; inset: 0; }
