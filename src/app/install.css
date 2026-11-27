@@ -1,0 +1,21 @@
+/* Schermata "Aggiungi alla Home" (installa/iphone, installa/computer), Q84. Misure come l'onboarding:
+   oggetto a y 116, titolo 28/36 centrato, testo 17 grigio, pulsante in fondo a 16 dai bordi. */
+.install { position: absolute; inset: 0; z-index: 29; background: var(--bg-default); padding-top: var(--device-top); overflow-y: auto; display: flex; flex-direction: column; }
+.install__body { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 54px 16px 140px; gap: 12px; }
+.install__icon { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); margin-bottom: 12px; }
+.install__body h1 { color: var(--text-primary); }
+.install__body > p { max-width: 340px; }
+.install__steps { list-style: none; margin: 20px 0 0; padding: 0 16px; width: 100%; background: var(--bg-surface); border-radius: 24px; text-align: left; }
+.install__step { position: relative; display: flex; align-items: center; gap: 12px; padding: 14px 0; color: var(--text-primary); }
+/* separatore che parte dal testo, come nelle liste */
+.install__step + .install__step::before { content: ''; position: absolute; top: 0; left: 40px; right: 0; height: 1px; background: var(--border-separator); }
+.install__step p { flex: 1 1 auto; margin: 0; }
+.install__step b { font-weight: 600; }
+.install__n { flex: none; width: 28px; height: 28px; border-radius: 14px; display: grid; place-items: center; background: var(--brand-default); color: var(--brand-on); }
+.install__glyph { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--fill-tertiary); color: var(--brand-accent); }
+.install__note { margin-top: 4px; }
+.install__qr { margin-top: 20px; padding: 20px; background: #fff; border-radius: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: var(--effect-glass-control); }
+.install__qr [role="img"], .install__qr svg { display: block; width: 200px; height: 200px; }
+.install__qr .secondary { color: #696b73; }
+.install__cta { position: absolute; left: 16px; right: 16px; bottom: calc(var(--safe-bottom-live) + 4px); display: flex; flex-direction: column; gap: 8px; }
+.install__cta .button { width: 100%; }

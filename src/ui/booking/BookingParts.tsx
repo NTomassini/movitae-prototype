@@ -51,10 +51,10 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
 }
 
 /** QR vero (codice della prenotazione), disegnato come SVG. */
-export function QR({ value }: { value: string }) {
+export function QR({ value, label = 'Codice QR della prenotazione' }: { value: string; label?: string }) {
   const [svg, setSvg] = useState('');
   useEffect(() => { QRCode.toString(value, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#000000', light: '#ffffff' } }).then(setSvg); }, [value]);
-  return <span role="img" aria-label="Codice QR della prenotazione" dangerouslySetInnerHTML={{ __html: svg }} />;
+  return <span role="img" aria-label={label} dangerouslySetInnerHTML={{ __html: svg }} />;
 }
 
 /** Evento per il calendario (Q50): file .ics vero; su iPhone si apre "Aggiungi a Calendario". */

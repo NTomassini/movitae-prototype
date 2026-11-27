@@ -78,6 +78,8 @@ export function ScopriScreen() {
   // Tab bar visibile solo con lo sheet piccolo, senza scheda, ricerca o "nessun risultato"; la pagina non scorre.
   // Q55: la tab bar c'è solo con la lista nascosta; appena lo sheet è visibile (anche piccolo) sparisce.
   // Q76: tra "nascosta" e "piccola" la tab bar scende seguendo lo sheet (anche col dito), invece di una transizione fissa.
+  // Q82: con la scheda aperta la lista scende fuori dallo schermo (resta montata, con il suo scorrimento) e la scheda
+  // prende il suo posto, come in Mappe; chiusa la scheda la lista risale all'altezza di prima (detent non cambia).
   const tabBarOn = !activityId && !showOffline && !search && !noResults;
   useScreenChrome({ tabBar: tabBarOn, bottomEdge: false, pageScroll: false });
   const tabBarOnRef = useRef(tabBarOn);
@@ -162,12 +164,12 @@ export function ScopriScreen() {
           </motion.button>
         )}
       </AnimatePresence>
-      <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={detent}
+      <ListSheet title={showOffline ? null : loading ? 'Cerco attività vicino a te…' : noResults ? 'Nessuna attività' : title} muted={loading} detent={activityId ? 'hidden' : detent}
         action={nFilters > 0 && !panel && !showOffline && !loading ? <button className="list-sheet__clear t-subheadline-emphasized" onClick={() => { setFilters(NO_FILTERS); setDetent('small'); }}>Cancella tutto</button> : undefined}
         fit={!showOffline && !loading && !noResults}
         onTabBar={driveTabBar}
         onClose={showOffline || loading || noResults ? undefined : () => setDetent('hidden')}
-        onDetent={showOffline || loading ? () => {} : setDetent}>
+        onDetent={showOffline || loading || activityId ? () => {} : setDetent}>
         {noResults ? (
           <div className="no-results">
             <p className="t-subheadline secondary">Con questi filtri non c’è niente qui vicino. Prova così:</p>

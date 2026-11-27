@@ -2,6 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { Navigate, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import { useAppState } from '../state/bookings';
 import { Splash } from './Splash';
+import { InstallScreen, shouldShowInstall } from './InstallScreen';
+import { AnimatePresence } from 'motion/react';
 import { settle, startEdgeBack } from './nav';
 import { TabBar } from '../ui/TabBar';
 import { ScrollEdge } from '../ui/ScrollEdge';
@@ -39,6 +41,8 @@ function Device() {
   // iOS 26: dopo la tastiera la finestra può restare spostata; si rimette a posto quando il campo perde il focus
   useEffect(() => { const f = () => setTimeout(() => window.scrollTo(0, 0), 50); window.addEventListener('focusout', f); return () => window.removeEventListener('focusout', f); }, []);
   const [splash, setSplash] = useState(false);
+  // Q83: nel browser, prima dello splash, la schermata che invita ad aggiungere il prototipo alla Home
+  const [install, setInstall] = useState(shouldShowInstall);
   const onSplash = useCallback((v: boolean) => setSplash(v), []);
   // Q36 B: l'onboarding si apre solo con ?onboarding nell'indirizzo (o dal pannello demo)
   useEffect(() => { if (new URLSearchParams(location.search).has('onboarding')) navigate('/onboarding/intro', { replace: true }); }, [navigate]);
@@ -73,7 +77,8 @@ function Device() {
         <TabBar hidden={!chrome.tabBar} />
         <StatusBar />
         <HomeIndicator />
-        <Splash onVisible={onSplash} />
+        <AnimatePresence>{install && <InstallScreen key="install" onContinue={() => setInstall(false)} />}</AnimatePresence>
+        {!install && <Splash onVisible={onSplash} />}
         <DemoPanel />
       </div>
     </div>
